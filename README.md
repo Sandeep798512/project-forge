@@ -106,7 +106,7 @@ STORAGE_LOCAL_PATH=./storage/protected
 EMAIL_FROM=support@projectforge.dev
 EMAIL_API_KEY=mock_email_api_key
 
-WHATSAPP_NUMBER=919876543210
+WHATSAPP_NUMBER=918081220303
 BRAND_NAME=ProjectForge
 ```
 
