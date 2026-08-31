@@ -4,14 +4,14 @@ let mongoMemoryServer: any = null;
 
 export const connectDB = async () => {
   try {
-    const connStr = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/projectforge';
-    console.log(`[DB] Attempting connection to MongoDB at ${connStr}...`);
+    const connStr = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/projectforge';
+    console.log(`[DB] Attempting connection to MongoDB Atlas at ${connStr.replace(/:([^@]+)@/, ':****@')}...`);
 
     await mongoose.connect(connStr, {
-      serverSelectionTimeoutMS: 3000,
+      serverSelectionTimeoutMS: 8000,
     });
 
-    console.log(`[DB] Connected to MongoDB host: ${mongoose.connection.host}`);
+    console.log(`[DB SUCCESS] Connected to MongoDB Atlas host: ${mongoose.connection.host}`);
   } catch (error: any) {
     console.warn(`[DB WARNING] Could not connect to primary MongoDB instance (${error.message}).`);
     console.log(`[DB] Launching automatic MongoDB In-Memory Server fallback for local testing...`);
