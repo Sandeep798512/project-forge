@@ -1,0 +1,358 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ExternalLink, CheckCircle2, ShieldCheck, Play, ArrowLeft, Star, FileText, Database, Layers, HelpCircle, Code, ShoppingCart, MessageSquare, Download } from 'lucide-react';
+import { BRAND } from '../config/brand.config';
+import { WhatsAppButton } from '../components/common/WhatsAppButton';
+import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
+
+export const ProjectDetail: React.FC = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  const [product, setProduct] = useState<any | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [activeTab, setActiveTab] = useState<'overview' | 'architecture' | 'deliverables' | 'viva'>('overview');
+  const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const res = await api.get(`/products/${slug}`);
+        if (res.data.success) {
+          setProduct(res.data.product);
+          setRelatedProducts(res.data.relatedProducts || []);
+        }
+      } catch (err) {
+        console.error('Error loading project details', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (slug) {
+      fetchProduct();
+    }
+  }, [slug]);
+
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      navigate(`/login?redirect=/projects/${slug}`);
+      return;
+    }
+    navigate(`/checkout/${product._id}`);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background py-16 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500" />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-background py-20 text-center">
+        <h2 className="text-2xl font-bold text-white">Project Package Not Found</h2>
+        <p className="text-gray-400 text-sm mt-2">The requested project may have been updated or unlisted.</p>
+        <Link to="/projects" className="mt-4 inline-block text-sm font-semibold text-primary-400 hover:underline">
+          Back to Projects Catalog
+        </Link>
+      </div>
+    );
+  }
+
+  const allImages = [product.thumbnail, ...(product.screenshots || [])];
+
+  return (
+    <div className="py-10 bg-background min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Back Link */}
+        <Link to="/projects" className="inline-flex items-center space-x-1.5 text-xs text-gray-400 hover:text-white mb-6 font-semibold transition-colors">
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Back to Marketplace</span>
+        </Link>
+
+        {/* Main Grid: Left Details (2/3) + Right Purchase Card (1/3) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* LEFT CONTENT */}
+          <div className="lg:col-span-2 space-y-8">
+            
+            {/* Header info */}
+            <div>
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <span className="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md bg-primary-500/10 border border-primary-500/20 text-primary-400">
+                  {product.category?.name || 'Software Project'}
+                </span>
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-surface border border-border text-gray-300">
+                  Difficulty: {product.difficulty}
+                </span>
+                <span className="text-xs font-mono px-2.5 py-0.5 rounded-md bg-surface border border-border text-emerald-400">
+                  v{product.currentVersion}
+                </span>
+              </div>
+
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-snug">
+                {product.title}
+              </h1>
+
+              <p className="text-gray-300 text-sm sm:text-base mt-3 leading-relaxed">
+                {product.shortDescription}
+              </p>
+            </div>
+
+            {/* Gallery Viewer */}
+            <div className="bg-surface/80 border border-border/80 rounded-2xl overflow-hidden p-2">
+              <div className="aspect-video relative rounded-xl overflow-hidden bg-surface-hover">
+                <img
+                  src={allImages[activeImageIndex]}
+                  alt={product.title}
+                  className="w-full h-full object-cover"
+                />
+                {product.liveDemoUrl && (
+                  <a
+                    href={product.liveDemoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute top-4 right-4 bg-surface/90 hover:bg-white hover:text-gray-900 text-gray-100 px-3.5 py-2 rounded-xl text-xs font-semibold backdrop-blur-md border border-border flex items-center space-x-1.5 transition-all"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Open Live Demo</span>
+                  </a>
+                )}
+              </div>
+
+              {/* Thumbnail Strip */}
+              {allImages.length > 1 && (
+                <div className="flex items-center space-x-2 mt-2 overflow-x-auto p-1">
+                  {allImages.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveImageIndex(idx)}
+                      className={`w-20 h-12 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
+                        activeImageIndex === idx ? 'border-primary-500 scale-95' : 'border-transparent opacity-70 hover:opacity-100'
+                      }`}
+                    >
+                      <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Tech Stack Pills */}
+            <div className="bg-surface/50 border border-border/60 rounded-2xl p-5">
+              <h3 className="text-xs uppercase font-mono font-semibold tracking-wider text-gray-400 mb-3 flex items-center space-x-1.5">
+                <Code className="w-4 h-4 text-primary-400" />
+                <span>Technology Stack & Integrations</span>
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {product.techStack.map((tech: string, idx: number) => (
+                  <span
+                    key={idx}
+                    className="px-3 py-1 rounded-xl text-xs font-mono font-medium bg-background border border-border text-primary-300"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="border-b border-border/60 flex items-center space-x-4 text-sm font-semibold">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`pb-3 transition-colors border-b-2 ${
+                  activeTab === 'overview' ? 'border-primary-500 text-primary-400' : 'border-transparent text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                Overview & Features
+              </button>
+              <button
+                onClick={() => setActiveTab('deliverables')}
+                className={`pb-3 transition-colors border-b-2 ${
+                  activeTab === 'deliverables' ? 'border-primary-500 text-primary-400' : 'border-transparent text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                Package Deliverables
+              </button>
+              <button
+                onClick={() => setActiveTab('architecture')}
+                className={`pb-3 transition-colors border-b-2 ${
+                  activeTab === 'architecture' ? 'border-primary-500 text-primary-400' : 'border-transparent text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                Architecture & Database
+              </button>
+              <button
+                onClick={() => setActiveTab('viva')}
+                className={`pb-3 transition-colors border-b-2 ${
+                  activeTab === 'viva' ? 'border-primary-500 text-primary-400' : 'border-transparent text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                Viva & Requirements
+              </button>
+            </div>
+
+            {/* Tab Contents */}
+            <div className="bg-surface/60 border border-border/60 rounded-2xl p-6 space-y-6">
+              
+              {activeTab === 'overview' && (
+                <div className="space-y-6 text-sm text-gray-300">
+                  <div>
+                    <h3 className="font-bold text-white text-base mb-2">Project Description</h3>
+                    <div className="whitespace-pre-line leading-relaxed text-gray-300">
+                      {product.fullDescription}
+                    </div>
+                  </div>
+
+                  {product.features && product.features.length > 0 && (
+                    <div>
+                      <h3 className="font-bold text-white text-base mb-3">Key Features & Modules</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {product.features.map((feat: string, idx: number) => (
+                          <div key={idx} className="flex items-start space-x-2 bg-background/60 p-3 rounded-xl border border-border/40">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                            <span className="text-xs text-gray-200 font-medium">{feat}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'deliverables' && (
+                <div className="space-y-4">
+                  <h3 className="font-bold text-white text-base">What You Get In This Package</h3>
+                  <div className="space-y-2.5">
+                    {product.deliverables.map((item: any, idx: number) => (
+                      <div key={idx} className="flex items-center justify-between p-3.5 bg-background border border-border/60 rounded-xl text-xs sm:text-sm">
+                        <div className="flex items-center space-x-2.5">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                          <span className="font-semibold text-gray-200">{item.name}</span>
+                        </div>
+                        <span className="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+                          Included
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'architecture' && (
+                <div className="space-y-5 text-xs sm:text-sm text-gray-300">
+                  <div>
+                    <h4 className="font-bold text-white mb-1">System Architecture Overview</h4>
+                    <p className="bg-background p-4 rounded-xl border border-border/60 leading-relaxed font-mono text-xs text-gray-300">
+                      {product.architectureDetails || 'Modular Decoupled REST Architecture.'}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white mb-1">Database Model & Storage</h4>
+                    <p className="bg-background p-4 rounded-xl border border-border/60 leading-relaxed font-mono text-xs text-gray-300">
+                      {product.databaseDetails || 'MongoDB Schema collections with indexing.'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'viva' && (
+                <div className="space-y-4 text-xs sm:text-sm text-gray-300">
+                  <h4 className="font-bold text-white">System Requirements for Local Setup</h4>
+                  <ul className="list-disc list-inside space-y-1 font-mono text-xs bg-background p-4 rounded-xl border border-border/60 text-gray-300">
+                    {product.requirements?.map((req: string, idx: number) => (
+                      <li key={idx}>{req}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+            </div>
+
+          </div>
+
+          {/* RIGHT SIDEBAR - PURCHASE BOX */}
+          <div className="space-y-6">
+            <div className="bg-surface border border-border rounded-2xl p-6 sticky top-24 shadow-2xl space-y-5">
+              
+              {/* Pricing Display */}
+              <div className="pb-4 border-b border-border/60">
+                <span className="text-xs text-gray-400 uppercase font-semibold">Package License Price</span>
+                <div className="flex items-baseline space-x-3 mt-1">
+                  <span className="text-3xl font-extrabold text-white">
+                    {BRAND.currency.symbol}{product.price.toLocaleString('en-IN')}
+                  </span>
+                  {product.originalPrice && product.originalPrice > product.price && (
+                    <span className="text-sm text-gray-500 line-through">
+                      {BRAND.currency.symbol}{product.originalPrice.toLocaleString('en-IN')}
+                    </span>
+                  )}
+                </div>
+                {product.discountPercentage && product.discountPercentage > 0 ? (
+                  <div className="mt-1.5 inline-block text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                    SAVE {product.discountPercentage}% TODAY
+                  </div>
+                ) : null}
+              </div>
+
+              {/* Quick Deliverable Summary */}
+              <div className="space-y-2 text-xs text-gray-300">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <span>Instant Download Access</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <span>Complete Source Code & DB Exports</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <span>Documentation, PPT & Viva QA</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <span>WhatsApp Setup Support</span>
+                </div>
+              </div>
+
+              {/* Buy Now CTA */}
+              <button
+                onClick={handleBuyNow}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-bold text-base shadow-glow-md transition-all duration-200 flex items-center justify-center space-x-2"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                <span>Buy Project Now</span>
+              </button>
+
+              <div className="text-center">
+                <span className="text-[11px] text-gray-500">
+                  Encrypted checkout powered by {BRAND.paymentProvider}
+                </span>
+              </div>
+
+              {/* WhatsApp Technical Assistance Button */}
+              <div className="pt-3 border-t border-border/60 text-center">
+                <WhatsAppButton
+                  variant="inline"
+                  label="Ask Questions on WhatsApp"
+                  customMessage={`Hi, I have a question regarding the project: ${product.title}`}
+                />
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  );
+};
