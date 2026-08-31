@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken, TokenPayload } from '../utils/jwt';
-import User from '../models/User';
+import User, { RbacRole } from '../models/User';
 
 export interface AuthRequest extends Request {
   user?: {
     id: string;
     email: string;
     role: 'user' | 'admin';
+    rbacRole: RbacRole;
     name: string;
   };
 }
@@ -15,7 +16,6 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
   try {
     let token: string | undefined;
 
-    // Check Authorization header
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
       token = req.headers.authorization.split(' ')[1];
     }
@@ -26,10 +26,15 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     }
 
     const decoded: TokenPayload = verifyToken(token);
-    const user = await User.findById(decoded.userId).select('name email role isVerified');
+    const user = await User.findById(decoded.userId).select('name email role rbacRole isVerified isSuspended');
 
     if (!user) {
       res.status(401).json({ success: false, message: 'Invalid or expired authentication token.' });
+      return;
+    }
+
+    if (user.isSuspended) {
+      res.status(403).json({ success: false, message: 'Your account has been suspended. Please contact support.' });
       return;
     }
 
@@ -37,6 +42,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
       id: (user._id as any).toString(),
       email: user.email,
       role: user.role,
+      rbacRole: user.rbacRole || (user.role === 'admin' ? 'SUPER_ADMIN' : 'USER'),
       name: user.name,
     };
 
@@ -52,4 +58,29 @@ export const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction
     return;
   }
   next();
+};
+
+export const requireRbacRole = (allowedRoles: RbacRole[]) => {
+  return (req: AuthRequest, res: Response, next: NextFunction): void => {
+    if (!req.user) {
+      res.status(401).json({ success: false, message: 'Not authenticated' });
+      return;
+    }
+
+    // SUPER_ADMIN has access to everything
+    if (req.user.rbacRole === 'SUPER_ADMIN' || req.user.role === 'admin') {
+      next();
+      return;
+    }
+
+    if (!allowedRoles.includes(req.user.rbacRole)) {
+      res.status(403).json({
+        success: false,
+        message: `Access denied. Requires one of roles: ${allowedRoles.join(', ')}`,
+      });
+      return;
+    }
+
+    next();
+  };
 };

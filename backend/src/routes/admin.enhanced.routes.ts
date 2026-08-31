@@ -1,0 +1,75 @@
+import { Router } from 'express';
+import {
+  getDashboardAnalytics,
+  getAdminProducts,
+  duplicateProduct,
+  getProductVersions,
+  createProductVersion,
+  manageCategoryCrud,
+  getAdminCustomers,
+  toggleCustomerSuspension,
+  getAdminEntitlements,
+  toggleEntitlementRevocation,
+  getAdminDownloadActivity,
+  getAdminReviews,
+  moderateReview,
+  getSiteContentAdmin,
+  updateSiteContentAdmin,
+  getFunnelAnalytics,
+} from '../controllers/admin.enhanced.controller';
+
+import {
+  createProductAdmin,
+  updateProductAdmin,
+  deleteProductAdmin,
+  getAdminOrders,
+  getAdminCoupons,
+  createCouponAdmin,
+  getAdminAuditLogs,
+} from '../controllers/admin.controller';
+
+import { authenticate, requireAdmin, requireRbacRole } from '../middlewares/auth.middleware';
+
+const router = Router();
+
+// Require JWT Auth and Admin Role
+router.use(authenticate, requireAdmin);
+
+// 1. Dashboard & Analytics
+router.get('/analytics/overview', getDashboardAnalytics);
+router.get('/analytics/funnel', getFunnelAnalytics);
+
+// 2. Product Management & Duplication
+router.get('/products/enhanced', getAdminProducts);
+router.post('/products/:id/duplicate', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), duplicateProduct);
+
+// 3. Product Versioning
+router.get('/products/:productId/versions', getProductVersions);
+router.post('/products/:productId/versions', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), createProductVersion);
+
+// 4. Categories CRUD
+router.all('/categories/crud', manageCategoryCrud);
+
+// 5. Orders & Payments
+router.get('/orders/list', getAdminOrders);
+
+// 6. Customers & Suspension
+router.get('/customers/list', getAdminCustomers);
+router.post('/customers/:customerId/toggle-suspend', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), toggleCustomerSuspension);
+
+// 7. Entitlements
+router.get('/entitlements/list', getAdminEntitlements);
+router.post('/entitlements/:id/toggle-revoke', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), toggleEntitlementRevocation);
+
+// 8. Downloads & Abuse Monitoring
+router.get('/downloads/activity', getAdminDownloadActivity);
+
+// 9. Review Moderation
+router.get('/reviews/list', getAdminReviews);
+router.post('/reviews/:id/moderate', requireRbacRole(['SUPER_ADMIN', 'ADMIN', 'CONTENT_MANAGER']), moderateReview);
+
+// 10. CMS & Content Management
+router.get('/content', getSiteContentAdmin);
+router.put('/content', requireRbacRole(['SUPER_ADMIN', 'ADMIN', 'CONTENT_MANAGER']), updateSiteContentAdmin);
+
+export default router;

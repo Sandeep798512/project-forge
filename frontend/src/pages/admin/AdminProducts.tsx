@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, CheckCircle2, XCircle, Search, Save, X } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle2, XCircle, Search, Copy, Sparkles, X, Save } from 'lucide-react';
 import { BRAND } from '../../config/brand.config';
 import api from '../../services/api';
 
@@ -8,6 +8,10 @@ export const AdminProducts: React.FC = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Search & Filter
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   const [formData, setFormData] = useState<any>({
     title: '',
@@ -26,13 +30,13 @@ export const AdminProducts: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [search, selectedCategory]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       const [prodRes, catRes] = await Promise.all([
-        api.get('/products?limit=50'),
+        api.get(`/admin/products/enhanced?search=${search}&category=${selectedCategory}&limit=50`),
         api.get('/categories'),
       ]);
       if (prodRes.data.success) setProducts(prodRes.data.products);
@@ -41,6 +45,17 @@ export const AdminProducts: React.FC = () => {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDuplicate = async (id: string) => {
+    try {
+      const res = await api.post(`/admin/products/${id}/duplicate`);
+      if (res.data.success) {
+        fetchData();
+      }
+    } catch (err: any) {
+      alert('Error duplicating product');
     }
   };
 
@@ -81,7 +96,7 @@ export const AdminProducts: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-white">Product Package Management</h1>
-          <p className="text-gray-400 text-xs mt-1">Create, update, version, and manage marketplace source code packages.</p>
+          <p className="text-gray-400 text-xs mt-1">Create, update, duplicate, version, and manage marketplace source code packages.</p>
         </div>
 
         <button
@@ -91,6 +106,33 @@ export const AdminProducts: React.FC = () => {
           <Plus className="w-4 h-4" />
           <span>Create New Product</span>
         </button>
+      </div>
+
+      {/* Search & Filter Toolbar */}
+      <div className="bg-surface/90 border border-border/80 rounded-2xl p-4 flex flex-col sm:flex-row gap-3">
+        <div className="flex-1 relative">
+          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+          <input
+            type="text"
+            placeholder="Search by product title or tech stack..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-background border border-border rounded-xl pl-9 pr-4 py-2 text-xs text-gray-100"
+          />
+        </div>
+
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className="bg-background border border-border rounded-xl px-3 py-2 text-xs text-gray-100"
+        >
+          <option value="">All Categories</option>
+          {categories.map((c) => (
+            <option key={c._id} value={c._id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Product List Table */}
@@ -135,6 +177,13 @@ export const AdminProducts: React.FC = () => {
                     </td>
                     <td className="p-3.5 text-right space-x-2">
                       <button
+                        onClick={() => handleDuplicate(p._id)}
+                        className="p-1.5 text-gray-400 hover:text-accent-400 transition-colors"
+                        title="Duplicate Product"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                      <button
                         onClick={() => handleDelete(p._id)}
                         className="p-1.5 text-red-400 hover:text-red-300 transition-colors"
                         title="Delete Product"
@@ -150,7 +199,7 @@ export const AdminProducts: React.FC = () => {
         )}
       </div>
 
-      {/* Modal for Creating New Product */}
+      {/* Create Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-surface border border-border rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
@@ -215,27 +264,6 @@ export const AdminProducts: React.FC = () => {
                   value={formData.shortDescription}
                   onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
                   className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-gray-300 mb-1">Full Description (Markdown)</label>
-                <textarea
-                  rows={4}
-                  required
-                  value={formData.fullDescription}
-                  onChange={(e) => setFormData({ ...formData, fullDescription: e.target.value })}
-                  className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100 font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-gray-300 mb-1">Tech Stack (comma separated)</label>
-                <input
-                  type="text"
-                  value={formData.techStack}
-                  onChange={(e) => setFormData({ ...formData, techStack: e.target.value })}
-                  className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100 font-mono"
                 />
               </div>
 

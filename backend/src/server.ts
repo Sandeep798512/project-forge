@@ -11,6 +11,7 @@ import entitlementRoutes from './routes/entitlement.routes';
 import downloadRoutes from './routes/download.routes';
 import paymentRoutes from './routes/payment.routes';
 import adminRoutes from './routes/admin.routes';
+import adminEnhancedRoutes from './routes/admin.enhanced.routes';
 import supportRoutes from './routes/support.routes';
 import { getRobotsTxt, getSitemapXml } from './controllers/seo.controller';
 
@@ -53,6 +54,7 @@ app.use('/api/me', entitlementRoutes);
 app.use('/api', downloadRoutes);
 app.use('/api', paymentRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin', adminEnhancedRoutes);
 app.use('/api', supportRoutes);
 
 // Global Error Handler

@@ -36,12 +36,23 @@ import { Profile } from './pages/dashboard/Profile';
 import { Security } from './pages/dashboard/Security';
 import { SupportTickets } from './pages/dashboard/SupportTickets';
 
-// Admin Layout & Pages
+// Admin Layout & 16 Business Suite Pages
 import { AdminLayout } from './layouts/AdminLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminProducts } from './pages/admin/AdminProducts';
+import { AdminProductVersions } from './pages/admin/AdminProductVersions';
+import { AdminCategories } from './pages/admin/AdminCategories';
 import { AdminOrders } from './pages/admin/AdminOrders';
+import { AdminPayments } from './pages/admin/AdminPayments';
+import { AdminCustomers } from './pages/admin/AdminCustomers';
+import { AdminEntitlements } from './pages/admin/AdminEntitlements';
+import { AdminDownloads } from './pages/admin/AdminDownloads';
 import { AdminCoupons } from './pages/admin/AdminCoupons';
+import { AdminReviews } from './pages/admin/AdminReviews';
+import { AdminSupport } from './pages/admin/AdminSupport';
+import { AdminAnalytics } from './pages/admin/AdminAnalytics';
+import { AdminContent } from './pages/admin/AdminContent';
+import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminAuditLogs } from './pages/admin/AdminAuditLogs';
 
 // Protected Route Guard
@@ -116,7 +127,7 @@ export const App: React.FC = () => {
             <Route path="security" element={<Security />} />
           </Route>
 
-          {/* Admin Protected Routes */}
+          {/* Admin Protected Routes (16 Modules) */}
           <Route
             path="/admin"
             element={
@@ -127,8 +138,19 @@ export const App: React.FC = () => {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<AdminProducts />} />
+            <Route path="product-versions" element={<AdminProductVersions />} />
+            <Route path="categories" element={<AdminCategories />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="payments" element={<AdminPayments />} />
+            <Route path="customers" element={<AdminCustomers />} />
+            <Route path="entitlements" element={<AdminEntitlements />} />
+            <Route path="downloads" element={<AdminDownloads />} />
             <Route path="coupons" element={<AdminCoupons />} />
+            <Route path="reviews" element={<AdminReviews />} />
+            <Route path="support" element={<AdminSupport />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="content" element={<AdminContent />} />
+            <Route path="settings" element={<AdminSettings />} />
             <Route path="audit-logs" element={<AdminAuditLogs />} />
           </Route>
 
