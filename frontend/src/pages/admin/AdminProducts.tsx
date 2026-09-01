@@ -433,12 +433,14 @@ export const AdminProducts: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-gray-300 mb-1">URL Slug</label>
+                  <label className="block font-semibold text-gray-300 mb-1">
+                    URL Slug <span className="text-[10px] text-gray-400 font-normal">(Auto-generated website page link - No need to change unless needed)</span>
+                  </label>
                   <input
                     type="text"
                     required
                     value={formData.slug}
-                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
                     className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100 font-mono"
                   />
                 </div>
