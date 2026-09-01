@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, Star, ArrowRight, Code2, Sparkles, CheckCircle } from 'lucide-react';
+import { ExternalLink, Star, ArrowRight, Code2, Sparkles, CheckCircle, Play } from 'lucide-react';
 import { BRAND } from '../../config/brand.config';
 
 export interface ProductCardProps {
@@ -16,6 +16,7 @@ export interface ProductCardProps {
     techStack: string[];
     difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
     liveDemoUrl?: string;
+    demoVideoUrl?: string;
     ratingAverage?: number;
     ratingCount?: number;
     category?: { name: string; slug: string } | any;
@@ -49,19 +50,34 @@ export const ProjectCard: React.FC<ProductCardProps> = ({ product }) => {
           </span>
         </div>
 
-        {/* Live Demo Quick Link */}
-        {product.liveDemoUrl && (
-          <a
-            href={product.liveDemoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="absolute top-3 right-3 bg-surface/90 hover:bg-white hover:text-gray-900 text-gray-200 p-2 rounded-xl border border-border/60 transition-all text-xs font-semibold flex items-center space-x-1 backdrop-blur-md"
-            title="Open Live Interactive Demo"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Demo</span>
-          </a>
-        )}
+        {/* Action Buttons Top Right */}
+        <div className="absolute top-3 right-3 flex items-center space-x-1.5">
+          {product.demoVideoUrl && (
+            <a
+              href={product.demoVideoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-red-600/90 hover:bg-red-600 text-white p-2 sm:px-2.5 sm:py-1 rounded-xl border border-red-400/40 transition-all text-xs font-bold flex items-center space-x-1 backdrop-blur-md shadow-md"
+              title="Watch Video Demo"
+            >
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span className="hidden sm:inline">Video</span>
+            </a>
+          )}
+
+          {product.liveDemoUrl && (
+            <a
+              href={product.liveDemoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-surface/90 hover:bg-emerald-600 text-gray-200 hover:text-white p-2 sm:px-2.5 sm:py-1 rounded-xl border border-border/60 transition-all text-xs font-bold flex items-center space-x-1 backdrop-blur-md"
+              title="Open Live Interactive Demo"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Demo</span>
+            </a>
+          )}
+        </div>
       </div>
 
       {/* Body Content */}

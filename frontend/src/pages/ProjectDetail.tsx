@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ExternalLink, CheckCircle2, ShieldCheck, Play, ArrowLeft, Star, FileText, Database, Layers, HelpCircle, Code, ShoppingCart, MessageSquare, Download } from 'lucide-react';
+import { ExternalLink, CheckCircle2, ShieldCheck, Play, ArrowLeft, Star, FileText, Database, Layers, HelpCircle, Code, ShoppingCart, MessageSquare, Download, Video } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
 import { WhatsAppButton } from '../components/common/WhatsAppButton';
 import { useAuth } from '../context/AuthContext';
@@ -66,7 +66,7 @@ export const ProjectDetail: React.FC = () => {
     );
   }
 
-  const allImages = [product.thumbnail, ...(product.screenshots || [])];
+  const allImages = [product.thumbnail, ...(product.screenshots || [])].filter(Boolean);
 
   return (
     <div className="py-10 bg-background min-h-screen">
@@ -85,8 +85,8 @@ export const ProjectDetail: React.FC = () => {
           <div className="lg:col-span-2 space-y-8">
             
             {/* Header info */}
-            <div>
-              <div className="flex flex-wrap items-center gap-2 mb-3">
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md bg-primary-500/10 border border-primary-500/20 text-primary-400">
                   {product.category?.name || 'Software Project'}
                 </span>
@@ -102,30 +102,73 @@ export const ProjectDetail: React.FC = () => {
                 {product.title}
               </h1>
 
-              <p className="text-gray-300 text-sm sm:text-base mt-3 leading-relaxed">
+              <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
                 {product.shortDescription}
               </p>
+
+              {/* High Visibility Hero Action Buttons */}
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                {product.demoVideoUrl && (
+                  <a
+                    href={product.demoVideoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold text-xs shadow-glow-sm flex items-center space-x-2 transition-all"
+                  >
+                    <Play className="w-4 h-4 fill-current text-white" />
+                    <span>Watch Demo Video</span>
+                  </a>
+                )}
+
+                {product.liveDemoUrl && (
+                  <a
+                    href={product.liveDemoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2.5 rounded-xl bg-surface-hover hover:bg-emerald-600 border border-emerald-500/40 text-emerald-400 hover:text-white font-bold text-xs shadow-glow-sm flex items-center space-x-2 transition-all"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Open Live Deployed App</span>
+                  </a>
+                )}
+              </div>
             </div>
 
             {/* Gallery Viewer */}
             <div className="bg-surface/80 border border-border/80 rounded-2xl overflow-hidden p-2">
               <div className="aspect-video relative rounded-xl overflow-hidden bg-surface-hover">
                 <img
-                  src={allImages[activeImageIndex]}
+                  src={allImages[activeImageIndex] || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80'}
                   alt={product.title}
                   className="w-full h-full object-cover"
                 />
-                {product.liveDemoUrl && (
-                  <a
-                    href={product.liveDemoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="absolute top-4 right-4 bg-surface/90 hover:bg-white hover:text-gray-900 text-gray-100 px-3.5 py-2 rounded-xl text-xs font-semibold backdrop-blur-md border border-border flex items-center space-x-1.5 transition-all"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    <span>Open Live Demo</span>
-                  </a>
-                )}
+
+                {/* Overlay Action Badges */}
+                <div className="absolute top-4 right-4 flex items-center space-x-2">
+                  {product.demoVideoUrl && (
+                    <a
+                      href={product.demoVideoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-red-600/90 hover:bg-red-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold backdrop-blur-md border border-red-400/40 flex items-center space-x-1.5 shadow-md transition-all"
+                    >
+                      <Play className="w-3.5 h-3.5 fill-current" />
+                      <span>Watch Demo Video</span>
+                    </a>
+                  )}
+
+                  {product.liveDemoUrl && (
+                    <a
+                      href={product.liveDemoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-surface/90 hover:bg-emerald-600 text-gray-100 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold backdrop-blur-md border border-border flex items-center space-x-1.5 transition-all"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Live App Demo</span>
+                    </a>
+                  )}
+                </div>
               </div>
 
               {/* Thumbnail Strip */}
@@ -302,6 +345,39 @@ export const ProjectDetail: React.FC = () => {
                   </div>
                 ) : null}
               </div>
+
+              {/* Demo Links Action Section */}
+              {(product.demoVideoUrl || product.liveDemoUrl) && (
+                <div className="space-y-2 pb-4 border-b border-border/60">
+                  <span className="text-[10px] text-gray-400 uppercase font-mono font-bold tracking-wider">
+                    Interactive Demos & Video
+                  </span>
+                  
+                  {product.demoVideoUrl && (
+                    <a
+                      href={product.demoVideoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold text-xs flex items-center justify-center space-x-2 transition-all shadow-glow-sm"
+                    >
+                      <Play className="w-4 h-4 fill-current" />
+                      <span>Watch Demo Video</span>
+                    </a>
+                  )}
+
+                  {product.liveDemoUrl && (
+                    <a
+                      href={product.liveDemoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2.5 px-4 rounded-xl bg-emerald-600/20 hover:bg-emerald-600 border border-emerald-500/40 text-emerald-300 hover:text-white font-bold text-xs flex items-center justify-center space-x-2 transition-all shadow-glow-sm"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      <span>Open Live App Demo</span>
+                    </a>
+                  )}
+                </div>
+              )}
 
               {/* Quick Deliverable Summary */}
               <div className="space-y-2 text-xs text-gray-300">
