@@ -37,6 +37,8 @@ export const AdminProducts: React.FC = () => {
     techStack: 'React, Node.js, Express, MongoDB',
     difficulty: 'Intermediate',
     thumbnail: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800&auto=format&fit=crop&q=80',
+    liveDemoUrl: '',
+    demoVideoUrl: '',
     currentVersion: '1.0.0',
     isPublished: true,
   };
@@ -528,6 +530,34 @@ export const AdminProducts: React.FC = () => {
                     placeholder="React, Node.js, Express, MongoDB"
                     className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100"
                   />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-semibold text-gray-300 mb-1">
+                      Live Deployed App URL <span className="text-[10px] text-primary-400 font-normal">(Vercel / Render / Netlify Link)</span>
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.liveDemoUrl || ''}
+                      onChange={(e) => setFormData({ ...formData, liveDemoUrl: e.target.value })}
+                      placeholder="e.g. https://sandeep-hospital-frontend.vercel.app/"
+                      className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-gray-300 mb-1">
+                      Demo Video URL <span className="text-[10px] text-primary-400 font-normal">(YouTube Video Link)</span>
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.demoVideoUrl || ''}
+                      onChange={(e) => setFormData({ ...formData, demoVideoUrl: e.target.value })}
+                      placeholder="e.g. https://www.youtube.com/watch?v=..."
+                      className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100 font-mono"
+                    />
+                  </div>
                 </div>
 
                 <div className="pt-3 border-t border-border flex justify-end space-x-2">
