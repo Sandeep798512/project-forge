@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Download, FileText, Wrench, MessageSquare, ExternalLink, ShieldAlert, Sparkles, BookOpen, Presentation, CheckCircle2 } from 'lucide-react';
+import { Download, FileText, Wrench, ExternalLink, ShieldAlert, Sparkles, BookOpen, Presentation, CheckCircle2 } from 'lucide-react';
 import { BRAND } from '../../config/brand.config';
 import { WhatsAppButton } from '../../components/common/WhatsAppButton';
 import api from '../../services/api';
@@ -76,6 +76,30 @@ export const MyPurchases: React.FC = () => {
         return <BookOpen className="w-4 h-4 text-emerald-400" />;
       default:
         return <FileText className="w-4 h-4 text-gray-300" />;
+    }
+  };
+
+  const getCleanAssetLabel = (asset: any) => {
+    if (asset.title && !asset.title.includes(' - ')) {
+      return asset.title;
+    }
+    switch (asset.assetType) {
+      case 'SOURCE_CODE':
+        return 'Complete Source Code (.ZIP)';
+      case 'DOCUMENTATION':
+        return 'IEEE Documentation (.PDF)';
+      case 'PPT':
+        return 'Project Presentation (.PPTX)';
+      case 'SETUP_GUIDE':
+        return 'Step-by-Step Setup Guide (.PDF)';
+      case 'VIVA':
+        return 'Viva Voce QA Bank (.PDF)';
+      case 'PROJECT_REPORT':
+        return 'Project Report (.PDF)';
+      case 'ARCHITECTURE':
+        return 'Architecture Diagram';
+      default:
+        return asset.title.includes(' - ') ? asset.title.split(' - ')[1] : asset.title;
     }
   };
 
@@ -176,14 +200,14 @@ export const MyPurchases: React.FC = () => {
                           >
                             <div className="flex items-center space-x-2 overflow-hidden">
                               {renderAssetIcon(asset.assetType)}
-                              <span className="truncate">{asset.title}</span>
+                              <span className="truncate">{getCleanAssetLabel(asset)}</span>
                             </div>
 
                             {isLoadingThis ? (
                               <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent ml-2 flex-shrink-0" />
                             ) : (
                               <span className="text-[10px] font-mono opacity-60 ml-2 uppercase flex-shrink-0">
-                                {asset.assetType === 'DOCUMENTATION' || asset.assetType === 'VIVA' ? 'OPEN' : 'DL'}
+                                {asset.assetType === 'DOCUMENTATION' || asset.assetType === 'VIVA' || asset.assetType === 'SETUP_GUIDE' ? 'OPEN' : 'DL'}
                               </span>
                             )}
                           </button>

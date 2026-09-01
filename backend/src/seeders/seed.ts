@@ -220,13 +220,13 @@ export const seedDatabase = async () => {
     ];
 
     // Asset definitions for seeding
-    const assetTemplates: { type: AssetType; ext: string; mime: string; titleSuffix: string }[] = [
-      { type: 'SOURCE_CODE', ext: '.zip', mime: 'application/zip', titleSuffix: 'Complete Source Code (.ZIP)' },
-      { type: 'DOCUMENTATION', ext: '.pdf', mime: 'application/pdf', titleSuffix: 'IEEE Documentation (.PDF)' },
-      { type: 'PPT', ext: '.pptx', mime: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', titleSuffix: 'Project Presentation (.PPTX)' },
-      { type: 'SETUP_GUIDE', ext: '.pdf', mime: 'application/pdf', titleSuffix: 'Step-by-Step Setup Guide (.PDF)' },
-      { type: 'VIVA', ext: '.pdf', mime: 'application/pdf', titleSuffix: 'Viva Voce QA Question Bank (.PDF)' },
-      { type: 'PROJECT_REPORT', ext: '.pdf', mime: 'application/pdf', titleSuffix: 'Complete Project Report (.PDF)' },
+    const assetTemplates: { type: AssetType; ext: string; mime: string; title: string }[] = [
+      { type: 'SOURCE_CODE', ext: '.zip', mime: 'application/zip', title: 'Complete Source Code (.ZIP)' },
+      { type: 'DOCUMENTATION', ext: '.pdf', mime: 'application/pdf', title: 'IEEE Documentation (.PDF)' },
+      { type: 'PPT', ext: '.pptx', mime: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', title: 'Project Presentation (.PPTX)' },
+      { type: 'SETUP_GUIDE', ext: '.pdf', mime: 'application/pdf', title: 'Step-by-Step Setup Guide (.PDF)' },
+      { type: 'VIVA', ext: '.pdf', mime: 'application/pdf', title: 'Viva Voce QA Question Bank (.PDF)' },
+      { type: 'PROJECT_REPORT', ext: '.pdf', mime: 'application/pdf', title: 'Complete Project Report (.PDF)' },
     ];
 
     for (const pData of productsData) {
@@ -241,7 +241,7 @@ export const seedDatabase = async () => {
 
         // Write physical sample file to storage
         if (tpl.ext === '.pdf') {
-          fs.writeFileSync(filePath, `%PDF-1.4\n% ProjectForge Official Deliverable: ${createdProd.title} (${tpl.titleSuffix})\nIncludes full technical specifications, architecture diagrams, and viva answers.`);
+          fs.writeFileSync(filePath, `%PDF-1.4\n% ProjectForge Official Deliverable: ${createdProd.title} (${tpl.title})\nIncludes full technical specifications, architecture diagrams, and viva answers.`);
         } else if (tpl.ext === '.pptx') {
           fs.writeFileSync(filePath, `PK\x03\x04 - ProjectForge Presentation Deck for ${createdProd.title}\nIncludes 15 Project Slides & Demo Screenshots.`);
         } else {
@@ -251,7 +251,7 @@ export const seedDatabase = async () => {
         const assetDoc = await ProductAsset.create({
           product: createdProd._id,
           assetType: tpl.type,
-          title: `${createdProd.title} - ${tpl.titleSuffix}`,
+          title: tpl.title,
           originalName: `${createdProd.slug}_${tpl.type.toLowerCase()}${tpl.ext}`,
           storageKey: fileKey,
           mimeType: tpl.mime,
@@ -274,7 +274,7 @@ export const seedDatabase = async () => {
       await createdProd.save();
     }
 
-    console.log('[SEED] Database seeding finished successfully with working assets!');
+    console.log('[SEED] Database seeding finished successfully with clean titles!');
     if (require.main === module) {
       process.exit(0);
     }
