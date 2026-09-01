@@ -46,8 +46,11 @@ router.use(authenticate, requireAdmin);
 router.get('/analytics/overview', getDashboardAnalytics);
 router.get('/analytics/funnel', getFunnelAnalytics);
 
-// 2. Product Management & Duplication
+// 2. Product Management & Duplication & CRUD
 router.get('/products/enhanced', getAdminProducts);
+router.post('/products', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), createProductAdmin);
+router.put('/products/:id', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), updateProductAdmin);
+router.delete('/products/:id', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), deleteProductAdmin);
 router.post('/products/:id/duplicate', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), duplicateProduct);
 
 // 3. Product Asset File Management
