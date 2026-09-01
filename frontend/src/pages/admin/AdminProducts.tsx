@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, CheckCircle2, XCircle, Search, Copy, Sparkles, X, Save, Upload, FileText, Download, AlertCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle2, XCircle, Search, Copy, Sparkles, X, Save, Upload, FileText, Download, AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { BRAND } from '../../config/brand.config';
 import api from '../../services/api';
 
@@ -36,7 +36,8 @@ export const AdminProducts: React.FC = () => {
     category: '',
     techStack: 'React, Node.js, Express, MongoDB',
     difficulty: 'Intermediate',
-    thumbnail: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800&auto=format&fit=crop&q=80',
+    thumbnail: '',
+    screenshots: [],
     liveDemoUrl: '',
     demoVideoUrl: '',
     currentVersion: '1.0.0',
@@ -83,6 +84,7 @@ export const AdminProducts: React.FC = () => {
       ...p,
       category: p.category?._id || p.category || categories[0]?._id,
       techStack: Array.isArray(p.techStack) ? p.techStack.join(', ') : p.techStack,
+      screenshots: Array.isArray(p.screenshots) ? p.screenshots : [],
     });
     setStatusMessage(null);
     setModalOpen(true);
@@ -96,6 +98,7 @@ export const AdminProducts: React.FC = () => {
       ...p,
       category: p.category?._id || p.category || categories[0]?._id,
       techStack: Array.isArray(p.techStack) ? p.techStack.join(', ') : p.techStack,
+      screenshots: Array.isArray(p.screenshots) ? p.screenshots : [],
     });
     setStatusMessage(null);
     setModalOpen(true);
@@ -118,8 +121,12 @@ export const AdminProducts: React.FC = () => {
       setSavingProduct(true);
       setStatusMessage(null);
 
+      const defaultThumbnail = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80';
+
       const payload = {
         ...formData,
+        thumbnail: formData.thumbnail ? formData.thumbnail.trim() : defaultThumbnail,
+        screenshots: Array.isArray(formData.screenshots) ? formData.screenshots : [],
         techStack: typeof formData.techStack === 'string' ? formData.techStack.split(',').map((s: string) => s.trim()) : formData.techStack,
         category: formData.category || categories[0]?._id,
         deliverables: [
@@ -519,6 +526,115 @@ export const AdminProducts: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, fullDescription: e.target.value })}
                     className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100"
                   />
+                </div>
+
+                {/* Main Cover / Thumbnail Image Selector */}
+                <div className="space-y-2 p-4 rounded-xl bg-background border border-border/80">
+                  <label className="block font-bold text-gray-200 text-xs flex items-center justify-between">
+                    <span>Main Cover / Thumbnail Image</span>
+                    <span className="text-[10px] text-gray-400 font-normal">URL or Upload File</span>
+                  </label>
+                  <div className="flex flex-col sm:flex-row items-center gap-3">
+                    <div className="flex-1 w-full space-y-2">
+                      <input
+                        type="text"
+                        placeholder="Paste Image URL (e.g. https://images.unsplash.com/...)"
+                        value={formData.thumbnail || ''}
+                        onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
+                        className="w-full bg-surface border border-border rounded-xl px-3 py-2 text-gray-100 text-xs"
+                      />
+                      <div className="flex items-center space-x-2">
+                        <span className="text-[10px] text-gray-400">OR Upload Local Photo:</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = () => {
+                                setFormData({ ...formData, thumbnail: reader.result as string });
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                          className="text-[10px] text-gray-300 file:mr-2 file:py-0.5 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-primary-600 file:text-white"
+                        />
+                      </div>
+                    </div>
+
+                    {formData.thumbnail && (
+                      <div className="w-20 h-14 rounded-lg overflow-hidden border border-border flex-shrink-0 bg-surface">
+                        <img src={formData.thumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Multiple Screenshots Gallery */}
+                <div className="space-y-3 p-4 rounded-xl bg-background border border-border/80">
+                  <div className="flex items-center justify-between">
+                    <label className="block font-bold text-gray-200 text-xs">
+                      Product Screenshots & Gallery ({formData.screenshots?.length || 0})
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        id="screenshot-file-input"
+                        className="hidden"
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || []);
+                          files.forEach((file) => {
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                              setFormData((prev: any) => ({
+                                ...prev,
+                                screenshots: [...(prev.screenshots || []), reader.result as string],
+                              }));
+                            };
+                            reader.readAsDataURL(file);
+                          });
+                        }}
+                      />
+                      <label
+                        htmlFor="screenshot-file-input"
+                        className="px-2.5 py-1 rounded-lg bg-accent-600 hover:bg-accent-500 text-white font-bold text-[10px] cursor-pointer flex items-center space-x-1 shadow-glow-sm"
+                      >
+                        <Plus className="w-3 h-3" />
+                        <span>Upload Screenshots (One or Multiple)</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Added Screenshots Preview Grid */}
+                  {formData.screenshots && formData.screenshots.length > 0 ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                      {formData.screenshots.map((src: string, idx: number) => (
+                        <div key={idx} className="relative group rounded-lg overflow-hidden border border-border h-20 bg-surface">
+                          <img src={src} alt={`Screenshot ${idx + 1}`} className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFormData((prev: any) => ({
+                                ...prev,
+                                screenshots: prev.screenshots.filter((_: any, i: number) => i !== idx),
+                              }));
+                            }}
+                            className="absolute top-1 right-1 p-1 bg-red-600/80 hover:bg-red-600 text-white rounded-full opacity-90 transition-opacity"
+                            title="Remove screenshot"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-[11px] text-gray-500 italic text-center py-3 border border-dashed border-border/60 rounded-lg">
+                      No screenshots added yet. Click "Upload Screenshots" above to select one or multiple photos from your computer.
+                    </div>
+                  )}
                 </div>
 
                 <div>
