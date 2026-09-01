@@ -326,25 +326,37 @@ export const ProjectDetail: React.FC = () => {
           <div className="space-y-6">
             <div className="bg-surface border border-border rounded-2xl p-6 sticky top-24 shadow-2xl space-y-5">
               
-              {/* Pricing Display */}
-              <div className="pb-4 border-b border-border/60">
-                <span className="text-xs text-gray-400 uppercase font-semibold">Package License Price</span>
-                <div className="flex items-baseline space-x-3 mt-1">
-                  <span className="text-3xl font-extrabold text-white">
-                    {BRAND.currency.symbol}{product.price.toLocaleString('en-IN')}
-                  </span>
-                  {product.originalPrice && product.originalPrice > product.price && (
-                    <span className="text-sm text-gray-500 line-through">
-                      {BRAND.currency.symbol}{product.originalPrice.toLocaleString('en-IN')}
-                    </span>
-                  )}
-                </div>
-                {product.discountPercentage && product.discountPercentage > 0 ? (
-                  <div className="mt-1.5 inline-block text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
-                    SAVE {product.discountPercentage}% TODAY
+              {/* Pricing Display (Flipkart Style Auto Discount) */}
+              {(() => {
+                const discountPercent = product.discountPercentage || (product.originalPrice && product.originalPrice > product.price ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0);
+                const totalSaved = product.originalPrice && product.originalPrice > product.price ? product.originalPrice - product.price : 0;
+
+                return (
+                  <div className="pb-4 border-b border-border/60">
+                    <span className="text-xs text-gray-400 uppercase font-semibold">Package License Price</span>
+                    <div className="flex items-baseline space-x-2.5 flex-wrap mt-1">
+                      <span className="text-3xl font-extrabold text-white">
+                        {BRAND.currency.symbol}{product.price.toLocaleString('en-IN')}
+                      </span>
+                      {product.originalPrice && product.originalPrice > product.price && (
+                        <span className="text-sm text-gray-500 line-through">
+                          {BRAND.currency.symbol}{product.originalPrice.toLocaleString('en-IN')}
+                        </span>
+                      )}
+                      {discountPercent > 0 && (
+                        <span className="text-sm font-extrabold text-emerald-400">
+                          {discountPercent}% off
+                        </span>
+                      )}
+                    </div>
+                    {discountPercent > 0 && (
+                      <div className="mt-2 inline-flex items-center space-x-1.5 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20">
+                        <span>🔥 You Save {BRAND.currency.symbol}{totalSaved.toLocaleString('en-IN')} ({discountPercent}% OFF)</span>
+                      </div>
+                    )}
                   </div>
-                ) : null}
-              </div>
+                );
+              })()}
 
               {/* Demo Links Action Section */}
               {(product.demoVideoUrl || product.liveDemoUrl) && (

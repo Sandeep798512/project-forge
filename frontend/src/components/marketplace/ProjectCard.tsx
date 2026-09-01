@@ -128,10 +128,10 @@ export const ProjectCard: React.FC<ProductCardProps> = ({ product }) => {
           )}
         </div>
 
-        {/* Pricing & Footer Actions */}
+        {/* Pricing & Footer Actions (Flipkart Style Discount) */}
         <div className="pt-3 border-t border-border/60 flex items-center justify-between">
           <div>
-            <div className="flex items-baseline space-x-2">
+            <div className="flex items-baseline space-x-1.5 flex-wrap">
               <span className="font-extrabold text-xl text-white">
                 {BRAND.currency.symbol}{product.price.toLocaleString('en-IN')}
               </span>
@@ -140,12 +140,15 @@ export const ProjectCard: React.FC<ProductCardProps> = ({ product }) => {
                   {BRAND.currency.symbol}{product.originalPrice.toLocaleString('en-IN')}
                 </span>
               )}
+              {(() => {
+                const discountPercent = product.discountPercentage || (product.originalPrice && product.originalPrice > product.price ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0);
+                return discountPercent > 0 ? (
+                  <span className="text-xs font-extrabold text-emerald-400">
+                    {discountPercent}% off
+                  </span>
+                ) : null;
+              })()}
             </div>
-            {product.discountPercentage && product.discountPercentage > 0 ? (
-              <span className="text-[10px] text-emerald-400 font-semibold tracking-wide uppercase">
-                {product.discountPercentage}% Instant OFF
-              </span>
-            ) : null}
           </div>
 
           <Link
