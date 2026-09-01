@@ -19,6 +19,13 @@ import {
 } from '../controllers/admin.enhanced.controller';
 
 import {
+  uploadProductAsset,
+  getProductAssetsAdmin,
+  updateProductAssetAdmin,
+  deleteProductAssetAdmin,
+} from '../controllers/productAsset.controller';
+
+import {
   createProductAdmin,
   updateProductAdmin,
   deleteProductAdmin,
@@ -43,32 +50,38 @@ router.get('/analytics/funnel', getFunnelAnalytics);
 router.get('/products/enhanced', getAdminProducts);
 router.post('/products/:id/duplicate', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), duplicateProduct);
 
-// 3. Product Versioning
+// 3. Product Asset File Management
+router.post('/products/:productId/assets', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), uploadProductAsset);
+router.get('/products/:productId/assets', getProductAssetsAdmin);
+router.patch('/products/:productId/assets/:assetId', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), updateProductAssetAdmin);
+router.delete('/products/:productId/assets/:assetId', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), deleteProductAssetAdmin);
+
+// 4. Product Versioning
 router.get('/products/:productId/versions', getProductVersions);
 router.post('/products/:productId/versions', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), createProductVersion);
 
-// 4. Categories CRUD
+// 5. Categories CRUD
 router.all('/categories/crud', manageCategoryCrud);
 
-// 5. Orders & Payments
+// 6. Orders & Payments
 router.get('/orders/list', getAdminOrders);
 
-// 6. Customers & Suspension
+// 7. Customers & Suspension
 router.get('/customers/list', getAdminCustomers);
 router.post('/customers/:customerId/toggle-suspend', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), toggleCustomerSuspension);
 
-// 7. Entitlements
+// 8. Entitlements
 router.get('/entitlements/list', getAdminEntitlements);
 router.post('/entitlements/:id/toggle-revoke', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), toggleEntitlementRevocation);
 
-// 8. Downloads & Abuse Monitoring
+// 9. Downloads & Abuse Monitoring
 router.get('/downloads/activity', getAdminDownloadActivity);
 
-// 9. Review Moderation
+// 10. Review Moderation
 router.get('/reviews/list', getAdminReviews);
 router.post('/reviews/:id/moderate', requireRbacRole(['SUPER_ADMIN', 'ADMIN', 'CONTENT_MANAGER']), moderateReview);
 
-// 10. CMS & Content Management
+// 11. CMS & Content Management
 router.get('/content', getSiteContentAdmin);
 router.put('/content', requireRbacRole(['SUPER_ADMIN', 'ADMIN', 'CONTENT_MANAGER']), updateSiteContentAdmin);
 

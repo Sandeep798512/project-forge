@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IDeliverableItem {
   name: string;
   included: boolean;
-  fileKey?: string; // storage key
+  fileKey?: string;
 }
 
 export interface IProductVersion {
@@ -28,11 +28,13 @@ export interface IProduct extends Document {
   screenshots: string[];
   demoVideoUrl?: string;
   liveDemoUrl?: string;
+  githubPreviewUrl?: string;
   features: string[];
   architectureDetails?: string;
   databaseDetails?: string;
   requirements: string[];
   deliverables: IDeliverableItem[];
+  assets?: (mongoose.Types.ObjectId | string)[];
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   freePreview: boolean;
   isPublished: boolean;
@@ -62,6 +64,7 @@ const ProductSchema: Schema = new Schema(
     screenshots: [{ type: String }],
     demoVideoUrl: { type: String },
     liveDemoUrl: { type: String },
+    githubPreviewUrl: { type: String },
     features: [{ type: String }],
     architectureDetails: { type: String },
     databaseDetails: { type: String },
@@ -73,6 +76,7 @@ const ProductSchema: Schema = new Schema(
         fileKey: { type: String },
       },
     ],
+    assets: [{ type: Schema.Types.ObjectId, ref: 'ProductAsset' }],
     difficulty: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced'], default: 'Intermediate' },
     freePreview: { type: Boolean, default: true },
     isPublished: { type: Boolean, default: true, index: true },

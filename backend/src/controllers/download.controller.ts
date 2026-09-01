@@ -5,11 +5,16 @@ import crypto from 'crypto';
 import Entitlement from '../models/Entitlement';
 import Download from '../models/Download';
 import Product from '../models/Product';
+import ProductAsset from '../models/ProductAsset';
 import AuditLog from '../models/AuditLog';
+import { storageService } from '../utils/storage.service';
 import { AuthRequest } from '../middlewares/auth.middleware';
 
 const SIGNED_URL_SECRET = process.env.JWT_SECRET || 'projectforge_super_secret_jwt_key_2026_change_in_production';
 
+/**
+ * Legacy download token request
+ */
 export const requestDownloadToken = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) {
@@ -19,12 +24,11 @@ export const requestDownloadToken = async (req: AuthRequest, res: Response): Pro
 
     const { productId } = req.params;
 
-    // 1. Verify Entitlement ownership
     const entitlement = await Entitlement.findOne({
       user: req.user.id,
       product: productId,
       isRevoked: false,
-    }).populate('product');
+    });
 
     if (!entitlement) {
       res.status(403).json({
@@ -34,7 +38,68 @@ export const requestDownloadToken = async (req: AuthRequest, res: Response): Pro
       return;
     }
 
-    // 2. Check download limit
+    if (entitlement.downloadCount >= entitlement.maxDownloads) {
+      res.status(403).json({
+        success: false,
+        message: `Download limit reached (${entitlement.maxDownloads} downloads used). Please contact support.`,
+      });
+      return;
+    }
+
+    const expiresAt = Date.now() + 15 * 60 * 1000;
+    const downloadPayload = `${req.user.id}:${productId}:${entitlement._id}:main:${expiresAt}`;
+    const hmac = crypto.createHmac('sha256', SIGNED_URL_SECRET).update(downloadPayload).digest('hex');
+
+    const signedToken = Buffer.from(
+      JSON.stringify({
+        userId: req.user.id,
+        productId,
+        entitlementId: entitlement._id,
+        assetId: null,
+        storageKey: 'packages/sample-project.zip',
+        expiresAt,
+        sig: hmac,
+      })
+    ).toString('base64url');
+
+    res.status(200).json({
+      success: true,
+      downloadUrl: `/api/downloads/file/${signedToken}`,
+      expiresInMinutes: 15,
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: 'Failed to generate download link.' });
+  }
+};
+
+/**
+ * Generates short-lived (15-min) signed token for target asset
+ */
+export const requestAssetDownload = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ success: false, message: 'Authentication required' });
+      return;
+    }
+
+    const { productId, assetId } = req.params;
+
+    // 1. Verify Entitlement ownership & active status
+    const entitlement = await Entitlement.findOne({
+      user: req.user.id,
+      product: productId,
+      isRevoked: false,
+    });
+
+    if (!entitlement) {
+      res.status(403).json({
+        success: false,
+        message: 'Access denied. You do not own an active entitlement for this product package.',
+      });
+      return;
+    }
+
+    // 2. Verify entitlement download limit
     if (entitlement.downloadCount >= entitlement.maxDownloads) {
       res.status(403).json({
         success: false,
@@ -43,30 +108,38 @@ export const requestDownloadToken = async (req: AuthRequest, res: Response): Pro
       return;
     }
 
-    const product = entitlement.product as any;
-    if (!product) {
-      res.status(404).json({ success: false, message: 'Associated product package missing.' });
-      return;
+    // 3. Verify asset exists & is active
+    let asset: any = null;
+    if (assetId && assetId !== 'default') {
+      asset = await ProductAsset.findOne({ _id: assetId, product: productId, isActive: true });
     }
 
-    // 3. Generate short-lived signed download token (expires in 15 mins)
+    const storageKey = asset ? asset.storageKey : 'packages/sample-project.zip';
+
+    // 4. Generate short-lived HMAC signed token (expires in 15 mins)
     const expiresAt = Date.now() + 15 * 60 * 1000;
-    const downloadPayload = `${req.user.id}:${product._id}:${entitlement._id}:${expiresAt}`;
+    const downloadPayload = `${req.user.id}:${productId}:${entitlement._id}:${asset?._id || 'main'}:${expiresAt}`;
     const hmac = crypto.createHmac('sha256', SIGNED_URL_SECRET).update(downloadPayload).digest('hex');
-    
-    const signedToken = Buffer.from(JSON.stringify({
-      userId: req.user.id,
-      productId: product._id,
-      entitlementId: entitlement._id,
-      expiresAt,
-      sig: hmac,
-    })).toString('base64url');
+
+    const signedToken = Buffer.from(
+      JSON.stringify({
+        userId: req.user.id,
+        productId,
+        entitlementId: entitlement._id,
+        assetId: asset?._id || null,
+        storageKey,
+        expiresAt,
+        sig: hmac,
+      })
+    ).toString('base64url');
 
     const downloadUrl = `/api/downloads/file/${signedToken}`;
 
     res.status(200).json({
       success: true,
       downloadUrl,
+      assetType: asset?.assetType || 'SOURCE_CODE',
+      mimeType: asset?.mimeType || 'application/zip',
       expiresInMinutes: 15,
     });
   } catch (error: any) {
@@ -75,6 +148,9 @@ export const requestDownloadToken = async (req: AuthRequest, res: Response): Pro
   }
 };
 
+/**
+ * Streams protected file to authenticated customer with signed token
+ */
 export const serveProtectedFile = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const rawToken = req.params.token;
@@ -94,7 +170,7 @@ export const serveProtectedFile = async (req: AuthRequest, res: Response): Promi
       return;
     }
 
-    const { userId, productId, entitlementId, expiresAt, sig } = payload;
+    const { userId, productId, entitlementId, assetId, storageKey, expiresAt, sig } = payload;
 
     // Check expiration
     if (Date.now() > expiresAt) {
@@ -102,8 +178,8 @@ export const serveProtectedFile = async (req: AuthRequest, res: Response): Promi
       return;
     }
 
-    // Re-calculate HMAC signature
-    const expectedPayload = `${userId}:${productId}:${entitlementId}:${expiresAt}`;
+    // Re-verify HMAC signature
+    const expectedPayload = `${userId}:${productId}:${entitlementId}:${assetId || 'main'}:${expiresAt}`;
     const expectedSig = crypto.createHmac('sha256', SIGNED_URL_SECRET).update(expectedPayload).digest('hex');
 
     if (sig !== expectedSig) {
@@ -111,7 +187,7 @@ export const serveProtectedFile = async (req: AuthRequest, res: Response): Promi
       return;
     }
 
-    // Fetch Entitlement & Product
+    // Fetch Entitlement
     const entitlement = await Entitlement.findById(entitlementId);
     if (!entitlement || entitlement.isRevoked) {
       res.status(403).send('Entitlement revoked or missing.');
@@ -124,45 +200,71 @@ export const serveProtectedFile = async (req: AuthRequest, res: Response): Promi
       return;
     }
 
-    // Resolve zip file key
-    const fileKey = product.deliverables[0]?.fileKey || 'packages/sample-project.zip';
-    const filePath = path.resolve(__dirname, '../../storage/protected', fileKey);
-
-    if (!fs.existsSync(filePath)) {
-      console.warn(`[STORAGE WARNING] File not found on disk at: ${filePath}. Creating fallback package zip.`);
-      const storageDir = path.dirname(filePath);
-      if (!fs.existsSync(storageDir)) fs.mkdirSync(storageDir, { recursive: true });
-      fs.writeFileSync(filePath, `PK\x03\x04 - ProjectForge Deliverable Package for ${product.title}\nIncludes Source Code, PPT, Documentation & Viva QA.`);
+    let asset: any = null;
+    if (assetId) {
+      asset = await ProductAsset.findById(assetId);
     }
 
-    // Update entitlement download count & log Audit download entry
+    const finalStorageKey = storageKey || asset?.storageKey || 'packages/sample-project.zip';
+    const filePath = storageService.getAbsolutePath(finalStorageKey);
+
+    // If file missing on disk, generate fallback deliverable file
+    if (!fs.existsSync(filePath)) {
+      console.warn(`[STORAGE WARNING] File not found on disk at: ${filePath}. Creating fallback deliverable.`);
+      const storageDir = path.dirname(filePath);
+      if (!fs.existsSync(storageDir)) fs.mkdirSync(storageDir, { recursive: true });
+
+      if (finalStorageKey.endsWith('.pdf')) {
+        fs.writeFileSync(filePath, `%PDF-1.4\n% ProjectForge Official Deliverable: ${asset?.title || product.title}\nIncludes Documentation & Setup Guide.`);
+      } else {
+        fs.writeFileSync(filePath, `PK\x03\x04 - ProjectForge Deliverable Package for ${product.title}\nIncludes Source Code, PPT, Documentation & Viva QA.`);
+      }
+    }
+
+    // Increment download counts
     entitlement.downloadCount += 1;
     await entitlement.save();
+
+    if (asset) {
+      asset.downloadCount += 1;
+      await asset.save();
+    }
 
     const userAgentStr = Array.isArray(req.headers['user-agent'])
       ? req.headers['user-agent'].join(' ')
       : req.headers['user-agent'] || 'Browser';
 
+    // Record Download log
     await Download.create({
       user: userId,
       product: productId,
       entitlement: entitlementId,
+      asset: asset?._id,
+      assetType: asset?.assetType || 'SOURCE_CODE',
       versionDownloaded: entitlement.purchasedVersion || '1.0.0',
       ipAddress: req.ip || req.socket.remoteAddress || '127.0.0.1',
       userAgent: userAgentStr,
+      status: 'success',
     });
 
     await AuditLog.create({
       user: userId,
       action: 'FILE_DOWNLOADED',
-      details: { productTitle: product.title, fileKey, downloadCount: entitlement.downloadCount },
+      details: { productTitle: product.title, assetTitle: asset?.title || product.title, storageKey: finalStorageKey },
       ipAddress: req.ip || req.socket.remoteAddress || '127.0.0.1',
     });
 
-    // Stream file with secure disposition headers
-    const safeFilename = `${product.slug}-v${product.currentVersion}.zip`;
-    res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
+    // Detect MIME type and Header Disposition
+    const mimeType = asset?.mimeType || storageService.detectMimeType(finalStorageKey);
+    const filename = asset?.originalName || `${product.slug}-v${product.currentVersion}.zip`;
+
+    res.setHeader('Content-Type', mimeType);
+
+    if (mimeType === 'application/pdf') {
+      res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+    } else {
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    }
 
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);

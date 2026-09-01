@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Download, FileText, Wrench, MessageSquare, ExternalLink, CheckCircle2, ShieldAlert, Sparkles } from 'lucide-react';
+import { Download, FileText, Wrench, MessageSquare, ExternalLink, ShieldAlert, Sparkles, BookOpen, Presentation, CheckCircle2 } from 'lucide-react';
 import { BRAND } from '../../config/brand.config';
 import { WhatsAppButton } from '../../components/common/WhatsAppButton';
 import api from '../../services/api';
@@ -8,47 +8,74 @@ import api from '../../services/api';
 export const MyPurchases: React.FC = () => {
   const [purchases, setPurchases] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [downloadingAssetId, setDownloadingAssetId] = useState<string | null>(null);
   const [downloadError, setDownloadError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchPurchases = async () => {
-      try {
-        const res = await api.get('/me/purchases');
-        if (res.data.success) {
-          setPurchases(res.data.purchases);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchPurchases();
   }, []);
 
-  const handleDownload = async (productId: string, productTitle: string) => {
+  const fetchPurchases = async () => {
     try {
-      setDownloadingId(productId);
+      setLoading(true);
+      const res = await api.get('/me/purchases');
+      if (res.data.success) {
+        setPurchases(res.data.purchases);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAssetDownload = async (productId: string, asset: any, productTitle: string) => {
+    try {
+      setDownloadingAssetId(asset._id);
       setDownloadError(null);
 
-      // Request secure signed download URL from backend
-      const res = await api.post(`/downloads/${productId}/request`);
+      // Request secure signed download URL from backend for specific asset
+      const res = await api.post(`/downloads/${productId}/assets/${asset._id}/request`);
+
       if (res.data.success && res.data.downloadUrl) {
-        // Trigger secure file download
-        const link = document.createElement('a');
-        link.href = res.data.downloadUrl;
-        link.download = `${productTitle.toLowerCase().replace(/[^a-z0-9]/g, '-')}.zip`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const downloadUrl = res.data.downloadUrl;
+        const mimeType = res.data.mimeType;
+
+        // If PDF, open directly in browser tab, else trigger download link
+        if (mimeType === 'application/pdf') {
+          window.open(downloadUrl, '_blank');
+        } else {
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = asset.originalName || `${productTitle.toLowerCase().replace(/[^a-z0-9]/g, '-')}.zip`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
       } else {
         setDownloadError(res.data.message || 'Failed to generate secure download link.');
       }
     } catch (err: any) {
       setDownloadError(err.response?.data?.message || 'Download error. Please check entitlement status.');
     } finally {
-      setDownloadingId(null);
+      setDownloadingAssetId(null);
+    }
+  };
+
+  const renderAssetIcon = (assetType: string) => {
+    switch (assetType) {
+      case 'SOURCE_CODE':
+        return <Download className="w-4 h-4" />;
+      case 'DOCUMENTATION':
+        return <FileText className="w-4 h-4 text-primary-400" />;
+      case 'PPT':
+        return <Presentation className="w-4 h-4 text-yellow-400" />;
+      case 'SETUP_GUIDE':
+        return <Wrench className="w-4 h-4 text-accent-400" />;
+      case 'VIVA':
+        return <BookOpen className="w-4 h-4 text-emerald-400" />;
+      default:
+        return <FileText className="w-4 h-4 text-gray-300" />;
     }
   };
 
@@ -56,9 +83,9 @@ export const MyPurchases: React.FC = () => {
     <div className="space-y-8 max-w-6xl mx-auto">
       
       <div>
-        <h1 className="text-2xl font-extrabold text-white">My Purchases</h1>
+        <h1 className="text-2xl font-extrabold text-white">My Purchases & Resources</h1>
         <p className="text-gray-400 text-xs mt-1">
-          Access your purchased software packages, documentation, and authenticated download links.
+          Access your purchased software source code, IEEE documentation PDFs, presentation decks, setup guides, and viva questions.
         </p>
       </div>
 
@@ -72,7 +99,7 @@ export const MyPurchases: React.FC = () => {
       {loading ? (
         <div className="space-y-4">
           {[1, 2].map((i) => (
-            <div key={i} className="h-44 bg-surface/50 rounded-2xl animate-pulse border border-border/40" />
+            <div key={i} className="h-48 bg-surface/50 rounded-2xl animate-pulse border border-border/40" />
           ))}
         </div>
       ) : purchases.length > 0 ? (
@@ -81,6 +108,8 @@ export const MyPurchases: React.FC = () => {
             const product = item.product;
             const order = item.order;
             if (!product) return null;
+
+            const assets: any[] = product.assets || [];
 
             return (
               <div
@@ -98,8 +127,9 @@ export const MyPurchases: React.FC = () => {
                     <div>
                       <div className="flex items-center space-x-2">
                         <h3 className="font-extrabold text-lg text-white">{product.title}</h3>
-                        <span className="text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded">
-                          Access Granted ✓
+                        <span className="text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded flex items-center space-x-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          <span>Access Granted</span>
                         </span>
                       </div>
                       <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 mt-1">
@@ -121,52 +151,59 @@ export const MyPurchases: React.FC = () => {
                   </Link>
                 </div>
 
-                {/* Actions Grid (Requirement #15) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                  
-                  {/* Download Source Code Button */}
-                  <button
-                    disabled={downloadingId === product._id}
-                    onClick={() => handleDownload(product._id, product.title)}
-                    className="py-3 px-4 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-bold text-xs shadow-glow-sm flex items-center justify-center space-x-2 transition-all disabled:opacity-50"
-                  >
-                    {downloadingId === product._id ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                    ) : (
-                      <>
-                        <Download className="w-4 h-4" />
-                        <span>Download Source (.ZIP)</span>
-                      </>
-                    )}
-                  </button>
+                {/* Dynamic Resource Action Buttons */}
+                <div className="space-y-3">
+                  <h4 className="font-bold text-xs uppercase tracking-wider text-gray-400">
+                    Available Purchased Assets & Deliverables ({assets.length})
+                  </h4>
 
-                  {/* Documentation */}
-                  <Link
-                    to={`/projects/${product.slug}?tab=deliverables`}
-                    className="py-3 px-4 rounded-xl bg-surface-hover border border-border text-gray-200 hover:text-white font-semibold text-xs flex items-center justify-center space-x-2 transition-colors"
-                  >
-                    <FileText className="w-4 h-4 text-primary-400" />
-                    <span>Documentation & PPT</span>
-                  </Link>
+                  {assets.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                      {assets.map((asset) => {
+                        const isLoadingThis = downloadingAssetId === asset._id;
+                        const isSource = asset.assetType === 'SOURCE_CODE';
 
-                  {/* Setup Guide */}
-                  <Link
-                    to={`/projects/${product.slug}?tab=viva`}
-                    className="py-3 px-4 rounded-xl bg-surface-hover border border-border text-gray-200 hover:text-white font-semibold text-xs flex items-center justify-center space-x-2 transition-colors"
-                  >
-                    <Wrench className="w-4 h-4 text-accent-400" />
-                    <span>Setup Guide & Viva</span>
-                  </Link>
+                        return (
+                          <button
+                            key={asset._id}
+                            disabled={isLoadingThis}
+                            onClick={() => handleAssetDownload(product._id, asset, product.title)}
+                            className={`py-3 px-4 rounded-xl text-xs font-bold flex items-center justify-between transition-all disabled:opacity-50 ${
+                              isSource
+                                ? 'bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white shadow-glow-sm'
+                                : 'bg-surface-hover border border-border text-gray-200 hover:text-white hover:border-primary-500/40'
+                            }`}
+                          >
+                            <div className="flex items-center space-x-2 overflow-hidden">
+                              {renderAssetIcon(asset.assetType)}
+                              <span className="truncate">{asset.title}</span>
+                            </div>
 
-                  {/* WhatsApp Developer Support */}
-                  <div className="flex items-center justify-center">
+                            {isLoadingThis ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent ml-2 flex-shrink-0" />
+                            ) : (
+                              <span className="text-[10px] font-mono opacity-60 ml-2 uppercase flex-shrink-0">
+                                {asset.assetType === 'DOCUMENTATION' || asset.assetType === 'VIVA' ? 'OPEN' : 'DL'}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-xs text-gray-400 italic bg-background p-4 rounded-xl border border-border/60">
+                      No standalone file assets configured yet for this package.
+                    </div>
+                  )}
+
+                  {/* WhatsApp Support CTA */}
+                  <div className="pt-2 flex justify-end">
                     <WhatsAppButton
                       variant="inline"
-                      label="WhatsApp Support"
-                      customMessage={`Hi, I purchased ${product.title} (Order ${order?.orderId || ''}) and need assistance.`}
+                      label="Need Live Setup Help? Contact Developer"
+                      customMessage={`Hi, I purchased ${product.title} (Order ${order?.orderId || ''}) and need assistance with project setup.`}
                     />
                   </div>
-
                 </div>
 
               </div>

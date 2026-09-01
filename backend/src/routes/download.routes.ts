@@ -1,13 +1,14 @@
 import { Router } from 'express';
-import { requestDownloadToken, serveProtectedFile } from '../controllers/download.controller';
+import { requestDownloadToken, requestAssetDownload, serveProtectedFile } from '../controllers/download.controller';
 import { authenticate } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// Endpoint to request short-lived signed URL token
+// Protected token request endpoints
 router.post('/downloads/:productId/request', authenticate, requestDownloadToken);
+router.post('/downloads/:productId/assets/:assetId/request', authenticate, requestAssetDownload);
 
-// Endpoint to download protected zip file using signed token
+// Public token file serving endpoint (token is signed and verified via HMAC SHA-256)
 router.get('/downloads/file/:token', serveProtectedFile);
 
 export default router;
