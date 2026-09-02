@@ -7,6 +7,7 @@ import { TrustSection } from '../components/marketplace/TrustSection';
 import { HowItWorks } from '../components/marketplace/HowItWorks';
 import { FAQSection } from '../components/marketplace/FAQSection';
 import { CategoryFilter, CategoryItem } from '../components/marketplace/CategoryFilter';
+import { HeroBackground } from '../components/common/HeroBackground';
 import api from '../services/api';
 
 export const Home: React.FC = () => {
@@ -84,9 +85,9 @@ export const Home: React.FC = () => {
       
       {/* HERO SECTION */}
       <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 border-b border-border/40">
-        {/* Background Gradients */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-primary-600/20 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute top-1/3 right-10 w-[400px] h-[300px] bg-accent-600/15 blur-[120px] rounded-full pointer-events-none" />
+        
+        {/* Dedicated Ambient Background Layer (Blobs, SVG Network & Floating Particles) */}
+        <HeroBackground />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-6">
