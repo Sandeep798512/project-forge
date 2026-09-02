@@ -84,9 +84,20 @@ export const Home: React.FC = () => {
       
       {/* HERO SECTION */}
       <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 border-b border-border/40">
-        {/* Background Gradients */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-primary-600/20 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute top-1/3 right-10 w-[400px] h-[300px] bg-accent-600/15 blur-[120px] rounded-full pointer-events-none" />
+        {/* Subtle Ambient Animated Hero Background */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+          {/* Ambient Glowing Orb 1 */}
+          <div className="absolute top-1/4 left-1/2 w-[650px] h-[380px] bg-gradient-to-tr from-primary-600/30 to-indigo-600/20 blur-[130px] rounded-full animate-ambient-float pointer-events-none" />
+          
+          {/* Ambient Glowing Orb 2 */}
+          <div className="absolute top-1/3 right-10 w-[450px] h-[320px] bg-gradient-to-bl from-accent-600/20 to-cyan-500/15 blur-[120px] rounded-full animate-ambient-reverse pointer-events-none" />
+
+          {/* Ambient Glowing Orb 3 (Bottom Left Accent) */}
+          <div className="absolute -bottom-10 left-10 w-[350px] h-[250px] bg-purple-600/15 blur-[110px] rounded-full animate-ambient-reverse pointer-events-none" />
+
+          {/* Ultra-Subtle Cyber Grid Overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293708_1px,transparent_1px),linear-gradient(to_bottom,#1f293708_1px,transparent_1px)] bg-[size:4rem_4rem] animate-ambient-grid pointer-events-none" />
+        </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-6">
