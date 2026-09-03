@@ -11,6 +11,8 @@ import {
   RotateCcw,
   TrendingUp,
   Star,
+  Search,
+  X,
 } from 'lucide-react';
 import { BRAND } from '../../config/brand.config';
 import api from '../../services/api';
@@ -22,6 +24,9 @@ export const AdminDashboard: React.FC = () => {
   const [recentCustomers, setRecentCustomers] = useState<any[]>([]);
   const [revenueChart, setRevenueChart] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Search filter state for Recent Customer Orders
+  const [orderSearch, setOrderSearch] = useState('');
 
   useEffect(() => {
     fetchDashboardData();
@@ -44,6 +49,15 @@ export const AdminDashboard: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const filteredRecentOrders = recentOrders.filter((o) => {
+    if (!orderSearch.trim()) return true;
+    const query = orderSearch.toLowerCase().trim();
+    const matchId = o.orderId ? o.orderId.toLowerCase().includes(query) : false;
+    const matchName = o.user?.name ? o.user.name.toLowerCase().includes(query) : false;
+    const matchEmail = o.user?.email ? o.user.email.toLowerCase().includes(query) : false;
+    return matchId || matchName || matchEmail;
+  });
 
   if (loading) {
     return (
@@ -178,11 +192,36 @@ export const AdminDashboard: React.FC = () => {
       {/* Grid: Recent Orders (2/3) + Top Products & Customers (1/3) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Recent Orders Table */}
+        {/* Recent Orders Table with Search */}
         <div className="lg:col-span-2 bg-surface/90 border border-border/80 rounded-2xl p-6 space-y-4">
-          <h3 className="font-bold text-base text-white">Recent Customer Orders</h3>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="font-bold text-base text-white">Recent Customer Orders</h3>
+              <p className="text-[11px] text-gray-400">Filter orders by Order ID or Customer Name/Email</p>
+            </div>
 
-          {recentOrders.length > 0 ? (
+            {/* Order ID & Customer Name Search Bar */}
+            <div className="relative w-full sm:w-72">
+              <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                placeholder="Search Order ID or Customer Name..."
+                value={orderSearch}
+                onChange={(e) => setOrderSearch(e.target.value)}
+                className="w-full bg-background border border-border/80 rounded-xl pl-9 pr-8 py-1.5 text-xs text-gray-100 placeholder-gray-500 focus:outline-none focus:border-primary-500 transition-colors"
+              />
+              {orderSearch && (
+                <button
+                  onClick={() => setOrderSearch('')}
+                  className="absolute right-2.5 top-2.5 text-gray-400 hover:text-white"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {filteredRecentOrders.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-background border-b border-border/60 text-gray-400 font-mono">
@@ -195,7 +234,7 @@ export const AdminDashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/40 text-gray-200">
-                  {recentOrders.map((o) => (
+                  {filteredRecentOrders.map((o) => (
                     <tr key={o._id} className="hover:bg-surface-hover">
                       <td className="p-3 font-mono font-bold text-primary-400">{o.orderId}</td>
                       <td className="p-3 font-semibold">{o.user?.name || o.user?.email || 'Customer'}</td>
@@ -214,7 +253,9 @@ export const AdminDashboard: React.FC = () => {
               </table>
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500 text-xs">No orders recorded in database.</div>
+            <div className="text-center py-8 text-gray-500 text-xs">
+              {orderSearch ? `No orders found matching "${orderSearch}"` : 'No orders recorded in database.'}
+            </div>
           )}
         </div>
 
