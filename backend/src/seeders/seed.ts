@@ -37,11 +37,12 @@ export const seedDatabase = async () => {
 
     // 2. Create Categories
     const categories = await Category.insertMany([
-      { name: 'AI / ML', slug: 'ai-ml', description: 'Artificial Intelligence & Machine Learning projects', order: 1 },
-      { name: 'MERN Stack', slug: 'mern-stack', description: 'Full-stack MongoDB, Express, React, Node projects', order: 2 },
-      { name: 'Web Development', slug: 'web-dev', description: 'Frontend and Backend web applications', order: 3 },
-      { name: 'Management Systems', slug: 'management', description: 'Enterprise & Hospital management tools', order: 4 },
-      { name: 'Real-Time Apps', slug: 'real-time', description: 'WebSockets & WebRTC real-time systems', order: 5 },
+      { name: 'Full Stack', slug: 'full-stack', description: 'Complete Full-Stack Web & Mobile Applications', order: 1 },
+      { name: 'AI / ML', slug: 'ai-ml', description: 'Artificial Intelligence & Machine Learning projects', order: 2 },
+      { name: 'MERN Stack', slug: 'mern-stack', description: 'Full-stack MongoDB, Express, React, Node projects', order: 3 },
+      { name: 'Web Development', slug: 'web-dev', description: 'Frontend and Backend web applications', order: 4 },
+      { name: 'Management Systems', slug: 'management', description: 'Enterprise & Hospital management tools', order: 5 },
+      { name: 'Real-Time Apps', slug: 'real-time', description: 'WebSockets & WebRTC real-time systems', order: 6 },
     ]);
     categories.forEach((cat) => console.log(`[SEED] Created Category: ${cat.name}`));
 

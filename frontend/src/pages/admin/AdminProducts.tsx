@@ -12,6 +12,11 @@ export const AdminProducts: React.FC = () => {
   const [savingProduct, setSavingProduct] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Quick Category Creation State inside Admin Modal
+  const [showAddCatInput, setShowAddCatInput] = useState(false);
+  const [newCatName, setNewCatName] = useState('');
+  const [creatingCat, setCreatingCat] = useState(false);
+
   // Search & Filter
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -66,6 +71,38 @@ export const AdminProducts: React.FC = () => {
     }
   };
 
+  const handleQuickCreateCategory = async () => {
+    if (!newCatName.trim()) return;
+    try {
+      setCreatingCat(true);
+      const slug = newCatName.toLowerCase().trim().replace(/[^a-z0-9]/g, '-');
+      const res = await api.post('/admin/categories/crud', {
+        action: 'create',
+        name: newCatName.trim(),
+        slug,
+        description: `${newCatName.trim()} projects`,
+      });
+
+      if (res.data.success) {
+        const catRes = await api.get('/categories');
+        if (catRes.data.success) {
+          setCategories(catRes.data.categories);
+          const createdCat = catRes.data.categories.find((c: any) => c.slug === slug || c.name === newCatName.trim());
+          if (createdCat) {
+            setFormData((prev: any) => ({ ...prev, category: createdCat._id }));
+          }
+        }
+        setNewCatName('');
+        setShowAddCatInput(false);
+        setStatusMessage({ type: 'success', text: `Category "${newCatName}" created & selected!` });
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Error creating category');
+    } finally {
+      setCreatingCat(false);
+    }
+  };
+
   const handleOpenCreateModal = () => {
     setEditingProductId(null);
     setEditingProductAssets([]);
@@ -75,6 +112,7 @@ export const AdminProducts: React.FC = () => {
     });
     setStatusMessage(null);
     setActiveTab('info');
+    setShowAddCatInput(false);
     setModalOpen(true);
   };
 
@@ -89,6 +127,7 @@ export const AdminProducts: React.FC = () => {
     setStatusMessage(null);
     setModalOpen(true);
     setActiveTab('info');
+    setShowAddCatInput(false);
     fetchProductAssets(p._id);
   };
 
@@ -456,18 +495,49 @@ export const AdminProducts: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-semibold text-gray-300 mb-1">Category</label>
-                    <select
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100"
-                    >
-                      {categories.map((c) => (
-                        <option key={c._id} value={c._id}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-semibold text-gray-300">Category</label>
+                      <button
+                        type="button"
+                        onClick={() => setShowAddCatInput(!showAddCatInput)}
+                        className="text-[10px] text-accent-400 hover:text-accent-300 font-bold flex items-center space-x-0.5"
+                      >
+                        <Plus className="w-3 h-3" />
+                        <span>{showAddCatInput ? 'Cancel' : '+ Add New Category'}</span>
+                      </button>
+                    </div>
+
+                    {!showAddCatInput ? (
+                      <select
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100 font-semibold"
+                      >
+                        {categories.map((c) => (
+                          <option key={c._id} value={c._id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="text"
+                          placeholder="Enter category (e.g. Full Stack)"
+                          value={newCatName}
+                          onChange={(e) => setNewCatName(e.target.value)}
+                          className="flex-1 bg-background border border-accent-500/50 rounded-xl px-2.5 py-1.5 text-xs text-white"
+                        />
+                        <button
+                          type="button"
+                          disabled={creatingCat || !newCatName.trim()}
+                          onClick={handleQuickCreateCategory}
+                          className="px-2.5 py-1.5 rounded-xl bg-accent-600 hover:bg-accent-500 text-white font-bold text-xs disabled:opacity-50 flex-shrink-0"
+                        >
+                          {creatingCat ? 'Saving...' : 'Save'}
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div>
