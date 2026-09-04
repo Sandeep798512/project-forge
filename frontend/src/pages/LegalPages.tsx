@@ -30,7 +30,7 @@ export const RefundPolicy: React.FC = () => {
           <h2 className="text-lg font-bold text-white">Digital Product Nature</h2>
           <p>Because our software packages contain non-tangible digital source code, downloads are fulfilled immediately after payment verification.</p>
           <h2 className="text-lg font-bold text-white">Eligible Refund Scenarios</h2>
-          <p>Refunds are granted if: (1) Duplicate payments occur due to gateway glitches, or (2) The source code archive is corrupt and our support team cannot provide a working fix within 48 hours.</p>
+          <p>Refunds are granted if: (1) Duplicate payments occur due to gateway glitches, or (2) The source code archive is corrupt.</p>
         </div>
       </div>
     </div>
