@@ -634,8 +634,8 @@ export const AdminProducts: React.FC = () => {
                     </div>
 
                     {formData.thumbnail && (
-                      <div className="w-20 h-14 rounded-lg overflow-hidden border border-border flex-shrink-0 bg-surface">
-                        <img src={formData.thumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
+                      <div className="w-24 h-16 rounded-lg overflow-hidden border border-border flex-shrink-0 bg-slate-950 flex items-center justify-center p-0.5">
+                        <img src={formData.thumbnail} alt="Thumbnail preview" className="max-w-full max-h-full object-contain" />
                       </div>
                     )}
                   </div>
@@ -682,8 +682,8 @@ export const AdminProducts: React.FC = () => {
                   {formData.screenshots && formData.screenshots.length > 0 ? (
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
                       {formData.screenshots.map((src: string, idx: number) => (
-                        <div key={idx} className="relative group rounded-lg overflow-hidden border border-border h-20 bg-surface">
-                          <img src={src} alt={`Screenshot ${idx + 1}`} className="w-full h-full object-cover" />
+                        <div key={idx} className="relative group rounded-lg overflow-hidden border border-border h-24 bg-slate-950 flex items-center justify-center p-0.5">
+                          <img src={src} alt={`Screenshot ${idx + 1}`} className="max-w-full max-h-full object-contain" />
                           <button
                             type="button"
                             onClick={() => {
@@ -692,7 +692,7 @@ export const AdminProducts: React.FC = () => {
                                 screenshots: prev.screenshots.filter((_: any, i: number) => i !== idx),
                               }));
                             }}
-                            className="absolute top-1 right-1 p-1 bg-red-600/80 hover:bg-red-600 text-white rounded-full opacity-90 transition-opacity"
+                            className="absolute top-1 right-1 p-1 bg-red-600/80 hover:bg-red-600 text-white rounded-full opacity-90 transition-opacity z-10"
                             title="Remove screenshot"
                           >
                             <X className="w-3 h-3" />

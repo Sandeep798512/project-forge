@@ -33,25 +33,35 @@ export const ProjectCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div className="bg-surface/80 border border-border/80 rounded-2xl overflow-hidden hover:border-primary-500/50 hover:shadow-glow-md transition-all duration-300 flex flex-col group">
       
-      {/* Thumbnail Container */}
-      <div className="relative aspect-video overflow-hidden bg-surface-hover">
+      {/* Thumbnail Container (Uncropped Original Image View) */}
+      <div className="relative aspect-video overflow-hidden bg-slate-950 flex items-center justify-center">
+        
+        {/* Soft Ambient Blur Layer */}
+        <img
+          src={product.thumbnail}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover blur-md opacity-25 scale-105 pointer-events-none"
+        />
+
+        {/* Uncropped Original Main Image */}
         <img
           src={product.thumbnail}
           alt={product.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="relative z-10 max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-80" />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-60 pointer-events-none z-10" />
         
         {/* Difficulty Pill */}
-        <div className="absolute top-3 left-3">
+        <div className="absolute top-3 left-3 z-20">
           <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border backdrop-blur-sm ${difficultyColors[product.difficulty] || difficultyColors.Intermediate}`}>
             {product.difficulty}
           </span>
         </div>
 
         {/* Action Buttons Top Right */}
-        <div className="absolute top-3 right-3 flex items-center space-x-1.5">
+        <div className="absolute top-3 right-3 z-20 flex items-center space-x-1.5">
           {product.demoVideoUrl && (
             <a
               href={product.demoVideoUrl}

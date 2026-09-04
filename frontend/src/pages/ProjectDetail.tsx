@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ExternalLink, CheckCircle2, ShieldCheck, Play, ArrowLeft, Star, FileText, Database, Layers, HelpCircle, Code, ShoppingCart, MessageSquare, Download, Video } from 'lucide-react';
+import { ExternalLink, CheckCircle2, ShieldCheck, Play, ArrowLeft, Star, FileText, Database, Layers, HelpCircle, Code, ShoppingCart, MessageSquare, Download, Video, Maximize2 } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
 import { WhatsAppButton } from '../components/common/WhatsAppButton';
 import { useAuth } from '../context/AuthContext';
@@ -16,6 +16,7 @@ export const ProjectDetail: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'architecture' | 'deliverables' | 'viva'>('overview');
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
+  const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -67,6 +68,7 @@ export const ProjectDetail: React.FC = () => {
   }
 
   const allImages = [product.thumbnail, ...(product.screenshots || [])].filter(Boolean);
+  const currentImgSrc = allImages[activeImageIndex] || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80';
 
   return (
     <div className="py-10 bg-background min-h-screen">
@@ -134,17 +136,36 @@ export const ProjectDetail: React.FC = () => {
               </div>
             </div>
 
-            {/* Gallery Viewer */}
+            {/* Uncropped Full Image Gallery Viewer */}
             <div className="bg-surface/80 border border-border/80 rounded-2xl overflow-hidden p-2">
-              <div className="aspect-video relative rounded-xl overflow-hidden bg-surface-hover">
+              <div className="aspect-video relative rounded-xl overflow-hidden bg-slate-950 flex items-center justify-center group">
+                
+                {/* Soft Blurred Background Fill (Fills Aspect Ratio without distortion) */}
                 <img
-                  src={allImages[activeImageIndex] || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80'}
-                  alt={product.title}
-                  className="w-full h-full object-cover"
+                  src={currentImgSrc}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover blur-md opacity-20 scale-105 pointer-events-none"
                 />
 
-                {/* Overlay Action Badges */}
-                <div className="absolute top-4 right-4 flex items-center space-x-2">
+                {/* Main Full Image (Uncropped, 100% Original Ratio Visible) */}
+                <img
+                  src={currentImgSrc}
+                  alt={product.title}
+                  className="relative z-10 max-w-full max-h-full object-contain cursor-pointer transition-transform duration-300 group-hover:scale-[1.01]"
+                  onClick={() => setLightboxOpen(true)}
+                  title="Click to view full screen"
+                />
+
+                {/* Overlay Action Badges & Lightbox trigger */}
+                <div className="absolute top-4 right-4 z-20 flex items-center space-x-2">
+                  <button
+                    onClick={() => setLightboxOpen(true)}
+                    className="bg-surface/90 hover:bg-white hover:text-gray-900 text-gray-200 p-2 rounded-xl border border-border backdrop-blur-md transition-all shadow-md"
+                    title="Expand Full Screen View"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                  </button>
+
                   {product.demoVideoUrl && (
                     <a
                       href={product.demoVideoUrl}
@@ -171,18 +192,18 @@ export const ProjectDetail: React.FC = () => {
                 </div>
               </div>
 
-              {/* Thumbnail Strip */}
+              {/* Uncropped Thumbnail Strip */}
               {allImages.length > 1 && (
                 <div className="flex items-center space-x-2 mt-2 overflow-x-auto p-1">
                   {allImages.map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => setActiveImageIndex(idx)}
-                      className={`w-20 h-12 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
-                        activeImageIndex === idx ? 'border-primary-500 scale-95' : 'border-transparent opacity-70 hover:opacity-100'
+                      className={`w-24 h-16 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 bg-slate-950 flex items-center justify-center ${
+                        activeImageIndex === idx ? 'border-primary-500 scale-95 shadow-glow-sm' : 'border-border/60 opacity-70 hover:opacity-100'
                       }`}
                     >
-                      <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
+                      <img src={img} alt={`Thumbnail ${idx + 1}`} className="max-w-full max-h-full object-contain" />
                     </button>
                   ))}
                 </div>
@@ -441,6 +462,29 @@ export const ProjectDetail: React.FC = () => {
         </div>
 
       </div>
+
+      {/* Full Screen Lightbox Modal for Original Image */}
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <div className="relative max-w-7xl max-h-[92vh] flex items-center justify-center">
+            <button
+              onClick={() => setLightboxOpen(false)}
+              className="absolute -top-10 right-0 text-gray-300 hover:text-white font-bold text-sm bg-surface/80 px-3 py-1 rounded-lg border border-border"
+            >
+              ✕ Close (ESC)
+            </button>
+            <img
+              src={currentImgSrc}
+              alt="Original High-Res Screenshot"
+              className="max-w-full max-h-[90vh] object-contain rounded-xl border border-border/60 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
