@@ -368,30 +368,43 @@ export const toggleEntitlementRevocation = async (req: AuthRequest, res: Respons
 export const updateEntitlementDownloadLimit = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { action, customMaxDownloads } = req.body; // action: 'reset' | 'set_limit'
+    const { action, customMaxDownloads, maxDownloads } = req.body; // action: 'reset' | 'set_limit'
     const entitlement = await Entitlement.findById(id);
 
     if (!entitlement) {
-      res.status(404).json({ success: false, message: 'Entitlement not found' });
+      res.status(404).json({ success: false, message: 'Entitlement record not found' });
       return;
     }
 
     if (action === 'reset') {
       entitlement.downloadCount = 0;
-    } else if (action === 'set_limit' && typeof customMaxDownloads === 'number' && customMaxDownloads >= 0) {
-      entitlement.maxDownloads = customMaxDownloads;
+    } else {
+      const rawLimit = customMaxDownloads !== undefined ? customMaxDownloads : maxDownloads;
+      const numLimit = Number(rawLimit);
+      if (!isNaN(numLimit) && numLimit >= 0) {
+        entitlement.maxDownloads = numLimit;
+      }
     }
 
     await entitlement.save();
 
-    await AuditLog.create({
-      user: req.user?.id,
-      action: 'ENTITLEMENT_LIMIT_UPDATED',
-      details: { entitlementId: id, action, downloadCount: entitlement.downloadCount, maxDownloads: entitlement.maxDownloads },
-    });
+    try {
+      await AuditLog.create({
+        user: req.user?.id,
+        action: 'ENTITLEMENT_LIMIT_UPDATED',
+        details: { entitlementId: id, action, downloadCount: entitlement.downloadCount, maxDownloads: entitlement.maxDownloads },
+      });
+    } catch (auditErr) {
+      console.warn('[AUDIT LOG WARNING]', auditErr);
+    }
 
-    res.status(200).json({ success: true, entitlement });
+    res.status(200).json({
+      success: true,
+      message: 'Entitlement download limit updated successfully',
+      entitlement,
+    });
   } catch (error: any) {
+    console.error('[UPDATE ENTITLEMENT LIMIT ERROR]', error);
     res.status(500).json({ success: false, message: error.message || 'Failed to update entitlement limit' });
   }
 };
