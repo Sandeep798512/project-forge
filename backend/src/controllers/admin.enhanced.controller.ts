@@ -365,6 +365,37 @@ export const toggleEntitlementRevocation = async (req: AuthRequest, res: Respons
   }
 };
 
+export const updateEntitlementDownloadLimit = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { action, customMaxDownloads } = req.body; // action: 'reset' | 'set_limit'
+    const entitlement = await Entitlement.findById(id);
+
+    if (!entitlement) {
+      res.status(404).json({ success: false, message: 'Entitlement not found' });
+      return;
+    }
+
+    if (action === 'reset') {
+      entitlement.downloadCount = 0;
+    } else if (action === 'set_limit' && typeof customMaxDownloads === 'number' && customMaxDownloads >= 0) {
+      entitlement.maxDownloads = customMaxDownloads;
+    }
+
+    await entitlement.save();
+
+    await AuditLog.create({
+      user: req.user?.id,
+      action: 'ENTITLEMENT_LIMIT_UPDATED',
+      details: { entitlementId: id, action, downloadCount: entitlement.downloadCount, maxDownloads: entitlement.maxDownloads },
+    });
+
+    res.status(200).json({ success: true, entitlement });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message || 'Failed to update entitlement limit' });
+  }
+};
+
 // 7. DOWNLOAD ACTIVITY & ABUSE DETECTION
 export const getAdminDownloadActivity = async (req: AuthRequest, res: Response): Promise<void> => {
   try {

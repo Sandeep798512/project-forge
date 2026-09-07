@@ -92,7 +92,7 @@ const ProductSchema: Schema = new Schema(
     downloadCount: { type: Number, default: 0 },
     ratingAverage: { type: Number, default: 5.0 },
     ratingCount: { type: Number, default: 0 },
-    maxDownloadsAllowed: { type: Number, default: 20 },
+    maxDownloadsAllowed: { type: Number, default: 5 },
   },
   { timestamps: true }
 );

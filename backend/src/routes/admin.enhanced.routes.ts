@@ -10,6 +10,7 @@ import {
   toggleCustomerSuspension,
   getAdminEntitlements,
   toggleEntitlementRevocation,
+  updateEntitlementDownloadLimit,
   getAdminDownloadActivity,
   getAdminReviews,
   moderateReview,
@@ -76,6 +77,7 @@ router.post('/customers/:customerId/toggle-suspend', requireRbacRole(['SUPER_ADM
 // 8. Entitlements
 router.get('/entitlements/list', getAdminEntitlements);
 router.post('/entitlements/:id/toggle-revoke', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), toggleEntitlementRevocation);
+router.post('/entitlements/:id/update-limit', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), updateEntitlementDownloadLimit);
 
 // 9. Downloads & Abuse Monitoring
 router.get('/downloads/activity', getAdminDownloadActivity);
