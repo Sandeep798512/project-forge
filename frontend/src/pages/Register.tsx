@@ -15,12 +15,19 @@ export const Register: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [referralCode, setReferralCode] = useState(searchParams.get('ref') || '');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!acceptedTerms) {
+      setError('Please read and agree to the Terms of Service, Privacy Policy, and Software License Agreement.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -120,6 +127,23 @@ export const Register: React.FC = () => {
                 className="w-full bg-background border border-border/80 rounded-xl pl-10 pr-4 py-2.5 text-sm font-mono text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
+          </div>
+
+          {/* Policy Agreement Checkbox */}
+          <div className="flex items-start space-x-2 pt-1 text-xs text-gray-300">
+            <input
+              type="checkbox"
+              id="acceptedTerms"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              className="mt-0.5 rounded border-border text-primary-600 focus:ring-primary-500 bg-background"
+            />
+            <label htmlFor="acceptedTerms" className="leading-tight text-gray-400">
+              I have read and agree to the{' '}
+              <Link to="/terms" target="_blank" className="text-primary-400 hover:underline font-semibold">Terms of Service</Link>,{' '}
+              <Link to="/privacy" target="_blank" className="text-primary-400 hover:underline font-semibold">Privacy Policy</Link>, and{' '}
+              <Link to="/license" target="_blank" className="text-primary-400 hover:underline font-semibold">Software License Agreement</Link>.
+            </label>
           </div>
 
           <button

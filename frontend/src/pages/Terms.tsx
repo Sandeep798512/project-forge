@@ -4,34 +4,94 @@ import { BRAND } from '../config/brand.config';
 export const Terms: React.FC = () => {
   return (
     <div className="py-16 bg-background min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 text-gray-300 text-sm leading-relaxed">
-        <h1 className="text-3xl font-extrabold text-white">Terms of Service</h1>
-        <p className="text-xs text-gray-400">Last updated: August 31, 2026</p>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-gray-300 text-sm leading-relaxed">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Terms of Service</h1>
+          <p className="text-xs text-gray-400 mt-2">Last updated: September 10, 2026 • Effective Date: September 10, 2026</p>
+        </div>
 
-        <section className="space-y-3 bg-surface/60 p-6 rounded-2xl border border-border/60">
-          <h2 className="text-lg font-bold text-white">1. Platform Scope & Purpose</h2>
+        <section className="space-y-4 bg-surface/60 p-6 sm:p-8 rounded-2xl border border-border/60">
+          <h2 className="text-xl font-bold text-white">1. Platform Purpose & Legitimate Use</h2>
           <p>
-            {BRAND.name} provides digital software packages, source code, documentation, and technical developer materials intended for software engineering education, learning, customization, and portfolio demonstration.
+            {BRAND.name} provides digital software project packages, source code archives, technical documentation, setup guides, viva/technical preparation resources, and developer customization materials. All materials offered on this platform are intended strictly for legitimate educational, self-learning, software customization, developer skill enhancement, and personal portfolio demonstration purposes.
+          </p>
+          <p className="text-amber-300/90 font-medium">
+            ProjectForge does NOT endorse, market, or permit academic dishonesty, plagiarism, misrepresentation of authorship, or fraudulent submission of unadapted materials under false claims.
           </p>
           <p>
-            We do not endorse or advertise academic cheating, plagiarism, guaranteed exam outcomes, or fraudulent submissions. Customers are expected to understand, adapt, and build upon the purchased software code.
+            Purchasers are responsible for reviewing, testing, understanding, and adapting any source code or technical materials before using or presenting them. ProjectForge makes no promises or guarantees regarding academic grades, examination scores, placement guarantees, or institutional project acceptance.
           </p>
         </section>
 
-        <section className="space-y-3 bg-surface/60 p-6 rounded-2xl border border-border/60">
-          <h2 className="text-lg font-bold text-white">2. License Grant</h2>
+        <section className="space-y-4 bg-surface/60 p-6 sm:p-8 rounded-2xl border border-border/60">
+          <h2 className="text-xl font-bold text-white">2. User Responsibilities & Institutional Compliance</h2>
+          <p>By registering, purchasing, or using ProjectForge materials, you agree that you are solely responsible for:</p>
+          <ul className="list-disc list-inside space-y-2 text-gray-300">
+            <li>Ensuring that your intended use complies with applicable laws, local regulations, and your academic institution or employer policies.</li>
+            <li>Reviewing, compiling, and testing all source code in your local development or staging environment prior to deployment.</li>
+            <li>Maintaining independent offline backups of all downloaded packages and project files.</li>
+            <li>Securing your account credentials, API keys, and local development or server hosting environments.</li>
+            <li>Refraining from uploading illegal, infringing, or malicious content through support channels or custom project forms.</li>
+          </ul>
+        </section>
+
+        <section className="space-y-4 bg-surface/60 p-6 sm:p-8 rounded-2xl border border-border/60">
+          <h2 className="text-xl font-bold text-white">3. Product Information & Technical Dependencies</h2>
           <p>
-            Upon purchasing a project package, {BRAND.name} grants you a non-exclusive, non-transferable license to modify, run, customize, and showcase the source code for personal, educational, and portfolio purposes.
+            ProjectForge strives to provide accurate product listings, including technology stacks, major dependencies, included deliverables, and difficulty levels. However, software execution depends on third-party frameworks, hosting environments, runtime versions, operating system configurations, and external API providers.
           </p>
-          <p className="text-red-400 font-semibold">
-            Strictly Prohibited: Reselling, re-distributing publicly on marketplace sites, or claiming original authorship for raw unmodified project zip packages is forbidden.
+          <p>
+            ProjectForge does not guarantee that every ready-made package will execute identically across all operating systems or unconfigured environments without appropriate local environment setup as specified in the product documentation.
           </p>
         </section>
 
-        <section className="space-y-3 bg-surface/60 p-6 rounded-2xl border border-border/60">
-          <h2 className="text-lg font-bold text-white">3. Digital Deliveries & Downloads</h2>
+        <section className="space-y-4 bg-surface/60 p-6 sm:p-8 rounded-2xl border border-border/60">
+          <h2 className="text-xl font-bold text-white">4. Digital Delivery & Access Authorization</h2>
           <p>
-            All purchases provide instant access through your authenticated account dashboard. Download links are securely authenticated and time-limited to prevent unauthorized link sharing.
+            Digital project packages are delivered electronically upon successful server-side payment verification. Verified purchasers receive access via their authenticated account dashboard.
+          </p>
+          <p>
+            To protect digital intellectual property and prevent link leaking, download access is governed by authenticated, time-limited security tokens. Customers should download and store their purchased archives promptly. If access fails or is interrupted due to a technical glitch, customers can contact developer support at <a href={`mailto:${BRAND.supportEmail}`} className="text-primary-400 hover:underline">{BRAND.supportEmail}</a> for prompt assistance.
+          </p>
+        </section>
+
+        <section className="space-y-4 bg-surface/60 p-6 sm:p-8 rounded-2xl border border-border/60">
+          <h2 className="text-xl font-bold text-white">5. Custom Project Request & Service Workflow</h2>
+          <p>
+            ProjectForge allows users to submit requests for custom software development or package customization. Submitting a custom project request form does NOT constitute an automatically accepted contract or legally binding commitment by ProjectForge.
+          </p>
+          <p>The custom project service workflow follows a clear multi-step process:</p>
+          <ol className="list-decimal list-inside space-y-2 text-gray-300">
+            <li><strong>Request Submitted:</strong> User submits project requirements via the designated platform form.</li>
+            <li><strong>Technical Review:</strong> ProjectForge reviews feasibility, technical scope, and legal/policy compliance.</li>
+            <li><strong>Scope & Quote Proposal:</strong> ProjectForge provides a proposed scope, delivery timeline estimate, and pricing quote.</li>
+            <li><strong>Customer Acceptance:</strong> The customer reviews and explicitly accepts the proposed scope and terms.</li>
+            <li><strong>Payment & Confirmation:</strong> Payment terms are confirmed and processed.</li>
+            <li><strong>Work Execution:</strong> Technical work commences according to the agreed milestone plan.</li>
+          </ol>
+          <p>
+            ProjectForge reserves the right to decline custom requests that involve illegal activity, credential theft, malware, copyright infringement, or academic deception.
+          </p>
+        </section>
+
+        <section className="space-y-4 bg-surface/60 p-6 sm:p-8 rounded-2xl border border-border/60">
+          <h2 className="text-xl font-bold text-white">6. Prohibited Activities & Security</h2>
+          <p>Users are strictly prohibited from using ProjectForge or its materials for:</p>
+          <ul className="list-disc list-inside space-y-2 text-gray-300">
+            <li>Reselling, sublicensing, or publicly redistributing raw, un-customized project ZIP packages on public marketplaces, forums, or code repositories.</li>
+            <li>Attempting to bypass authentication, download token expiration, or access control mechanisms.</li>
+            <li>Submitting malware, stolen confidential code, API secrets, or unauthorized third-party credentials.</li>
+            <li>Engaging in fraudulent chargebacks or unauthorized account sharing.</li>
+          </ul>
+        </section>
+
+        <section className="space-y-4 bg-surface/60 p-6 sm:p-8 rounded-2xl border border-border/60">
+          <h2 className="text-xl font-bold text-white">7. Neutral Limitation of Liability & Contact</h2>
+          <p>
+            To the maximum extent permitted under applicable law, ProjectForge operates as a provider of educational digital resources and software tools. ProjectForge shall not be liable for indirect, incidental, or consequential damages resulting from third-party hosting failures, improper code execution, or institutional decisions.
+          </p>
+          <p>
+            For questions regarding these Terms of Service, please contact our support team at <a href={`mailto:${BRAND.supportEmail}`} className="text-primary-400 hover:underline">{BRAND.supportEmail}</a> or via our official WhatsApp helpdesk.
           </p>
         </section>
       </div>

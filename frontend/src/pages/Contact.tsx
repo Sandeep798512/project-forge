@@ -73,7 +73,10 @@ export const Contact: React.FC = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
-                <h2 className="text-xl font-bold text-white mb-2">Send an Inquiry</h2>
+                <h2 className="text-xl font-bold text-white mb-1">Send an Inquiry</h2>
+                <p className="text-[11px] text-amber-400/90 font-medium bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-xl">
+                  🔒 <strong>Security Notice:</strong> Do not submit passwords, API keys, private credentials, or confidential information in this form.
+                </p>
                 
                 <div>
                   <label className="block text-xs font-semibold text-gray-300 mb-1">Your Name</label>

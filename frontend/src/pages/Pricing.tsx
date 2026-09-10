@@ -114,11 +114,27 @@ export const Pricing: React.FC = () => {
           ))}
         </div>
 
-        <div className="bg-surface/40 border border-border/60 rounded-2xl p-8 text-center max-w-3xl mx-auto space-y-3">
+        <div className="bg-surface/40 border border-border/60 rounded-2xl p-8 text-center max-w-3xl mx-auto space-y-4">
           <h3 className="font-bold text-lg text-white">Have a specific custom project requirement?</h3>
-          <p className="text-gray-400 text-xs">
+          <p className="text-gray-400 text-xs leading-relaxed">
             Send us your problem statement or functional specification on WhatsApp for a quick estimate.
           </p>
+          <p className="text-[11px] text-amber-400/90 font-medium bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-xl max-w-xl mx-auto">
+            🔒 <strong>Security Notice:</strong> Do not share passwords, API keys, or private confidential credentials in project inquiries.
+          </p>
+
+          {/* Custom Project Workflow */}
+          <div className="pt-4 border-t border-border/40 text-left space-y-2 text-xs">
+            <h4 className="font-bold text-gray-200 text-center uppercase tracking-wider text-[11px] mb-3">Custom Project Workflow Stages</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center font-mono font-bold text-[10px]">
+              <div className="p-2 rounded-xl bg-background border border-border text-gray-300">1. SUBMITTED</div>
+              <div className="p-2 rounded-xl bg-background border border-amber-500/30 text-amber-400">2. REVIEW</div>
+              <div className="p-2 rounded-xl bg-background border border-primary-500/30 text-primary-400">3. QUOTE</div>
+              <div className="p-2 rounded-xl bg-background border border-emerald-500/30 text-emerald-400">4. ACCEPTANCE</div>
+              <div className="p-2 rounded-xl bg-background border border-indigo-500/30 text-indigo-400">5. WORK STARTED</div>
+            </div>
+          </div>
+
           <div className="pt-2 flex justify-center">
             <WhatsAppButton
               variant="inline"

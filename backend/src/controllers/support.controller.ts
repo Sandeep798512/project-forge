@@ -1,48 +1,74 @@
 import { Response } from 'express';
 import SupportTicket from '../models/SupportTicket';
 import AuditLog from '../models/AuditLog';
+import User from '../models/User';
 import { AuthRequest } from '../middlewares/auth.middleware';
 
 export const createSupportTicket = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user) {
-      res.status(401).json({ success: false, message: 'Authentication required' });
-      return;
-    }
+    const { name, email, subject, message, description, priority, orderId, productId, category } = req.body;
 
-    const { subject, description, priority, orderId, productId } = req.body;
+    const ticketSubject = subject || 'General Inquiry';
+    const ticketDescription = description || message;
 
-    if (!subject || !description) {
+    if (!ticketSubject || !ticketDescription) {
       res.status(400).json({ success: false, message: 'Subject and description are required.' });
       return;
     }
 
+    let userId = req.user?.id;
+    if (!userId) {
+      const userEmail = (email || 'guest@projectforge.dev').toLowerCase();
+      const existing = await User.findOne({ email: userEmail });
+      if (existing) {
+        userId = (existing._id as any).toString();
+      } else {
+        const guest = await User.findOneAndUpdate(
+          { email: 'guest@projectforge.dev' },
+          {
+            name: name || 'Guest User',
+            email: 'guest@projectforge.dev',
+            password: 'GuestPassword123!',
+            role: 'user',
+            isVerified: true,
+          },
+          { upsert: true, new: true }
+        );
+        userId = (guest._id as any).toString();
+      }
+    }
+
     const ticketId = `TCK-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
+    const isIpComplaint = category === 'IP_COMPLAINT' || ticketSubject.toUpperCase().includes('IP / COPYRIGHT');
 
     const ticket = await SupportTicket.create({
       ticketId,
-      user: req.user.id,
+      user: userId,
       order: orderId || undefined,
       product: productId || undefined,
-      subject,
-      description,
-      priority: priority || 'medium',
+      subject: isIpComplaint ? `[IP COMPLAINT] ${ticketSubject}` : ticketSubject,
+      description: ticketDescription,
+      priority: isIpComplaint ? 'high' : priority || 'medium',
       status: 'open',
       messages: [
         {
           sender: 'user',
-          senderName: req.user.name,
-          message: description,
+          senderName: req.user?.name || name || 'Guest Complainant',
+          message: ticketDescription,
           createdAt: new Date(),
         },
       ],
     });
 
-    await AuditLog.create({
-      user: req.user.id,
-      action: 'SUPPORT_TICKET_CREATED',
-      details: { ticketId, subject },
-    });
+    try {
+      await AuditLog.create({
+        user: userId,
+        action: isIpComplaint ? 'IP_COMPLAINT_SUBMITTED' : 'SUPPORT_TICKET_CREATED',
+        details: { ticketId, subject: ticketSubject },
+      });
+    } catch (auditErr) {
+      console.warn('[AUDIT LOG WARNING]', auditErr);
+    }
 
     res.status(201).json({ success: true, ticket });
   } catch (error: any) {

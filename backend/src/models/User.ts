@@ -16,6 +16,8 @@ export interface IUser extends Document {
   resetPasswordExpire?: Date;
   referralCode: string;
   referredBy?: string;
+  acceptedTermsAt?: Date;
+  acceptedTermsVersion?: string;
   totalSpent: number;
   purchaseCount: number;
   createdAt: Date;
@@ -42,6 +44,8 @@ const UserSchema: Schema = new Schema(
     resetPasswordExpire: { type: Date },
     referralCode: { type: String, unique: true, sparse: true },
     referredBy: { type: String },
+    acceptedTermsAt: { type: Date, default: Date.now },
+    acceptedTermsVersion: { type: String, default: '2026-09-10' },
     totalSpent: { type: Number, default: 0 },
     purchaseCount: { type: Number, default: 0 },
   },

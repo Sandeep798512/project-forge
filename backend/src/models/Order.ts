@@ -14,6 +14,7 @@ export interface IOrder extends Document {
   discountAmount: number;
   finalAmount: number;
   couponCode?: string;
+  acceptedTermsAt?: Date;
   status: 'pending' | 'paid' | 'failed' | 'cancelled' | 'refunded';
   createdAt: Date;
   updatedAt: Date;
@@ -34,6 +35,7 @@ const OrderSchema: Schema = new Schema(
     discountAmount: { type: Number, default: 0 },
     finalAmount: { type: Number, required: true },
     couponCode: { type: String },
+    acceptedTermsAt: { type: Date, default: Date.now },
     status: {
       type: String,
       enum: ['pending', 'paid', 'failed', 'cancelled', 'refunded'],

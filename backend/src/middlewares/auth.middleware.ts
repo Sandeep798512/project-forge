@@ -52,6 +52,34 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
   }
 };
 
+export const optionalAuthenticate = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    let token: string | undefined;
+
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    if (token) {
+      const decoded: TokenPayload = verifyToken(token);
+      const user = await User.findById(decoded.userId).select('name email role rbacRole isVerified isSuspended');
+
+      if (user && !user.isSuspended) {
+        req.user = {
+          id: (user._id as any).toString(),
+          email: user.email,
+          role: user.role,
+          rbacRole: user.rbacRole || (user.role === 'admin' ? 'SUPER_ADMIN' : 'USER'),
+          name: user.name,
+        };
+      }
+    }
+  } catch (error) {
+    // Silently continue for optional auth
+  }
+  next();
+};
+
 export const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction): void => {
   if (!req.user || req.user.role !== 'admin') {
     res.status(403).json({ success: false, message: 'Access denied. Admin privileges required.' });
