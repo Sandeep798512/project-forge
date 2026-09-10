@@ -71,6 +71,25 @@ export const AdminDashboard: React.FC = () => {
   }
 
   const maxRevenue = Math.max(...(revenueChart.map((d) => d.revenue) || [1]), 1000);
+  const trendTotalRevenue = revenueChart.reduce((sum, item) => sum + (item.revenue || 0), 0);
+  const trendTotalOrders = revenueChart.reduce((sum, item) => sum + (item.orders || 0), 0);
+  const peakRevenue = Math.max(...(revenueChart.map((d) => d.revenue) || [0]), 0);
+  const peakItem = revenueChart.find((d) => d.revenue === peakRevenue && peakRevenue > 0);
+  const avgDailyRevenue = revenueChart.length > 0 ? trendTotalRevenue / revenueChart.length : 0;
+
+  const formatDateLabel = (dateStr: string) => {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthIdx = parseInt(parts[1], 10) - 1;
+      const day = parts[2];
+      if (monthIdx >= 0 && monthIdx < 12) {
+        return `${day} ${monthNames[monthIdx]}`;
+      }
+    }
+    return dateStr.length > 5 ? dateStr.slice(5) : dateStr;
+  };
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -152,41 +171,144 @@ export const AdminDashboard: React.FC = () => {
 
       </div>
 
-      {/* Revenue Chart Section */}
-      <div className="bg-surface/90 border border-border/80 rounded-2xl p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-bold text-base text-white">Daily Revenue Trend</h3>
-            <p className="text-xs text-gray-400">Aggregated verified sales by date from MongoDB Order collection.</p>
+      {/* Daily Revenue Trend Section */}
+      <div className="bg-surface/90 border border-border/80 rounded-2xl p-6 space-y-5 shadow-2xl relative overflow-hidden">
+        
+        {/* Ambient Background Glow */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Section Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-4 relative z-10">
+          <div className="flex items-center space-x-3">
+            <div className="p-2.5 rounded-xl bg-gradient-to-tr from-primary-600/30 to-accent-500/30 border border-primary-500/30 text-primary-400">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-lg text-white tracking-tight">Daily Revenue Trend</h3>
+              <p className="text-xs text-gray-400">Aggregated verified sales by date from MongoDB Order collection.</p>
+            </div>
           </div>
-          <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
-            REAL DB DATA
-          </span>
+          <div className="flex items-center space-x-2">
+            <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3.5 py-1.5 rounded-full flex items-center space-x-2 shadow-glow-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>REAL DB DATA</span>
+            </span>
+          </div>
         </div>
 
+        {/* Quick Trend Summary KPI Badges */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-background/60 border border-border/60 p-4 rounded-xl relative z-10">
+          <div className="space-y-1">
+            <span className="text-[10px] uppercase font-mono font-bold text-gray-400 tracking-wider">Trend Revenue</span>
+            <p className="text-base font-extrabold text-emerald-400">
+              {BRAND.currency.symbol}{trendTotalRevenue.toLocaleString('en-IN')}
+            </p>
+          </div>
+          <div className="space-y-1">
+            <span className="text-[10px] uppercase font-mono font-bold text-gray-400 tracking-wider">Peak Sales Day</span>
+            <p className="text-base font-extrabold text-primary-400 flex items-center space-x-1">
+              <span>{peakRevenue > 0 ? `${BRAND.currency.symbol}${peakRevenue.toLocaleString('en-IN')}` : '₹0'}</span>
+              {peakItem && <span className="text-[10px] font-mono text-gray-400 font-normal">({formatDateLabel(peakItem._id)})</span>}
+            </p>
+          </div>
+          <div className="space-y-1">
+            <span className="text-[10px] uppercase font-mono font-bold text-gray-400 tracking-wider">Completed Orders</span>
+            <p className="text-base font-extrabold text-white">{trendTotalOrders} Orders</p>
+          </div>
+          <div className="space-y-1">
+            <span className="text-[10px] uppercase font-mono font-bold text-gray-400 tracking-wider">Daily Avg Revenue</span>
+            <p className="text-base font-extrabold text-accent-400">
+              {BRAND.currency.symbol}{Math.round(avgDailyRevenue).toLocaleString('en-IN')}
+            </p>
+          </div>
+        </div>
+
+        {/* Visual Chart Graphic Area */}
         {revenueChart.length > 0 ? (
-          <div className="h-44 flex items-end justify-between space-x-2 pt-6 pb-2 border-b border-border/60 overflow-x-auto">
-            {revenueChart.map((d, idx) => {
-              const heightPercent = Math.max(10, Math.round((d.revenue / maxRevenue) * 100));
-              return (
-                <div key={idx} className="flex-1 flex flex-col items-center group min-w-[28px]">
-                  <div className="text-[10px] font-mono text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity mb-1">
-                    ₹{d.revenue}
+          <div className="relative pt-6 pb-2 border-b border-border/60">
+            
+            {/* Y-Axis Horizontal Background Reference Grid Lines */}
+            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-20 text-[9px] font-mono text-gray-400 pb-8">
+              <div className="border-b border-dashed border-gray-400 w-full pt-1 flex justify-between">
+                <span>{BRAND.currency.symbol}{maxRevenue.toLocaleString('en-IN')}</span>
+              </div>
+              <div className="border-b border-dashed border-gray-400 w-full flex justify-between">
+                <span>{BRAND.currency.symbol}{Math.round(maxRevenue / 2).toLocaleString('en-IN')}</span>
+              </div>
+              <div className="border-b border-gray-400 w-full flex justify-between">
+                <span>{BRAND.currency.symbol}0</span>
+              </div>
+            </div>
+
+            {/* Bars Column Wrapper */}
+            <div className="h-52 flex items-end justify-between space-x-2 sm:space-x-3 overflow-x-auto relative z-10 px-2">
+              {revenueChart.map((d, idx) => {
+                const heightPercent = d.revenue > 0 ? Math.max(15, Math.round((d.revenue / maxRevenue) * 100)) : 6;
+                const isPeak = d.revenue === peakRevenue && peakRevenue > 0;
+
+                return (
+                  <div key={idx} className="flex-1 flex flex-col items-center group min-w-[36px] h-full justify-end relative cursor-pointer">
+                    
+                    {/* Hover Floating Glassmorphic Tooltip */}
+                    <div className="absolute -top-16 z-30 hidden group-hover:flex flex-col items-center pointer-events-none transition-all animate-in fade-in zoom-in-95 duration-150">
+                      <div className="bg-surface/95 border border-primary-500/50 backdrop-blur-md px-3.5 py-2 rounded-xl shadow-2xl text-center whitespace-nowrap min-w-[110px]">
+                        <div className="text-[10px] font-semibold text-gray-300">{formatDateLabel(d._id)}</div>
+                        <div className="text-xs font-extrabold text-emerald-400">
+                          {BRAND.currency.symbol}{(d.revenue || 0).toLocaleString('en-IN')}
+                        </div>
+                        <div className="text-[9px] text-gray-400 font-mono mt-0.5">
+                          {d.orders || 0} {d.orders === 1 ? 'paid order' : 'paid orders'}
+                        </div>
+                      </div>
+                      <div className="w-2.5 h-2.5 bg-surface/95 border-r border-b border-primary-500/50 rotate-45 -mt-1" />
+                    </div>
+
+                    {/* Always-Visible Top Revenue Amount Label */}
+                    <div className={`text-[10px] font-mono font-bold transition-colors mb-1.5 min-h-[16px] flex items-center justify-center ${
+                      isPeak ? 'text-emerald-300 font-extrabold scale-110' : d.revenue > 0 ? 'text-gray-300 group-hover:text-emerald-400' : 'text-gray-600'
+                    }`}>
+                      {d.revenue > 0 ? `₹${d.revenue >= 10000 ? `${(d.revenue / 1000).toFixed(1)}k` : d.revenue}` : ''}
+                    </div>
+
+                    {/* Glowing Bar Column */}
+                    {d.revenue > 0 ? (
+                      <div
+                        style={{ height: `${heightPercent}%` }}
+                        className={`w-full max-w-[44px] rounded-t-lg transition-all duration-300 relative group-hover:scale-105 group-hover:brightness-125 ${
+                          isPeak
+                            ? 'bg-gradient-to-t from-emerald-600 via-teal-500 to-emerald-400 border-t-2 border-emerald-300 shadow-[0_0_16px_rgba(52,211,153,0.6)]'
+                            : 'bg-gradient-to-t from-indigo-700 via-primary-500 to-accent-400 border-t-2 border-accent-300 shadow-[0_0_12px_rgba(99,102,241,0.4)]'
+                        }`}
+                      >
+                        {isPeak && (
+                          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-[10px] bg-emerald-500 text-black font-extrabold px-1 rounded-full shadow-sm">
+                            ★
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div
+                        style={{ height: '6%' }}
+                        className="w-full max-w-[44px] bg-white/5 border-t border-white/20 rounded-t transition-all group-hover:bg-white/15"
+                      />
+                    )}
+
+                    {/* Bottom Date Label */}
+                    <span className={`text-[10px] font-mono mt-2.5 transition-colors whitespace-nowrap ${
+                      isPeak ? 'text-emerald-400 font-bold' : 'text-gray-400 group-hover:text-white'
+                    }`}>
+                      {formatDateLabel(d._id)}
+                    </span>
                   </div>
-                  <div
-                    style={{ height: `${heightPercent}%` }}
-                    className="w-full bg-gradient-to-t from-primary-600 to-accent-500 rounded-t group-hover:brightness-125 transition-all"
-                  />
-                  <span className="text-[9px] font-mono text-gray-500 mt-2 rotate-45 sm:rotate-0">
-                    {d._id.slice(5)}
-                  </span>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         ) : (
-          <div className="text-center py-10 text-gray-500 text-xs border border-dashed border-border rounded-xl">
-            No paid order transactions recorded yet. Data will populate automatically upon checkout.
+          <div className="text-center py-12 text-gray-500 text-xs border border-dashed border-border/80 rounded-xl space-y-2">
+            <TrendingUp className="w-8 h-8 mx-auto text-gray-600 animate-pulse" />
+            <p className="font-semibold text-gray-400">No paid order transactions recorded yet in MongoDB.</p>
+            <p className="text-[11px] text-gray-500">Daily revenue chart populates live as verified orders are completed.</p>
           </div>
         )}
       </div>
