@@ -5,6 +5,9 @@ export const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters').max(50, 'Password cannot exceed 50 characters'),
   referralCode: z.string().optional(),
+  acceptedTerms: z.literal(true, {
+    errorMap: () => ({ message: 'You must accept the Terms of Service, Privacy Policy, and Software License Agreement' }),
+  }),
 });
 
 export const loginSchema = z.object({

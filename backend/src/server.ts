@@ -67,8 +67,29 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
+// Production Startup Secret Validation
+const validateProductionSecrets = () => {
+  if (process.env.NODE_ENV === 'production') {
+    const requiredSecrets = [
+      { key: 'JWT_SECRET', val: process.env.JWT_SECRET, placeholders: ['projectforge_super_secret_jwt_key_2026_change_in_production', 'super-secret-jwt-key', 'jwt_secret_placeholder'] },
+      { key: 'RAZORPAY_KEY_SECRET', val: process.env.RAZORPAY_KEY_SECRET, placeholders: ['rzp_test_placeholder_key_secret', 'placeholder'] },
+      { key: 'RAZORPAY_WEBHOOK_SECRET', val: process.env.RAZORPAY_WEBHOOK_SECRET, placeholders: ['rzp_webhook_secret_placeholder', 'placeholder'] },
+    ];
+
+    const missingOrInsecure = requiredSecrets.filter(
+      (s) => !s.val || s.placeholders.some((p) => s.val?.toLowerCase() === p.toLowerCase())
+    );
+
+    if (missingOrInsecure.length > 0) {
+      console.error('[CRITICAL FATAL ERROR] Production startup blocked! Missing or insecure secret placeholders detected for:', missingOrInsecure.map(s => s.key).join(', '));
+      process.exit(1);
+    }
+  }
+};
+
 // Connect DB and start server
 const startServer = async () => {
+  validateProductionSecrets();
   await connectDB();
   app.listen(PORT, () => {
     console.log(`[SERVER] ${BRAND.name} API running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);

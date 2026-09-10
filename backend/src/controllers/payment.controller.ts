@@ -25,7 +25,15 @@ export const createPaymentOrder = async (req: AuthRequest, res: Response): Promi
       return;
     }
 
-    const { productId, couponCode } = req.body;
+    const { productId, couponCode, acceptedTerms } = req.body;
+
+    if (acceptedTerms !== true) {
+      res.status(400).json({
+        success: false,
+        message: 'You must accept the Terms of Service, Privacy Policy, Refund Policy, and Software License Agreement to proceed with payment.',
+      });
+      return;
+    }
 
     // 1. Fetch product & price server-side (NEVER trust frontend price)
     const product = await Product.findById(productId);
@@ -79,6 +87,7 @@ export const createPaymentOrder = async (req: AuthRequest, res: Response): Promi
       discountAmount,
       finalAmount,
       couponCode: appliedCoupon,
+      acceptedTermsAt: new Date(),
       status: 'pending',
     });
 
@@ -129,11 +138,12 @@ export const verifyPaymentSignature = async (req: AuthRequest, res: Response): P
       return;
     }
 
-    // If using live Razorpay keys, verify HMAC signature: razorpayOrderId + "|" + razorpayPaymentId
+    // Verify HMAC signature: razorpayOrderId + "|" + razorpayPaymentId
     const text = `${razorpayOrderId}|${razorpayPaymentId}`;
+    const isDev = process.env.NODE_ENV !== 'production';
     const isSignatureValid =
-      RAZORPAY_KEY_SECRET === 'rzp_test_placeholder_key_secret'
-        ? true // Test Mode Sandbox verification
+      (isDev && RAZORPAY_KEY_SECRET === 'rzp_test_placeholder_key_secret')
+        ? true // Dev Sandbox test mode verification
         : verifyHmacSignature(text, razorpaySignature, RAZORPAY_KEY_SECRET);
 
     if (!isSignatureValid) {
@@ -210,8 +220,13 @@ export const handleRazorpayWebhook = async (req: AuthRequest, res: Response): Pr
     const signature = req.headers['x-razorpay-signature'] as string;
     const rawBody = JSON.stringify(req.body);
 
-    // Verify Webhook Signature if production secret configured
-    if (RAZORPAY_WEBHOOK_SECRET !== 'rzp_webhook_secret_placeholder') {
+    // Strict verification in production, allow placeholder fallback ONLY in development mode
+    const isDev = process.env.NODE_ENV !== 'production';
+    if (!isDev || RAZORPAY_WEBHOOK_SECRET !== 'rzp_webhook_secret_placeholder') {
+      if (!signature) {
+        res.status(400).send('Webhook signature missing');
+        return;
+      }
       const isValid = verifyHmacSignature(rawBody, signature, RAZORPAY_WEBHOOK_SECRET);
       if (!isValid) {
         res.status(400).send('Invalid webhook signature');

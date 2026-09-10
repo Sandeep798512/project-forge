@@ -31,7 +31,7 @@ export const Register: React.FC = () => {
     setLoading(true);
 
     try {
-      const res = await authService.register({ name, email, password, referralCode });
+      const res = await authService.register({ name, email, password, referralCode, acceptedTerms: true });
       if (res.success && res.token && res.user) {
         register(res.token, res.user);
         navigate(redirect);

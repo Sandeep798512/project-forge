@@ -76,6 +76,7 @@ export const Checkout: React.FC = () => {
       const orderRes = await api.post('/payments/create-order', {
         productId: product._id,
         couponCode: couponSuccess ? couponCode : undefined,
+        acceptedTerms: true,
       });
 
       if (!orderRes.data.success) {

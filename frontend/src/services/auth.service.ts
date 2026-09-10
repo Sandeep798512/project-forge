@@ -2,7 +2,7 @@ import api from './api';
 import { AuthResponse } from '../types/auth';
 
 export const authService = {
-  register: async (payload: { name: string; email: string; password: string; referralCode?: string }): Promise<AuthResponse> => {
+  register: async (payload: { name: string; email: string; password: string; referralCode?: string; acceptedTerms?: boolean }): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>('/auth/register', payload);
     return response.data;
   },

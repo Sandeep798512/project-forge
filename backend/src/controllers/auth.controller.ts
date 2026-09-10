@@ -43,6 +43,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       isVerified: true, // Auto-verified for smooth developer experience
       referralCode: userReferralCode,
       referredBy: referralCode,
+      acceptedTermsAt: new Date(),
+      acceptedTermsVersion: '2026-09-10',
     });
 
     const token = generateToken({
@@ -172,7 +174,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     res.status(200).json({
       success: true,
       message: 'Password reset token generated successfully.',
-      resetToken, // Returned for dev testing
+      ...(process.env.NODE_ENV === 'development' ? { resetToken } : {}),
     });
   } catch (error: any) {
     res.status(500).json({ success: false, message: 'Error processing forgot password request.' });
