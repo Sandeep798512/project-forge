@@ -58,7 +58,11 @@ export const AdminDashboard: React.FC = () => {
     const matchName = o.user?.name ? o.user.name.toLowerCase().includes(query) : false;
     const matchEmail = o.user?.email ? o.user.email.toLowerCase().includes(query) : false;
     const matchCoupon = o.couponCode ? o.couponCode.toLowerCase().includes(query) : false;
-    return matchId || matchName || matchEmail || matchCoupon;
+    const matchProject = o.items ? o.items.some((item: any) => {
+      const itemTitle = item?.title || item?.product?.title || '';
+      return itemTitle.toLowerCase().includes(query);
+    }) : false;
+    return matchId || matchName || matchEmail || matchCoupon || matchProject;
   });
 
   if (loading) {
@@ -321,15 +325,15 @@ export const AdminDashboard: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="font-bold text-base text-white">Recent Customer Orders</h3>
-              <p className="text-[11px] text-gray-400">Search by Order ID, Customer Name/Email, or Coupon Code</p>
+              <p className="text-[11px] text-gray-400">Search by Order ID, Customer Name/Email, Project Title, or Coupon Code</p>
             </div>
 
-            {/* Order ID, Customer Name, and Coupon Code Search Bar */}
+            {/* Order ID, Customer Name, Project Title, and Coupon Code Search Bar */}
             <div className="relative w-full sm:w-80">
               <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5" />
               <input
                 type="text"
-                placeholder="Search Order ID, Customer, or Coupon (e.g. SAN2020)..."
+                placeholder="Search Order ID, Customer, Project, or Coupon..."
                 value={orderSearch}
                 onChange={(e) => setOrderSearch(e.target.value)}
                 className="w-full bg-background border border-border/80 rounded-xl pl-9 pr-8 py-1.5 text-xs text-gray-100 placeholder-gray-500 focus:outline-none focus:border-primary-500 transition-colors font-mono"
@@ -352,6 +356,7 @@ export const AdminDashboard: React.FC = () => {
                   <tr>
                     <th className="p-3">Order ID</th>
                     <th className="p-3">Customer</th>
+                    <th className="p-3">Purchased Project</th>
                     <th className="p-3">Coupon Used</th>
                     <th className="p-3">Amount</th>
                     <th className="p-3">Status</th>
@@ -363,6 +368,29 @@ export const AdminDashboard: React.FC = () => {
                     <tr key={o._id} className="hover:bg-surface-hover">
                       <td className="p-3 font-mono font-bold text-primary-400">{o.orderId}</td>
                       <td className="p-3 font-semibold">{o.user?.name || o.user?.email || 'Customer'}</td>
+                      <td className="p-3">
+                        {o.items && o.items.length > 0 ? (
+                          <div className="flex items-center space-x-2 min-w-[160px] max-w-[240px]">
+                            {o.items[0]?.product?.thumbnail && (
+                              <img
+                                src={o.items[0].product.thumbnail}
+                                alt={o.items[0].title || o.items[0].product?.title}
+                                className="w-7 h-7 rounded-md object-cover flex-shrink-0 border border-border/60"
+                              />
+                            )}
+                            <div className="overflow-hidden">
+                              <span className="font-semibold text-white truncate block text-[11px]" title={o.items[0]?.title || o.items[0]?.product?.title}>
+                                {o.items[0]?.title || o.items[0]?.product?.title || 'Project Package'}
+                              </span>
+                              {o.items.length > 1 && (
+                                <span className="text-[9px] text-accent-400 font-mono">+{o.items.length - 1} more items</span>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-gray-500 text-[11px]">-</span>
+                        )}
+                      </td>
                       <td className="p-3 font-mono">
                         {o.couponCode ? (
                           <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-accent-500/15 text-accent-300 border border-accent-500/30 flex items-center space-x-1 w-max">
