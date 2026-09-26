@@ -187,3 +187,89 @@ export const License: React.FC = () => {
     </div>
   );
 };
+
+export const Disclaimer: React.FC = () => {
+  return (
+    <div className="py-16 bg-background min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-gray-300 text-sm leading-relaxed">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Disclaimer</h1>
+          <p className="text-xs text-gray-400 mt-2">Last updated: September 26, 2026 • Effective Date: September 26, 2026</p>
+        </div>
+
+        <div className="bg-surface/60 p-6 sm:p-8 rounded-2xl border border-border/60 space-y-6">
+          <section className="space-y-3">
+            <p>
+              The software projects, source code, documentation, demonstrations, and related digital materials provided by ProjectForge are intended primarily for <strong>educational, learning, development, and project demonstration purposes</strong>.
+            </p>
+            <p>
+              ProjectForge does not guarantee that every project will work without modification in every user's specific operating system, hardware configuration, software environment, hosting provider, database configuration, API version, or third-party service.
+            </p>
+            <p>
+              Users may need to configure, modify, debug, update, or customize the source code according to their individual requirements and technical environment.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">Educational Use</h2>
+            <p>
+              ProjectForge provides software project packages to help students and developers understand software development concepts, project architecture, implementation techniques, and related technologies.
+            </p>
+            <p>
+              Purchasing a project does not guarantee academic marks, project approval, internship selection, employment, placement, or any particular academic or professional outcome. Users are responsible for understanding and complying with the academic rules and requirements of their educational institution.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">Third-Party Services and Components</h2>
+            <p>
+              Some projects may use third-party libraries, frameworks, APIs, cloud services, payment services, datasets, fonts, icons, or other external components.
+            </p>
+            <p>
+              Such third-party components remain subject to their respective owners' terms, licenses, and policies. Users are responsible for reviewing and complying with applicable third-party terms when using, modifying, deploying, or redistributing a project.
+            </p>
+            <p>
+              ProjectForge does not claim ownership of third-party software, trademarks, or other intellectual property belonging to their respective owners.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">User Responsibility</h2>
+            <p>
+              Users are responsible for reviewing, testing, configuring, and securing any source code before deploying it in a production environment or using it for real-world purposes.
+            </p>
+            <p>
+              Users should not use demonstration or educational software in safety-critical, financial, medical, security-sensitive, or other high-risk environments without appropriate professional review, testing, security controls, and compliance measures.
+            </p>
+            <p>
+              ProjectForge is not responsible for problems resulting from unauthorized modifications, incorrect configuration, unsupported environments, misuse of the software, insecure deployment, or changes made by third-party services.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">Intellectual Property</h2>
+            <p>
+              Users must not represent ProjectForge's materials, third-party materials, or other copyrighted components as their own where doing so would violate applicable intellectual-property rights or license terms.
+            </p>
+            <p>
+              Where a project contains components subject to separate open-source or third-party licenses, those license terms continue to apply.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">No Guarantee of Specific Results</h2>
+            <p>
+              ProjectForge provides digital software materials and related support according to the applicable product description and purchase terms. ProjectForge does not guarantee a particular academic, business, financial, employment, or other outcome from the use of any project.
+            </p>
+            <p>
+              By purchasing or using ProjectForge materials, users acknowledge that software development involves configuration, testing, maintenance, and ongoing updates.
+            </p>
+            <p>
+              For questions regarding a specific project's included features, licensing, or supported environment, users should contact ProjectForge support before purchase or deployment.
+            </p>
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+};
