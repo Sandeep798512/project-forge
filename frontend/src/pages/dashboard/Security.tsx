@@ -31,6 +31,7 @@ export const Security: React.FC = () => {
             <input
               type="password"
               required
+              maxLength={50}
               className="w-full bg-background border border-border/80 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder-gray-500"
             />
           </div>
@@ -41,6 +42,7 @@ export const Security: React.FC = () => {
               type="password"
               required
               minLength={6}
+              maxLength={50}
               className="w-full bg-background border border-border/80 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder-gray-500"
             />
           </div>

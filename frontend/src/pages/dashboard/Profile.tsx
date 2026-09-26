@@ -146,6 +146,7 @@ export const Profile: React.FC = () => {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={deletePassword}
+                  maxLength={50}
                   onChange={(e) => setDeletePassword(e.target.value)}
                   placeholder="Enter your current password"
                   className="w-full bg-background border border-border/80 rounded-xl pl-3.5 pr-10 py-2 text-xs text-gray-100 placeholder-gray-500 focus:outline-none focus:border-red-500"
