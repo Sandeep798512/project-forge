@@ -47,6 +47,10 @@ export const AdminProducts: React.FC = () => {
     demoVideoUrl: '',
     currentVersion: '1.0.0',
     isPublished: true,
+    hasDocumentation: true,
+    hasPPT: true,
+    hasVivaQA: true,
+    hasSetupSupport: true,
   };
 
   const [formData, setFormData] = useState<any>(initialFormState);
@@ -123,6 +127,10 @@ export const AdminProducts: React.FC = () => {
       category: p.category?._id || p.category || categories[0]?._id,
       techStack: Array.isArray(p.techStack) ? p.techStack.join(', ') : p.techStack,
       screenshots: Array.isArray(p.screenshots) ? p.screenshots : [],
+      hasDocumentation: p.hasDocumentation !== false,
+      hasPPT: p.hasPPT !== false,
+      hasVivaQA: p.hasVivaQA !== false,
+      hasSetupSupport: p.hasSetupSupport !== false,
     });
     setStatusMessage(null);
     setModalOpen(true);
@@ -138,6 +146,10 @@ export const AdminProducts: React.FC = () => {
       category: p.category?._id || p.category || categories[0]?._id,
       techStack: Array.isArray(p.techStack) ? p.techStack.join(', ') : p.techStack,
       screenshots: Array.isArray(p.screenshots) ? p.screenshots : [],
+      hasDocumentation: p.hasDocumentation !== false,
+      hasPPT: p.hasPPT !== false,
+      hasVivaQA: p.hasVivaQA !== false,
+      hasSetupSupport: p.hasSetupSupport !== false,
     });
     setStatusMessage(null);
     setModalOpen(true);
@@ -168,10 +180,16 @@ export const AdminProducts: React.FC = () => {
         screenshots: Array.isArray(formData.screenshots) ? formData.screenshots : [],
         techStack: typeof formData.techStack === 'string' ? formData.techStack.split(',').map((s: string) => s.trim()) : formData.techStack,
         category: formData.category || categories[0]?._id,
+        hasDocumentation: formData.hasDocumentation !== false,
+        hasPPT: formData.hasPPT !== false,
+        hasVivaQA: formData.hasVivaQA !== false,
+        hasSetupSupport: formData.hasSetupSupport !== false,
         deliverables: [
-          { name: 'Complete Source Code', included: true, fileKey: 'packages/sample-project.zip' },
-          { name: 'Documentation & PPT', included: true },
-          { name: 'Viva Voce QA Bank', included: true },
+          { name: 'Complete Source Code & DB Exports', included: true, fileKey: 'packages/sample-project.zip' },
+          ...(formData.hasDocumentation !== false ? [{ name: 'Project Documentation & Report', included: true }] : []),
+          ...(formData.hasPPT !== false ? [{ name: 'PPT Presentation Slides', included: true }] : []),
+          ...(formData.hasVivaQA !== false ? [{ name: 'Viva Voce QA Bank', included: true }] : []),
+          ...(formData.hasSetupSupport !== false ? [{ name: 'WhatsApp Setup Support', included: true }] : []),
         ],
       };
 
@@ -716,6 +734,54 @@ export const AdminProducts: React.FC = () => {
                     placeholder="React, Node.js, Express, MongoDB"
                     className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100"
                   />
+                </div>
+
+                {/* Deliverables & Reports Inclusion Checkboxes */}
+                <div className="space-y-2 p-4 rounded-xl bg-background border border-border/80">
+                  <label className="block font-bold text-gray-200 text-xs">
+                    Included Deliverables & Reports <span className="text-[10px] text-gray-400 font-normal">(Select what is included with this project package)</span>
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <label className="flex items-center space-x-2 bg-surface p-2.5 rounded-lg border border-border/60 cursor-pointer hover:border-primary-500/40">
+                      <input
+                        type="checkbox"
+                        checked={formData.hasDocumentation !== false}
+                        onChange={(e) => setFormData({ ...formData, hasDocumentation: e.target.checked })}
+                        className="rounded border-border text-primary-600 focus:ring-primary-500 w-4 h-4"
+                      />
+                      <span className="font-semibold text-gray-200">Project Documentation & Report</span>
+                    </label>
+
+                    <label className="flex items-center space-x-2 bg-surface p-2.5 rounded-lg border border-border/60 cursor-pointer hover:border-primary-500/40">
+                      <input
+                        type="checkbox"
+                        checked={formData.hasPPT !== false}
+                        onChange={(e) => setFormData({ ...formData, hasPPT: e.target.checked })}
+                        className="rounded border-border text-primary-600 focus:ring-primary-500 w-4 h-4"
+                      />
+                      <span className="font-semibold text-gray-200">PPT Presentation Slides</span>
+                    </label>
+
+                    <label className="flex items-center space-x-2 bg-surface p-2.5 rounded-lg border border-border/60 cursor-pointer hover:border-primary-500/40">
+                      <input
+                        type="checkbox"
+                        checked={formData.hasVivaQA !== false}
+                        onChange={(e) => setFormData({ ...formData, hasVivaQA: e.target.checked })}
+                        className="rounded border-border text-primary-600 focus:ring-primary-500 w-4 h-4"
+                      />
+                      <span className="font-semibold text-gray-200">Viva Voce QA Bank</span>
+                    </label>
+
+                    <label className="flex items-center space-x-2 bg-surface p-2.5 rounded-lg border border-border/60 cursor-pointer hover:border-primary-500/40">
+                      <input
+                        type="checkbox"
+                        checked={formData.hasSetupSupport !== false}
+                        onChange={(e) => setFormData({ ...formData, hasSetupSupport: e.target.checked })}
+                        className="rounded border-border text-primary-600 focus:ring-primary-500 w-4 h-4"
+                      />
+                      <span className="font-semibold text-gray-200">WhatsApp Setup Support</span>
+                    </label>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

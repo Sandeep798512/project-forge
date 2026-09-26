@@ -35,6 +35,10 @@ export interface IProduct extends Document {
   requirements: string[];
   deliverables: IDeliverableItem[];
   assets?: (mongoose.Types.ObjectId | string)[];
+  hasDocumentation?: boolean;
+  hasPPT?: boolean;
+  hasVivaQA?: boolean;
+  hasSetupSupport?: boolean;
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   freePreview: boolean;
   isPublished: boolean;
@@ -77,6 +81,10 @@ const ProductSchema: Schema = new Schema(
       },
     ],
     assets: [{ type: Schema.Types.ObjectId, ref: 'ProductAsset' }],
+    hasDocumentation: { type: Boolean, default: true },
+    hasPPT: { type: Boolean, default: true },
+    hasVivaQA: { type: Boolean, default: true },
+    hasSetupSupport: { type: Boolean, default: true },
     difficulty: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced'], default: 'Intermediate' },
     freePreview: { type: Boolean, default: true },
     isPublished: { type: Boolean, default: true, index: true },
