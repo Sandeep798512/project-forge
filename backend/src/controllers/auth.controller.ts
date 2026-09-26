@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import crypto from 'crypto';
 import User from '../models/User';
+import Entitlement from '../models/Entitlement';
 import { hashPassword, comparePassword } from '../utils/passwords';
 import { generateToken } from '../utils/jwt';
 import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '../validators/auth.validator';
@@ -236,6 +237,8 @@ export const deleteAccount = async (req: AuthRequest, res: Response): Promise<vo
       }
     }
 
+    // Revoke entitlements so download links immediately stop working
+    await Entitlement.updateMany({ user: userId }, { isRevoked: true });
     await User.findByIdAndDelete(userId);
 
     res.status(200).json({

@@ -2,6 +2,7 @@ import { Response } from 'express';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
+import User from '../models/User';
 import Entitlement from '../models/Entitlement';
 import Download from '../models/Download';
 import Product from '../models/Product';
@@ -184,6 +185,13 @@ export const serveProtectedFile = async (req: AuthRequest, res: Response): Promi
 
     if (sig !== expectedSig) {
       res.status(403).send('Tampered download token signature rejected.');
+      return;
+    }
+
+    // Verify user exists and is not suspended
+    const user = await User.findById(userId);
+    if (!user || user.isSuspended) {
+      res.status(403).send('User account no longer exists or is suspended.');
       return;
     }
 
