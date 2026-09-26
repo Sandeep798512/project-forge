@@ -76,9 +76,10 @@ export const ResetPassword: React.FC = () => {
                   type="password"
                   required
                   minLength={6}
+                  maxLength={50}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="At least 6 characters"
+                  placeholder="6 to 50 characters"
                   className="w-full bg-background border border-border/80 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-100 placeholder-gray-500"
                 />
               </div>
