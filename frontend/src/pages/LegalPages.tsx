@@ -46,9 +46,25 @@ export const Privacy: React.FC = () => {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">4. Your Privacy Rights & Contact</h2>
+            <h2 className="text-lg font-bold text-white">4. Account Deletion & Data Removal</h2>
             <p>
-              Users have the right to request access to their stored account data, request correction of inaccurate profile details, or request account deletion where technically supported and consistent with active transaction retention requirements.
+              You can delete your account at any time from your account settings.
+            </p>
+            <p>
+              When you request account deletion, we will delete the personal information associated with your account from our active systems, including your account/profile information and other user data that is not required to be retained.
+            </p>
+            <p>
+              Some information may be retained where necessary to comply with applicable legal, accounting, tax, fraud-prevention, security, dispute-resolution, or other legitimate requirements. Such information will be retained only for the period required for those purposes.
+            </p>
+            <p>
+              Once the deletion process is completed, your deleted account and associated data cannot be recovered.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">5. Your Privacy Rights & Contact</h2>
+            <p>
+              Users have the right to request access to their stored account data, request correction of inaccurate profile details, or request account deletion directly from their account settings as outlined above.
             </p>
             <p>
               For any privacy-related inquiries or data requests, please contact our designated privacy support contact at <a href={`mailto:${BRAND.supportEmail}`} className="text-primary-400 hover:underline">{BRAND.supportEmail}</a>.
