@@ -26,4 +26,9 @@ export const authService = {
     const response = await api.post<AuthResponse>('/auth/reset-password', payload);
     return response.data;
   },
+
+  deleteAccount: async (password?: string): Promise<{ success: boolean; message?: string }> => {
+    const response = await api.delete<{ success: boolean; message?: string }>('/auth/me', { data: { password } });
+    return response.data;
+  },
 };

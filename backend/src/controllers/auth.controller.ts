@@ -212,3 +212,38 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({ success: false, message: 'Error resetting password.' });
   }
 };
+
+export const deleteAccount = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ success: false, message: 'Authentication required' });
+      return;
+    }
+
+    const userId = req.user.id;
+    const user = await User.findById(userId).select('+password');
+    if (!user) {
+      res.status(404).json({ success: false, message: 'User account not found.' });
+      return;
+    }
+
+    const { password } = req.body;
+    if (password && user.password) {
+      const isMatch = await comparePassword(password, user.password);
+      if (!isMatch) {
+        res.status(400).json({ success: false, message: 'Incorrect password. Account deletion canceled.' });
+        return;
+      }
+    }
+
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Account deleted successfully.',
+    });
+  } catch (error: any) {
+    console.error('[AUTH DELETE ACCOUNT ERROR]', error);
+    res.status(500).json({ success: false, message: 'Server error during account deletion.' });
+  }
+};
