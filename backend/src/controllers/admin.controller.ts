@@ -165,6 +165,60 @@ export const createCouponAdmin = async (req: AuthRequest, res: Response): Promis
   }
 };
 
+export const toggleCouponStatusAdmin = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const coupon = await Coupon.findById(id);
+
+    if (!coupon) {
+      res.status(404).json({ success: false, message: 'Coupon not found' });
+      return;
+    }
+
+    coupon.isActive = !coupon.isActive;
+    await coupon.save();
+
+    await AuditLog.create({
+      user: req.user?.id,
+      action: coupon.isActive ? 'ADMIN_COUPON_ACTIVATED' : 'ADMIN_COUPON_DEACTIVATED',
+      details: { couponCode: coupon.code, couponId: coupon._id, isActive: coupon.isActive },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Coupon ${coupon.code} ${coupon.isActive ? 'activated' : 'deactivated'} successfully.`,
+      coupon,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to update coupon status' });
+  }
+};
+
+export const deleteCouponAdmin = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const coupon = await Coupon.findByIdAndDelete(id);
+
+    if (!coupon) {
+      res.status(404).json({ success: false, message: 'Coupon not found' });
+      return;
+    }
+
+    await AuditLog.create({
+      user: req.user?.id,
+      action: 'ADMIN_COUPON_DELETED',
+      details: { couponCode: coupon.code, couponId: id },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Coupon ${coupon.code} permanently deleted successfully.`,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to delete coupon' });
+  }
+};
+
 export const getAdminAuditLogs = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const logs = await AuditLog.find()

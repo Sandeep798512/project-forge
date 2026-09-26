@@ -33,6 +33,8 @@ import {
   getAdminOrders,
   getAdminCoupons,
   createCouponAdmin,
+  toggleCouponStatusAdmin,
+  deleteCouponAdmin,
   getAdminAuditLogs,
 } from '../controllers/admin.controller';
 
@@ -89,5 +91,11 @@ router.post('/reviews/:id/moderate', requireRbacRole(['SUPER_ADMIN', 'ADMIN', 'C
 // 11. CMS & Content Management
 router.get('/content', getSiteContentAdmin);
 router.put('/content', requireRbacRole(['SUPER_ADMIN', 'ADMIN', 'CONTENT_MANAGER']), updateSiteContentAdmin);
+
+// 12. Coupons Management
+router.get('/coupons/list', getAdminCoupons);
+router.post('/coupons', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), createCouponAdmin);
+router.patch('/coupons/:id/toggle', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), toggleCouponStatusAdmin);
+router.delete('/coupons/:id', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), deleteCouponAdmin);
 
 export default router;

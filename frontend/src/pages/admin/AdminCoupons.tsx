@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Tag, Plus, Save } from 'lucide-react';
+import { Tag, Plus, Trash2, Power } from 'lucide-react';
 import api from '../../services/api';
 
 export const AdminCoupons: React.FC = () => {
@@ -41,6 +41,33 @@ export const AdminCoupons: React.FC = () => {
       }
     } catch (err: any) {
       alert(err.response?.data?.message || 'Failed to create coupon');
+    }
+  };
+
+  const handleToggleStatus = async (couponId: string) => {
+    try {
+      const res = await api.patch(`/admin/coupons/${couponId}/toggle`);
+      if (res.data.success) {
+        fetchCoupons();
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to update coupon status');
+    }
+  };
+
+  const handleDeleteCoupon = async (couponId: string, couponCode: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to permanently delete this coupon? This action cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    try {
+      const res = await api.delete(`/admin/coupons/${couponId}`);
+      if (res.data.success) {
+        fetchCoupons();
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to delete coupon');
     }
   };
 
@@ -123,6 +150,7 @@ export const AdminCoupons: React.FC = () => {
                 <th className="p-3.5">Min Order</th>
                 <th className="p-3.5">Times Used</th>
                 <th className="p-3.5">Status</th>
+                <th className="p-3.5 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/40 text-gray-200">
@@ -133,9 +161,34 @@ export const AdminCoupons: React.FC = () => {
                   <td className="p-3.5 font-mono">₹{c.minOrderAmount}</td>
                   <td className="p-3.5 font-mono">{c.timesUsed}</td>
                   <td className="p-3.5">
-                    <span className={`px-2 py-0.5 rounded font-mono font-bold ${c.isActive ? 'bg-emerald-500/10 text-emerald-400' : 'bg-gray-500/10 text-gray-400'}`}>
+                    <span className={`px-2 py-0.5 rounded font-mono font-bold ${c.isActive ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>
                       {c.isActive ? 'ACTIVE' : 'INACTIVE'}
                     </span>
+                  </td>
+                  <td className="p-3.5 text-right">
+                    <div className="flex items-center justify-end space-x-2">
+                      <button
+                        onClick={() => handleToggleStatus(c._id)}
+                        className={`px-2.5 py-1 rounded-lg font-semibold text-xs border transition-colors flex items-center space-x-1 ${
+                          c.isActive
+                            ? 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border-amber-500/20'
+                            : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/20'
+                        }`}
+                        title={c.isActive ? 'Deactivate Coupon' : 'Activate Coupon'}
+                      >
+                        <Power className="w-3 h-3" />
+                        <span>{c.isActive ? 'Deactivate' : 'Activate'}</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleDeleteCoupon(c._id, c.code)}
+                        className="px-2.5 py-1 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 font-semibold text-xs transition-colors flex items-center space-x-1"
+                        title="Permanently Delete Coupon"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Delete Permanently</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
