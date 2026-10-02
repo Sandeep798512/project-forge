@@ -109,25 +109,33 @@ export const Home: React.FC = () => {
 
             {/* Supporting Text */}
             <p className="text-gray-300 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
-              Production-style software projects with complete source code, documentation, setup guides, and technical support — designed to help students learn, customize, and showcase real development work.
+              Production-style software projects with complete source code, documentation & setup guides — plus <strong className="text-emerald-400 font-semibold">100% Free Study Materials, University Lecture Notes & PYQs</strong> to help CSE/IT students learn, build, and excel.
             </p>
 
             {/* Hero CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-4">
               <Link
                 to="/projects"
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-semibold px-7 py-3.5 rounded-xl shadow-glow-md transition-all duration-200"
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-semibold px-6 py-3.5 rounded-xl shadow-glow-md transition-all duration-200"
               >
                 <span>Explore Projects</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
 
               <Link
+                to="/study-materials"
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-semibold px-6 py-3.5 rounded-xl transition-all duration-200"
+              >
+                <BookOpen className="w-4 h-4 text-emerald-400" />
+                <span>Free Notes & PYQs</span>
+              </Link>
+
+              <Link
                 to="/projects"
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-surface-hover hover:bg-surface border border-border text-gray-200 hover:text-white font-semibold px-7 py-3.5 rounded-xl transition-colors"
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-surface-hover hover:bg-surface border border-border text-gray-200 hover:text-white font-semibold px-6 py-3.5 rounded-xl transition-colors"
               >
                 <Play className="w-4 h-4 text-primary-400 fill-current" />
-                <span>View Live Demos</span>
+                <span>View Demos</span>
               </Link>
             </div>
 
@@ -143,7 +151,7 @@ export const Home: React.FC = () => {
               </div>
               <div className="flex items-center space-x-1.5">
                 <CheckCircle className="w-4 h-4 text-emerald-400" />
-                <span>WhatsApp Developer Support</span>
+                <span>Free Study Notes & PYQs</span>
               </div>
             </div>
 
