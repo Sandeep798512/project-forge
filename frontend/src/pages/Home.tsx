@@ -92,9 +92,18 @@ export const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-6">
             
+            {/* Hero Brand Logo Image */}
+            <div className="flex justify-center mb-2 sm:mb-4">
+              <img
+                src="/img/logo1.png"
+                alt="CampusGet Logo"
+                className="h-16 sm:h-20 md:h-24 w-auto max-w-[220px] sm:max-w-[300px] object-contain drop-shadow-[0_0_25px_rgba(99,102,241,0.35)] transition-transform duration-300 hover:scale-105"
+              />
+            </div>
+
             {/* Top Pill */}
-            <div className="inline-flex items-center space-x-2.5 bg-surface/80 border border-primary-500/30 px-4 py-1.5 rounded-full text-xs font-medium text-primary-300 backdrop-blur-md">
-              <img src="/img/logo1.png" alt="CampusGet Logo" className="w-5 h-5 object-contain rounded-full" />
+            <div className="inline-flex items-center space-x-2 bg-surface/80 border border-primary-500/30 px-4 py-1.5 rounded-full text-xs font-medium text-primary-300 backdrop-blur-md">
+              <Sparkles className="w-4 h-4 text-primary-400" />
               <span>Production-Ready Developer Marketplace for CSE/IT</span>
             </div>
 
