@@ -32,9 +32,11 @@ export const ForgotPassword: React.FC = () => {
         
         <div className="text-center space-y-2">
           <Link to="/" className="inline-flex items-center space-x-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary-600 to-accent-500 flex items-center justify-center text-white font-bold">
-              <Terminal className="w-5 h-5" />
-            </div>
+            <img
+              src="/campusget-icon-light-tile.png"
+              alt={BRAND.name}
+              className="w-10 h-10 rounded-xl object-contain shadow-glow-sm"
+            />
             <span className="font-extrabold text-2xl text-white">{BRAND.name}</span>
           </Link>
           <h2 className="text-xl font-bold text-white pt-2">Reset Password</h2>

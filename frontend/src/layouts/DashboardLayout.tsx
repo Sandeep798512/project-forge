@@ -28,9 +28,11 @@ export const DashboardLayout: React.FC = () => {
           
           {/* Brand Logo */}
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary-600 to-accent-500 flex items-center justify-center text-white font-bold">
-              <Terminal className="w-5 h-5" />
-            </div>
+            <img
+              src="/campusget-icon-light-tile.png"
+              alt={BRAND.name}
+              className="w-9 h-9 rounded-xl object-contain"
+            />
             <div>
               <span className="font-extrabold text-lg text-white">{BRAND.name}</span>
               <span className="block text-[10px] uppercase font-mono text-primary-400 font-semibold">User Portal</span>

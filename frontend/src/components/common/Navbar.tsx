@@ -25,9 +25,11 @@ export const Navbar: React.FC = () => {
           
           {/* Brand Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary-600 via-primary-500 to-accent-500 flex items-center justify-center shadow-glow-sm group-hover:scale-105 transition-transform duration-200">
-              <Terminal className="w-5 h-5 text-white" />
-            </div>
+            <img
+              src="/campusget-icon-light-tile.png"
+              alt={BRAND.name}
+              className="w-10 h-10 rounded-xl object-contain shadow-glow-sm group-hover:scale-105 transition-transform duration-200"
+            />
             <div>
               <span className="font-extrabold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-primary-400">
                 {BRAND.name}

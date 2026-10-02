@@ -12,9 +12,11 @@ export const Footer: React.FC = () => {
           {/* Brand Col */}
           <div className="lg:col-span-2 space-y-4">
             <Link to="/" className="flex items-center space-x-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary-600 to-accent-500 flex items-center justify-center text-white font-bold">
-                <Terminal className="w-5 h-5" />
-              </div>
+              <img
+                src="/campusget-icon-light-tile.png"
+                alt={BRAND.name}
+                className="w-9 h-9 rounded-xl object-contain shadow-glow-sm"
+              />
               <span className="font-extrabold text-xl text-white tracking-tight">{BRAND.name}</span>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed max-w-sm">

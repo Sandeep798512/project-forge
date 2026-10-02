@@ -73,9 +73,11 @@ export const AdminLayout: React.FC = () => {
           
           {/* Header */}
           <div className="flex items-center space-x-3 pb-4 border-b border-border/60">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-accent-600 to-primary-600 flex items-center justify-center text-white font-bold shadow-glow-sm">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
+            <img
+              src="/campusget-icon-light-tile.png"
+              alt={BRAND.name}
+              className="w-10 h-10 rounded-xl object-contain shadow-glow-sm"
+            />
             <div className="overflow-hidden">
               <span className="font-extrabold text-base text-white truncate block">{BRAND.name}</span>
               <span className="inline-block text-[10px] font-mono font-bold bg-accent-500/10 text-accent-400 border border-accent-500/30 px-2 py-0.5 rounded uppercase">
