@@ -93,8 +93,8 @@ export const Home: React.FC = () => {
           <div className="text-center max-w-3xl mx-auto space-y-6">
             
             {/* Top Pill */}
-            <div className="inline-flex items-center space-x-2 bg-surface/80 border border-primary-500/30 px-4 py-1.5 rounded-full text-xs font-medium text-primary-300 backdrop-blur-md">
-              <Sparkles className="w-4 h-4 text-primary-400" />
+            <div className="inline-flex items-center space-x-2.5 bg-surface/80 border border-primary-500/30 px-4 py-1.5 rounded-full text-xs font-medium text-primary-300 backdrop-blur-md">
+              <img src="/img/logo1.png" alt="CampusGet Logo" className="w-5 h-5 object-contain rounded-full" />
               <span>Production-Ready Developer Marketplace for CSE/IT</span>
             </div>
 
