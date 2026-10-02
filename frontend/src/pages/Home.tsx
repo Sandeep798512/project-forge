@@ -93,11 +93,11 @@ export const Home: React.FC = () => {
           <div className="text-center max-w-3xl mx-auto space-y-6">
             
             {/* Hero Brand Logo Image */}
-            <div className="flex justify-center mb-2 sm:mb-4">
+            <div className="flex justify-center m-0 p-0">
               <img
                 src="/img/logo1.png"
                 alt="CampusGet Logo"
-                className="h-16 sm:h-20 md:h-24 w-auto max-w-[220px] sm:max-w-[300px] object-contain drop-shadow-[0_0_25px_rgba(99,102,241,0.35)] transition-transform duration-300 hover:scale-105"
+                className="m-0 p-0 block h-16 sm:h-20 md:h-24 w-auto max-w-[220px] sm:max-w-[300px] object-contain drop-shadow-[0_0_25px_rgba(99,102,241,0.35)] transition-transform duration-300 hover:scale-105"
               />
             </div>
 
