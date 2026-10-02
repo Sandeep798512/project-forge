@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Terminal, ArrowRight, Sparkles, Code2, ShieldCheck, Play, CheckCircle, Zap } from 'lucide-react';
+import { Terminal, ArrowRight, Sparkles, Code2, ShieldCheck, Play, CheckCircle, Zap, BookOpen, Download } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
 import { ProjectCard } from '../components/marketplace/ProjectCard';
 import { TrustSection } from '../components/marketplace/TrustSection';
@@ -209,6 +209,44 @@ export const Home: React.FC = () => {
 
       {/* TRUST & AUDIENCE */}
       <TrustSection />
+
+      {/* FREE STUDY MATERIALS PROMO BANNER */}
+      <section className="py-16 bg-surface/60 border-y border-border/60 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="bg-gradient-to-r from-emerald-950/60 via-surface to-surface border border-emerald-500/30 rounded-3xl p-8 md:p-12 flex flex-col lg:flex-row items-center justify-between gap-8 shadow-2xl">
+            <div className="space-y-4 max-w-2xl text-center lg:text-left">
+              <div className="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-semibold text-emerald-400">
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>100% Free Resources For Students</span>
+              </div>
+
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+                Free Study Materials, Lecture Notes & PYQs
+              </h2>
+
+              <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                Access verified university lecture notes, previous year exam questions (PYQs), lab manuals, and syllabus copies for Computer Science & IT — completely free with instant direct downloads.
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-gray-400 pt-2">
+                <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> AKTU / VTU / DU Aligned</span>
+                <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> No Login Required</span>
+                <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> PDF & Document Downloads</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 flex-shrink-0">
+              <Link
+                to="/study-materials"
+                className="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-7 py-4 rounded-2xl shadow-glow-sm transition-all duration-200 text-sm"
+              >
+                <span>Explore Free Materials</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* FAQ SECTION */}
       <FAQSection />

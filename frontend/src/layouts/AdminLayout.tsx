@@ -22,6 +22,7 @@ import {
   Menu,
   X,
   Sparkles,
+  BookOpen,
 } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
 import { useAuth } from '../context/AuthContext';
@@ -60,6 +61,7 @@ export const AdminLayout: React.FC = () => {
     { label: '14. Content (CMS)', path: '/admin/content', icon: FileText },
     { label: '15. Settings', path: '/admin/settings', icon: Settings },
     { label: '16. Audit Logs', path: '/admin/audit-logs', icon: Shield },
+    { label: '17. Study Materials', path: '/admin/study-materials', icon: BookOpen },
   ];
 
   return (

@@ -16,6 +16,7 @@ import { FAQPage } from './pages/FAQ';
 import { Contact } from './pages/Contact';
 import { Support } from './pages/Support';
 import { Checkout } from './pages/Checkout';
+import { StudyMaterials } from './pages/StudyMaterials';
 
 // Auth Pages
 import { Login } from './pages/Login';
@@ -37,7 +38,7 @@ import { Profile } from './pages/dashboard/Profile';
 import { Security } from './pages/dashboard/Security';
 import { SupportTickets } from './pages/dashboard/SupportTickets';
 
-// Admin Layout & 16 Business Suite Pages
+// Admin Layout & 17 Business Suite Pages
 import { AdminLayout } from './layouts/AdminLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminProducts } from './pages/admin/AdminProducts';
@@ -55,6 +56,7 @@ import { AdminAnalytics } from './pages/admin/AdminAnalytics';
 import { AdminContent } from './pages/admin/AdminContent';
 import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminAuditLogs } from './pages/admin/AdminAuditLogs';
+import { AdminStudyMaterials } from './pages/admin/AdminStudyMaterials';
 
 // Protected Route Guard
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -90,6 +92,7 @@ export const App: React.FC = () => {
           <Route path="/projects" element={<PublicLayout><Projects /></PublicLayout>} />
           <Route path="/projects/:slug" element={<PublicLayout><ProjectDetail /></PublicLayout>} />
           <Route path="/go/:slug" element={<PublicLayout><CampaignPage /></PublicLayout>} />
+          <Route path="/study-materials" element={<PublicLayout><StudyMaterials /></PublicLayout>} />
           <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
           <Route path="/pricing" element={<PublicLayout><Pricing /></PublicLayout>} />
           <Route path="/faq" element={<PublicLayout><FAQPage /></PublicLayout>} />
@@ -130,7 +133,7 @@ export const App: React.FC = () => {
             <Route path="security" element={<Security />} />
           </Route>
 
-          {/* Admin Protected Routes (16 Modules) */}
+          {/* Admin Protected Routes (17 Modules) */}
           <Route
             path="/admin"
             element={
@@ -155,6 +158,7 @@ export const App: React.FC = () => {
             <Route path="content" element={<AdminContent />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="audit-logs" element={<AdminAuditLogs />} />
+            <Route path="study-materials" element={<AdminStudyMaterials />} />
           </Route>
 
           {/* Fallback */}
