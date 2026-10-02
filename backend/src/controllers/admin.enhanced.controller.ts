@@ -517,9 +517,9 @@ export const getFunnelAnalytics = async (req: AuthRequest, res: Response): Promi
     res.status(200).json({
       success: true,
       funnel: {
-        views: Math.max(views, 150),
-        buyClicks: Math.max(buyClicks, 65),
-        checkouts: Math.max(checkouts, 42),
+        views,
+        buyClicks,
+        checkouts,
         paymentSuccess,
         downloads,
       },

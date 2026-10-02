@@ -1,3 +1,5 @@
+import api from './api';
+
 export type EventName =
   | 'page_view'
   | 'project_view'
@@ -9,8 +11,15 @@ export type EventName =
   | 'download_started'
   | 'whatsapp_clicked';
 
-export const trackEvent = (eventName: EventName, properties?: Record<string, any>) => {
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[ANALYTICS EVENT: ${eventName}]`, properties || {});
+export const trackEvent = async (eventName: EventName, properties?: Record<string, any>) => {
+  try {
+    const productId = properties?.productId || properties?.id;
+    await api.post('/analytics/event', {
+      eventType: eventName,
+      productId: productId || undefined,
+      metadata: properties || undefined,
+    });
+  } catch (err) {
+    // Fail silently so user interaction is never broken
   }
 };

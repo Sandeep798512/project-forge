@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ShoppingCart, ShieldCheck, Lock, CheckCircle2, Tag, AlertCircle, ArrowLeft } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
 import { useAuth } from '../context/AuthContext';
+import { trackEvent } from '../services/analytics';
 import api from '../services/api';
 
 export const Checkout: React.FC = () => {
@@ -29,7 +30,11 @@ export const Checkout: React.FC = () => {
         const res = await api.get(`/products`);
         if (res.data.success) {
           const found = res.data.products.find((p: any) => p._id === productId || p.slug === productId);
-          setProduct(found || res.data.products[0]);
+          const targetProduct = found || res.data.products[0];
+          setProduct(targetProduct);
+          if (targetProduct?._id) {
+            trackEvent('checkout_started', { productId: targetProduct._id });
+          }
         }
       } catch (err) {
         console.error('Checkout product fetch error', err);

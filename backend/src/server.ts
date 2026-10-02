@@ -14,6 +14,7 @@ import adminRoutes from './routes/admin.routes';
 import adminEnhancedRoutes from './routes/admin.enhanced.routes';
 import supportRoutes from './routes/support.routes';
 import studyMaterialRoutes from './routes/studyMaterial.routes';
+import analyticsRoutes from './routes/analytics.routes';
 import { getRobotsTxt, getSitemapXml } from './controllers/seo.controller';
 
 dotenv.config();
@@ -58,6 +59,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/admin', adminEnhancedRoutes);
 app.use('/api', supportRoutes);
 app.use('/api', studyMaterialRoutes);
+app.use('/api', analyticsRoutes);
 
 // Global Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

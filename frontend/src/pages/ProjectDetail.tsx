@@ -4,6 +4,7 @@ import { ExternalLink, CheckCircle2, ShieldCheck, Play, ArrowLeft, Star, FileTex
 import { BRAND } from '../config/brand.config';
 import { WhatsAppButton } from '../components/common/WhatsAppButton';
 import { useAuth } from '../context/AuthContext';
+import { trackEvent } from '../services/analytics';
 import api from '../services/api';
 
 export const ProjectDetail: React.FC = () => {
@@ -26,6 +27,7 @@ export const ProjectDetail: React.FC = () => {
         if (res.data.success) {
           setProduct(res.data.product);
           setRelatedProducts(res.data.relatedProducts || []);
+          trackEvent('project_view', { productId: res.data.product._id, slug });
         }
       } catch (err) {
         console.error('Error loading project details', err);
@@ -40,6 +42,9 @@ export const ProjectDetail: React.FC = () => {
   }, [slug]);
 
   const handleBuyNow = () => {
+    if (product?._id) {
+      trackEvent('buy_click', { productId: product._id });
+    }
     if (!isAuthenticated) {
       navigate(`/login?redirect=/projects/${slug}`);
       return;
