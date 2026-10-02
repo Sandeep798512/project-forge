@@ -14,7 +14,7 @@ export const Privacy: React.FC = () => {
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white">1. Information We Collect</h2>
             <p>
-              ProjectForge collects only essential data necessary to deliver digital products, verify purchases, provide technical support, and maintain platform security:
+              CampusGet collects only essential data necessary to deliver digital products, verify purchases, provide technical support, and maintain platform security:
             </p>
             <ul className="list-disc list-inside space-y-2 text-gray-300">
               <li><strong>Account Profile Data:</strong> Full Name, Email Address, and encrypted/hashed account passwords.</li>
@@ -31,7 +31,7 @@ export const Privacy: React.FC = () => {
               All online financial transactions are processed securely through certified payment gateway partner <strong>Razorpay</strong> using bank-grade SSL encryption.
             </p>
             <p className="text-emerald-400 font-medium">
-              ProjectForge NEVER collects, views, processes, or stores raw credit/debit card numbers, CVVs, net banking credentials, or UPI PINs on our servers.
+              CampusGet NEVER collects, views, processes, or stores raw credit/debit card numbers, CVVs, net banking credentials, or UPI PINs on our servers.
             </p>
           </section>
 
@@ -89,7 +89,7 @@ export const RefundPolicy: React.FC = () => {
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white">1. Nature of Digital Deliverables</h2>
             <p>
-              ProjectForge specializes in downloadable digital software project packages containing non-tangible source code, documentation, presentations, and technical resources. Upon successful server-side payment verification, digital access is immediately provisioned to your customer dashboard.
+              CampusGet specializes in downloadable digital software project packages containing non-tangible source code, documentation, presentations, and technical resources. Upon successful server-side payment verification, digital access is immediately provisioned to your customer dashboard.
             </p>
           </section>
 
@@ -102,11 +102,11 @@ export const RefundPolicy: React.FC = () => {
 
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white">3. Eligible Reviewable Refund Scenarios</h2>
-            <p>ProjectForge evaluates refund requests on a fair, case-by-case basis under the following eligible technical scenarios:</p>
+            <p>CampusGet evaluates refund requests on a fair, case-by-case basis under the following eligible technical scenarios:</p>
             <ul className="list-disc list-inside space-y-2 text-gray-300">
               <li><strong>Duplicate Payment:</strong> Multiple charges incurred for the exact same order due to a payment gateway glitch.</li>
               <li><strong>Unfulfilled Access:</strong> Payment was successfully charged but our system failed to grant entitlement and technical support cannot provision access within 24 business hours.</li>
-              <li><strong>Corrupted Source Archive:</strong> The downloaded ZIP or file archive is corrupted/unreadable and ProjectForge support is unable to provide a working replacement archive.</li>
+              <li><strong>Corrupted Source Archive:</strong> The downloaded ZIP or file archive is corrupted/unreadable and CampusGet support is unable to provide a working replacement archive.</li>
             </ul>
           </section>
 
@@ -162,7 +162,7 @@ export const License: React.FC = () => {
 
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white">3. License Restrictions</h2>
-            <p>Unless explicitly authorized in writing by ProjectForge, the customer MAY NOT:</p>
+            <p>Unless explicitly authorized in writing by CampusGet, the customer MAY NOT:</p>
             <ul className="list-disc list-inside space-y-2 text-gray-300">
               <li>Resell, sublicense, or distribute the raw, un-customized project package or source files to third parties.</li>
               <li>Publish the raw, unmodified project package on public repositories (e.g., GitHub, GitLab) as a competing free or commercial template.</li>
@@ -173,13 +173,13 @@ export const License: React.FC = () => {
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white">4. Intellectual Property & Third-Party Dependencies</h2>
             <p>
-              <strong>ProjectForge Materials:</strong> ProjectForge retains ownership of original proprietary package structure, curated technical documentation, setup guides, and original codebase architecture.
+              <strong>CampusGet Materials:</strong> CampusGet retains ownership of original proprietary package structure, curated technical documentation, setup guides, and original codebase architecture.
             </p>
             <p>
               <strong>Customer Modifications:</strong> The customer retains ownership of their independent, custom-authored modifications and additions built upon the code.
             </p>
             <p>
-              <strong>Third-Party & Open-Source Libraries:</strong> Packages may utilize third-party open-source libraries, frameworks (e.g., React, Node.js, Express, Tailwind CSS), fonts, or icons. Such components remain governed by their respective open-source licenses (e.g., MIT, Apache 2.0). ProjectForge does not claim original ownership over third-party open-source dependencies.
+              <strong>Third-Party & Open-Source Libraries:</strong> Packages may utilize third-party open-source libraries, frameworks (e.g., React, Node.js, Express, Tailwind CSS), fonts, or icons. Such components remain governed by their respective open-source licenses (e.g., MIT, Apache 2.0). CampusGet does not claim original ownership over third-party open-source dependencies.
             </p>
           </section>
         </div>
@@ -200,10 +200,10 @@ export const Disclaimer: React.FC = () => {
         <div className="bg-surface/60 p-6 sm:p-8 rounded-2xl border border-border/60 space-y-6">
           <section className="space-y-3">
             <p>
-              The software projects, source code, documentation, demonstrations, and related digital materials provided by ProjectForge are intended primarily for <strong>educational, learning, development, and project demonstration purposes</strong>.
+              The software projects, source code, documentation, demonstrations, and related digital materials provided by CampusGet are intended primarily for <strong>educational, learning, development, and project demonstration purposes</strong>.
             </p>
             <p>
-              ProjectForge does not guarantee that every project will work without modification in every user's specific operating system, hardware configuration, software environment, hosting provider, database configuration, API version, or third-party service.
+              CampusGet does not guarantee that every project will work without modification in every user's specific operating system, hardware configuration, software environment, hosting provider, database configuration, API version, or third-party service.
             </p>
             <p>
               Users may need to configure, modify, debug, update, or customize the source code according to their individual requirements and technical environment.
@@ -213,7 +213,7 @@ export const Disclaimer: React.FC = () => {
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white">Educational Use</h2>
             <p>
-              ProjectForge provides software project packages to help students and developers understand software development concepts, project architecture, implementation techniques, and related technologies.
+              CampusGet provides software project packages to help students and developers understand software development concepts, project architecture, implementation techniques, and related technologies.
             </p>
             <p>
               Purchasing a project does not guarantee academic marks, project approval, internship selection, employment, placement, or any particular academic or professional outcome. Users are responsible for understanding and complying with the academic rules and requirements of their educational institution.
@@ -229,7 +229,7 @@ export const Disclaimer: React.FC = () => {
               Such third-party components remain subject to their respective owners' terms, licenses, and policies. Users are responsible for reviewing and complying with applicable third-party terms when using, modifying, deploying, or redistributing a project.
             </p>
             <p>
-              ProjectForge does not claim ownership of third-party software, trademarks, or other intellectual property belonging to their respective owners.
+              CampusGet does not claim ownership of third-party software, trademarks, or other intellectual property belonging to their respective owners.
             </p>
           </section>
 
@@ -242,14 +242,14 @@ export const Disclaimer: React.FC = () => {
               Users should not use demonstration or educational software in safety-critical, financial, medical, security-sensitive, or other high-risk environments without appropriate professional review, testing, security controls, and compliance measures.
             </p>
             <p>
-              ProjectForge is not responsible for problems resulting from unauthorized modifications, incorrect configuration, unsupported environments, misuse of the software, insecure deployment, or changes made by third-party services.
+              CampusGet is not responsible for problems resulting from unauthorized modifications, incorrect configuration, unsupported environments, misuse of the software, insecure deployment, or changes made by third-party services.
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white">Intellectual Property</h2>
             <p>
-              Users must not represent ProjectForge's materials, third-party materials, or other copyrighted components as their own where doing so would violate applicable intellectual-property rights or license terms.
+              Users must not represent CampusGet's materials, third-party materials, or other copyrighted components as their own where doing so would violate applicable intellectual-property rights or license terms.
             </p>
             <p>
               Where a project contains components subject to separate open-source or third-party licenses, those license terms continue to apply.
@@ -259,13 +259,13 @@ export const Disclaimer: React.FC = () => {
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white">No Guarantee of Specific Results</h2>
             <p>
-              ProjectForge provides digital software materials and related support according to the applicable product description and purchase terms. ProjectForge does not guarantee a particular academic, business, financial, employment, or other outcome from the use of any project.
+              CampusGet provides digital software materials and related support according to the applicable product description and purchase terms. CampusGet does not guarantee a particular academic, business, financial, employment, or other outcome from the use of any project.
             </p>
             <p>
-              By purchasing or using ProjectForge materials, users acknowledge that software development involves configuration, testing, maintenance, and ongoing updates.
+              By purchasing or using CampusGet materials, users acknowledge that software development involves configuration, testing, maintenance, and ongoing updates.
             </p>
             <p>
-              For questions regarding a specific project's included features, licensing, or supported environment, users should contact ProjectForge support before purchase or deployment.
+              For questions regarding a specific project's included features, licensing, or supported environment, users should contact CampusGet support before purchase or deployment.
             </p>
           </section>
         </div>

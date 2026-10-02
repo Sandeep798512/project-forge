@@ -223,9 +223,9 @@ export const serveProtectedFile = async (req: AuthRequest, res: Response): Promi
       if (!fs.existsSync(storageDir)) fs.mkdirSync(storageDir, { recursive: true });
 
       if (finalStorageKey.endsWith('.pdf')) {
-        fs.writeFileSync(filePath, `%PDF-1.4\n% ProjectForge Official Deliverable: ${asset?.title || product.title}\nIncludes Documentation & Setup Guide.`);
+        fs.writeFileSync(filePath, `%PDF-1.4\n% CampusGet Official Deliverable: ${asset?.title || product.title}\nIncludes Documentation & Setup Guide.`);
       } else {
-        fs.writeFileSync(filePath, `PK\x03\x04 - ProjectForge Deliverable Package for ${product.title}\nIncludes Source Code, PPT, Documentation & Viva QA.`);
+        fs.writeFileSync(filePath, `PK\x03\x04 - CampusGet Deliverable Package for ${product.title}\nIncludes Source Code, PPT, Documentation & Viva QA.`);
       }
     }
 

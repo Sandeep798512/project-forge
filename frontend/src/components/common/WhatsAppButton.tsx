@@ -9,7 +9,7 @@ interface WhatsAppButtonProps {
 }
 
 export const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
-  customMessage = 'Hi! I have a question about project packages on ProjectForge.',
+  customMessage = 'Hi! I have a question about project packages on CampusGet.',
   label = 'Chat on WhatsApp',
   variant = 'floating',
 }) => {

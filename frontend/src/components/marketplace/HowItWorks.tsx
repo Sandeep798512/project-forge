@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, Eye, CreditCard, Download, Wrench, MessageSquareText } from 'lucide-react';
+import { BRAND } from '../../config/brand.config';
 
 export const HowItWorks: React.FC = () => {
   const steps = [
@@ -47,7 +48,7 @@ export const HowItWorks: React.FC = () => {
         
         <div className="text-center max-w-2xl mx-auto mb-12">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-            How ProjectForge Works
+            How {BRAND.name} Works
           </h2>
           <p className="text-gray-400 text-sm mt-2">
             From discovering your project to running it locally in under 5 minutes.

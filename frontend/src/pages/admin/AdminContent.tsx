@@ -9,7 +9,7 @@ export const AdminContent: React.FC = () => {
     promoBannerText: '',
     promoBannerActive: true,
     whatsappNumber: '918081220303',
-    supportEmail: 'support@projectforge.dev',
+    supportEmail: 'support@campusget.in',
   });
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);

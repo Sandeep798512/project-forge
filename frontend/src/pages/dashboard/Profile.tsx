@@ -98,7 +98,7 @@ export const Profile: React.FC = () => {
             <span>Danger Zone: Delete Account</span>
           </div>
           <p className="text-gray-400 text-xs">
-            Permanently delete your developer account and remove your personal profile from ProjectForge. This action is permanent and cannot be undone.
+            Permanently delete your developer account and remove your personal profile from CampusGet. This action is permanent and cannot be undone.
           </p>
           <button
             onClick={() => {

@@ -83,7 +83,7 @@ ${ownershipStatement}
             {BRAND.name} respects the intellectual property rights of creators, developers, and copyright holders. In accordance with applicable copyright laws, we maintain a neutral review process to investigate and address bona fide notices of alleged copyright or trademark infringement.
           </p>
           <p>
-            If you believe in good faith that any package, material, or content hosted on ProjectForge infringes upon your copyright or intellectual property rights, please submit a formal IP Complaint using the form below or by emailing <a href={`mailto:${BRAND.supportEmail}`} className="text-primary-400 hover:underline font-semibold">{BRAND.supportEmail}</a>.
+            If you believe in good faith that any package, material, or content hosted on CampusGet infringes upon your copyright or intellectual property rights, please submit a formal IP Complaint using the form below or by emailing <a href={`mailto:${BRAND.supportEmail}`} className="text-primary-400 hover:underline font-semibold">{BRAND.supportEmail}</a>.
           </p>
         </div>
 
@@ -151,13 +151,13 @@ ${ownershipStatement}
               </div>
 
               <div>
-                <label className="block font-semibold text-gray-300 mb-1">ProjectForge Product URL / Ref *</label>
+                <label className="block font-semibold text-gray-300 mb-1">CampusGet Product URL / Ref *</label>
                 <input
                   type="text"
                   required
                   value={infringingUrl}
                   onChange={(e) => setInfringingUrl(e.target.value)}
-                  placeholder="e.g. https://projectforge.dev/projects/job-portal-hub"
+                  placeholder="e.g. https://campusget.in/projects/job-portal-hub"
                   className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-gray-100 font-mono"
                 />
               </div>

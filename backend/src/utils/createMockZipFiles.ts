@@ -20,7 +20,7 @@ export const ensureProtectedStorageDirectories = () => {
   for (const pkg of packages) {
     const pkgPath = path.join(storageDir, pkg);
     if (!fs.existsSync(pkgPath)) {
-      const mockZipContent = `PK\x03\x04 - PROJECTFORGE SECURE DOWNLOAD PACKAGE (${pkg})\n\nIncluded Deliverables:\n1. Source Code (Frontend & Backend)\n2. Database Schemas\n3. System Architecture PDF\n4. Presentation PPTX\n5. Viva Questions & Setup Guide\n\nThank you for choosing ProjectForge! Build. Understand. Showcase.`;
+      const mockZipContent = `PK\x03\x04 - CAMPUSGET SECURE DOWNLOAD PACKAGE (${pkg})\n\nIncluded Deliverables:\n1. Source Code (Frontend & Backend)\n2. Database Schemas\n3. System Architecture PDF\n4. Presentation PPTX\n5. Viva Questions & Setup Guide\n\nThank you for choosing CampusGet! Build. Understand. Showcase.`;
       fs.writeFileSync(pkgPath, mockZipContent);
       console.log(`[STORAGE] Created mock zip package file: ${pkg}`);
     }
