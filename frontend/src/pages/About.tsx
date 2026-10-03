@@ -52,7 +52,7 @@ export const About: React.FC = () => {
             </div>
             <h3 className="font-bold text-white text-base">360° Academic Materials</h3>
             <p className="text-gray-400 text-xs leading-relaxed">
-              From IEEE-format project reports and presentation decks to viva questions and system architecture diagrams.
+              From comprehensive project reports and presentation decks to viva questions and system architecture diagrams.
             </p>
           </div>
 

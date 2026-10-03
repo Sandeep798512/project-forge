@@ -87,7 +87,7 @@ export const MyPurchases: React.FC = () => {
       case 'SOURCE_CODE':
         return 'Complete Source Code (.ZIP)';
       case 'DOCUMENTATION':
-        return 'IEEE Documentation (.PDF)';
+        return 'Documentation (.PDF)';
       case 'PPT':
         return 'Project Presentation (.PPTX)';
       case 'SETUP_GUIDE':
@@ -109,7 +109,7 @@ export const MyPurchases: React.FC = () => {
       <div>
         <h1 className="text-2xl font-extrabold text-white">My Purchases & Resources</h1>
         <p className="text-gray-400 text-xs mt-1">
-          Access your purchased software source code, IEEE documentation PDFs, presentation decks, setup guides, and viva questions.
+          Access your purchased software source code, documentation PDFs, presentation decks, setup guides, and viva questions.
         </p>
       </div>
 

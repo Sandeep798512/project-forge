@@ -305,7 +305,7 @@ export const ProjectDetail: React.FC = () => {
                       <div key={idx} className="flex items-center justify-between p-3.5 bg-background border border-border/60 rounded-xl text-xs sm:text-sm">
                         <div className="flex items-center space-x-2.5">
                           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                          <span className="font-semibold text-gray-200">{item.name}</span>
+                          <span className="font-semibold text-gray-200">{item.name?.replace(/IEEE\s*(Style\s*)?/gi, '')}</span>
                         </div>
                         <span className="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
                           Included
