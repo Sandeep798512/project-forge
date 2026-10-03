@@ -81,7 +81,7 @@ export const seedDatabase = async () => {
         requirements: ['Node.js 18+', 'MongoDB 6.0+', 'Google Gemini API Key', 'NPM 9+'],
         whatsIncluded: [
           'Complete Clean Source Code (.ZIP)',
-          'Comprehensive IEEE Style Documentation (.PDF)',
+          'Comprehensive Documentation (.PDF)',
           'Project Presentation Deck (.PPTX)',
           'Step-by-Step Local & Cloud Setup Guide (.PDF)',
           'Viva Voce QA Question Bank (.PDF)',
@@ -114,7 +114,7 @@ export const seedDatabase = async () => {
         requirements: ['Node.js 18+', 'MongoDB 6.0+', 'Gemini API Key'],
         whatsIncluded: [
           'Complete Clean Source Code (.ZIP)',
-          'Comprehensive IEEE Style Documentation (.PDF)',
+          'Comprehensive Documentation (.PDF)',
           'Project Presentation Deck (.PPTX)',
           'Setup Guide (.PDF)',
           'Viva Voce QA Bank (.PDF)',
@@ -177,7 +177,7 @@ export const seedDatabase = async () => {
         requirements: ['Node.js 18+', 'MongoDB 6.0+'],
         whatsIncluded: [
           'Complete Clean Source Code (.ZIP)',
-          'IEEE Style Documentation (.PDF)',
+          'Documentation (.PDF)',
           'Presentation Deck (.PPTX)',
           'Setup Guide (.PDF)',
           'Viva Voce QA Bank (.PDF)',
@@ -268,7 +268,7 @@ export const seedDatabase = async () => {
       createdProd.assets = createdAssetIds;
       createdProd.deliverables = [
         { name: 'Complete Source Code', included: true, fileKey: `packages/${createdProd.slug}_source_code.zip` },
-        { name: 'IEEE Style Documentation', included: true },
+        { name: 'Documentation', included: true },
         { name: 'Presentation Deck (PPTX)', included: true },
         { name: 'Viva Voce Question Bank', included: true },
       ];
