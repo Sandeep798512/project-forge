@@ -239,7 +239,7 @@ export const AdminProducts: React.FC = () => {
       reader.onload = async () => {
         const base64Content = (reader.result as string).split(',')[1];
         const defaultTitle = assetType === 'SOURCE_CODE' ? 'Complete Source Code (.ZIP)'
-          : assetType === 'DOCUMENTATION' ? 'Documentation (.PDF)'
+          : assetType === 'DOCUMENTATION' ? 'IEEE Documentation (.PDF)'
           : assetType === 'PPT' ? 'Project Presentation (.PPTX)'
           : assetType === 'SETUP_GUIDE' ? 'Step-by-Step Setup Guide (.PDF)'
           : assetType === 'VIVA' ? 'Viva Voce QA Bank (.PDF)'
@@ -870,7 +870,7 @@ export const AdminProducts: React.FC = () => {
                               className="w-full bg-surface border border-border rounded-xl px-3 py-2 text-gray-100 font-semibold"
                             >
                               <option value="SOURCE_CODE">Source Code (.ZIP)</option>
-                              <option value="DOCUMENTATION">Documentation (.PDF)</option>
+                              <option value="DOCUMENTATION">IEEE Documentation (.PDF)</option>
                               <option value="PPT">Presentation Deck (.PPTX)</option>
                               <option value="SETUP_GUIDE">Step-by-Step Setup Guide (.PDF)</option>
                               <option value="VIVA">Viva Voce QA Bank (.PDF)</option>

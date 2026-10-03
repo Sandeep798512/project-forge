@@ -223,7 +223,7 @@ export const seedDatabase = async () => {
     // Asset definitions for seeding
     const assetTemplates: { type: AssetType; ext: string; mime: string; title: string }[] = [
       { type: 'SOURCE_CODE', ext: '.zip', mime: 'application/zip', title: 'Complete Source Code (.ZIP)' },
-      { type: 'DOCUMENTATION', ext: '.pdf', mime: 'application/pdf', title: 'Documentation (.PDF)' },
+      { type: 'DOCUMENTATION', ext: '.pdf', mime: 'application/pdf', title: 'IEEE Documentation (.PDF)' },
       { type: 'PPT', ext: '.pptx', mime: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', title: 'Project Presentation (.PPTX)' },
       { type: 'SETUP_GUIDE', ext: '.pdf', mime: 'application/pdf', title: 'Step-by-Step Setup Guide (.PDF)' },
       { type: 'VIVA', ext: '.pdf', mime: 'application/pdf', title: 'Viva Voce QA Question Bank (.PDF)' },
