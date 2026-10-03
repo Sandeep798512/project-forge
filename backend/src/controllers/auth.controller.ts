@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import crypto from 'crypto';
 import User from '../models/User';
 import Entitlement from '../models/Entitlement';
+import AuditLog from '../models/AuditLog';
 import { hashPassword, comparePassword } from '../utils/passwords';
 import { generateToken } from '../utils/jwt';
 import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '../validators/auth.validator';
@@ -250,3 +251,58 @@ export const deleteAccount = async (req: AuthRequest, res: Response): Promise<vo
     res.status(500).json({ success: false, message: 'Server error during account deletion.' });
   }
 };
+
+export const updatePassword = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ success: false, message: 'Authentication required' });
+      return;
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      res.status(400).json({ success: false, message: 'Both currentPassword and newPassword are required.' });
+      return;
+    }
+
+    if (newPassword.length < 6 || newPassword.length > 50) {
+      res.status(400).json({ success: false, message: 'New password must be between 6 and 50 characters long.' });
+      return;
+    }
+
+    const user = await User.findById(req.user.id).select('+password');
+    if (!user || !user.password) {
+      res.status(404).json({ success: false, message: 'User account not found.' });
+      return;
+    }
+
+    const isMatch = await comparePassword(currentPassword, user.password);
+    if (!isMatch) {
+      res.status(400).json({ success: false, message: 'Incorrect current password.' });
+      return;
+    }
+
+    user.password = await hashPassword(newPassword);
+    await user.save();
+
+    try {
+      await AuditLog.create({
+        user: req.user.id,
+        action: 'PASSWORD_UPDATED',
+        details: { userEmail: user.email },
+      });
+    } catch (auditErr) {
+      // Audit log non-critical
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Password updated successfully!',
+    });
+  } catch (error: any) {
+    console.error('[UPDATE PASSWORD ERROR]', error);
+    res.status(500).json({ success: false, message: 'Failed to update password. Server error.' });
+  }
+};
+

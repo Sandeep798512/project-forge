@@ -23,3 +23,9 @@ export const resetPasswordSchema = z.object({
   token: z.string().min(1, 'Reset token is required'),
   newPassword: z.string().min(6, 'Password must be at least 6 characters').max(50, 'Password cannot exceed 50 characters'),
 });
+
+export const updatePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z.string().min(6, 'New password must be at least 6 characters').max(50, 'Password cannot exceed 50 characters'),
+});
+

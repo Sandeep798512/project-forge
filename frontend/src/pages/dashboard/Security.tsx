@@ -29,27 +29,25 @@ export const Security: React.FC = () => {
 
     try {
       setLoading(true);
-      // Attempt backend update if route available
       const res = await api.put('/auth/update-password', {
         currentPassword,
         newPassword,
       });
 
-      if (res.data.success) {
+      if (res.data?.success) {
         setSuccess(true);
         setCurrentPassword('');
         setNewPassword('');
+        setTimeout(() => setSuccess(false), 4000);
       } else {
-        setError(res.data.message || 'Failed to update password');
+        setError(res.data?.message || 'Failed to update password');
       }
     } catch (err: any) {
-      // Fallback feedback if mock or custom response
-      setSuccess(true);
-      setCurrentPassword('');
-      setNewPassword('');
+      const msg = err.response?.data?.message || err.message || 'Failed to update password. Please check your current password.';
+      setError(msg);
+      setSuccess(false);
     } finally {
       setLoading(false);
-      setTimeout(() => setSuccess(false), 4000);
     }
   };
 
