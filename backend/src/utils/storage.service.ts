@@ -1,6 +1,8 @@
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
+import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { Readable } from 'stream';
 
 export interface StorageFileMeta {
   key: string;
@@ -12,11 +14,32 @@ export interface StorageFileMeta {
 export class StorageService {
   private localBasePath: string;
   private provider: 'local' | 's3';
+  private s3Client: S3Client | null = null;
+  private bucketName: string;
 
   constructor() {
     this.provider = (process.env.STORAGE_PROVIDER as 'local' | 's3') || 'local';
     this.localBasePath = path.resolve(__dirname, '../../storage/protected');
-    this.ensureLocalStorageDir();
+    this.bucketName = process.env.STORAGE_BUCKET_NAME || process.env.R2_BUCKET_NAME || 'campusget-storage';
+
+    const accessKeyId = process.env.STORAGE_ACCESS_KEY || process.env.R2_ACCESS_KEY_ID;
+    const secretAccessKey = process.env.STORAGE_SECRET_KEY || process.env.R2_SECRET_ACCESS_KEY;
+    const endpoint = process.env.STORAGE_ENDPOINT || process.env.R2_ENDPOINT;
+
+    if ((this.provider === 's3' || endpoint) && accessKeyId && secretAccessKey) {
+      this.provider = 's3';
+      this.s3Client = new S3Client({
+        region: process.env.STORAGE_REGION || 'auto',
+        endpoint: endpoint,
+        credentials: {
+          accessKeyId,
+          secretAccessKey,
+        },
+      });
+      console.log('[STORAGE] S3 / Cloudflare R2 Client Initialized.');
+    } else {
+      this.ensureLocalStorageDir();
+    }
   }
 
   private ensureLocalStorageDir() {
@@ -25,9 +48,6 @@ export class StorageService {
     }
   }
 
-  /**
-   * Generates a safe storage key for uploaded asset
-   */
   public generateKey(productId: string, assetType: string, filename: string): string {
     const ext = path.extname(filename).toLowerCase();
     const safeBase = path.basename(filename, ext).replace(/[^a-z0-9]/gi, '_');
@@ -36,13 +56,29 @@ export class StorageService {
     return `packages/${productId}/${assetType.toLowerCase()}_${safeBase}_${timestamp}_${randomHex}${ext}`;
   }
 
-  /**
-   * Uploads file buffer to storage
-   */
   public async uploadAsset(storageKey: string, buffer: Buffer): Promise<StorageFileMeta> {
-    if (this.provider === 's3' && process.env.STORAGE_ACCESS_KEY) {
-      // S3 / R2 Cloud Storage SDK call if credentials configured
-      console.log(`[STORAGE] S3 Cloud Storage Upload: ${storageKey}`);
+    const mimeType = this.detectMimeType(storageKey);
+
+    if (this.provider === 's3' && this.s3Client) {
+      try {
+        console.log(`[STORAGE] Uploading to S3/R2 Bucket (${this.bucketName}): ${storageKey}`);
+        await this.s3Client.send(
+          new PutObjectCommand({
+            Bucket: this.bucketName,
+            Key: storageKey,
+            Body: buffer,
+            ContentType: mimeType,
+          })
+        );
+        return {
+          key: storageKey,
+          size: buffer.length,
+          mimeType,
+          exists: true,
+        };
+      } catch (s3Err) {
+        console.error('[STORAGE S3 UPLOAD ERROR, FALLING BACK TO LOCAL]', s3Err);
+      }
     }
 
     // Default & Local Protected Storage Fallback
@@ -57,15 +93,26 @@ export class StorageService {
     return {
       key: storageKey,
       size: buffer.length,
-      mimeType: this.detectMimeType(storageKey),
+      mimeType,
       exists: true,
     };
   }
 
-  /**
-   * Deletes asset from storage
-   */
   public async deleteAsset(storageKey: string): Promise<boolean> {
+    if (this.provider === 's3' && this.s3Client) {
+      try {
+        await this.s3Client.send(
+          new DeleteObjectCommand({
+            Bucket: this.bucketName,
+            Key: storageKey,
+          })
+        );
+        return true;
+      } catch (err) {
+        console.error('[STORAGE S3 DELETE ERROR]', err);
+      }
+    }
+
     try {
       const fullPath = path.resolve(this.localBasePath, storageKey);
       if (fs.existsSync(fullPath)) {
@@ -73,37 +120,42 @@ export class StorageService {
         return true;
       }
     } catch (err) {
-      console.error('[STORAGE DELETE ERROR]', err);
+      console.error('[STORAGE LOCAL DELETE ERROR]', err);
     }
     return false;
   }
 
-  /**
-   * Checks if file exists on disk/storage
-   */
   public fileExists(storageKey: string): boolean {
     const fullPath = path.resolve(this.localBasePath, storageKey);
     return fs.existsSync(fullPath);
   }
 
-  /**
-   * Reads readable stream for streaming response
-   */
   public getFileStream(storageKey: string): fs.ReadStream {
     const fullPath = path.resolve(this.localBasePath, storageKey);
     return fs.createReadStream(fullPath);
   }
 
-  /**
-   * Gets absolute file path for local serving
-   */
+  public async getS3ObjectStream(storageKey: string): Promise<Readable | null> {
+    if (this.provider === 's3' && this.s3Client) {
+      try {
+        const response = await this.s3Client.send(
+          new GetObjectCommand({
+            Bucket: this.bucketName,
+            Key: storageKey,
+          })
+        );
+        return (response.Body as Readable) || null;
+      } catch (err) {
+        console.error('[STORAGE S3 GET OBJECT ERROR]', err);
+      }
+    }
+    return null;
+  }
+
   public getAbsolutePath(storageKey: string): string {
     return path.resolve(this.localBasePath, storageKey);
   }
 
-  /**
-   * Helper to detect standard MIME types
-   */
   public detectMimeType(filename: string): string {
     const ext = path.extname(filename).toLowerCase();
     switch (ext) {
