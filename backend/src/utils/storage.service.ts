@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
 import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Readable } from 'stream';
 
 export interface StorageFileMeta {
@@ -13,20 +14,31 @@ export interface StorageFileMeta {
 
 export class StorageService {
   private localBasePath: string;
-  private provider: 'local' | 's3';
+  private provider: 'local' | 's3' | 'supabase';
   private s3Client: S3Client | null = null;
+  private supabaseClient: SupabaseClient | null = null;
   private bucketName: string;
 
   constructor() {
-    this.provider = (process.env.STORAGE_PROVIDER as 'local' | 's3') || 'local';
+    this.provider = (process.env.STORAGE_PROVIDER as 'local' | 's3' | 'supabase') || 'local';
     this.localBasePath = path.resolve(__dirname, '../../storage/protected');
-    this.bucketName = process.env.STORAGE_BUCKET_NAME || process.env.R2_BUCKET_NAME || 'campusget-storage';
+    this.bucketName = process.env.STORAGE_BUCKET_NAME || process.env.R2_BUCKET_NAME || process.env.SUPABASE_BUCKET_NAME || 'campusget-storage';
 
     const accessKeyId = process.env.STORAGE_ACCESS_KEY || process.env.R2_ACCESS_KEY_ID;
     const secretAccessKey = process.env.STORAGE_SECRET_KEY || process.env.R2_SECRET_ACCESS_KEY;
     const endpoint = process.env.STORAGE_ENDPOINT || process.env.R2_ENDPOINT;
 
-    if ((this.provider === 's3' || endpoint) && accessKeyId && secretAccessKey) {
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+
+    // 1. Check Supabase Storage Credentials
+    if (supabaseUrl && supabaseKey) {
+      this.provider = 'supabase';
+      this.supabaseClient = createClient(supabaseUrl, supabaseKey);
+      console.log('[STORAGE] Supabase Storage Client Initialized.');
+    }
+    // 2. Check S3 / Cloudflare R2 Credentials
+    else if ((this.provider === 's3' || endpoint) && accessKeyId && secretAccessKey) {
       this.provider = 's3';
       this.s3Client = new S3Client({
         region: process.env.STORAGE_REGION || 'auto',
@@ -59,7 +71,33 @@ export class StorageService {
   public async uploadAsset(storageKey: string, buffer: Buffer): Promise<StorageFileMeta> {
     const mimeType = this.detectMimeType(storageKey);
 
-    if (this.provider === 's3' && this.s3Client) {
+    // 1. Supabase Upload
+    if (this.supabaseClient) {
+      try {
+        console.log(`[STORAGE] Uploading to Supabase Bucket (${this.bucketName}): ${storageKey}`);
+        const { error } = await this.supabaseClient.storage
+          .from(this.bucketName)
+          .upload(storageKey, buffer, {
+            contentType: mimeType,
+            upsert: true,
+          });
+
+        if (!error) {
+          return {
+            key: storageKey,
+            size: buffer.length,
+            mimeType,
+            exists: true,
+          };
+        }
+        console.error('[STORAGE SUPABASE UPLOAD ERROR]', error);
+      } catch (supaErr) {
+        console.error('[STORAGE SUPABASE EXCEPTION, FALLING BACK]', supaErr);
+      }
+    }
+
+    // 2. S3 / Cloudflare R2 Upload
+    if (this.s3Client) {
       try {
         console.log(`[STORAGE] Uploading to S3/R2 Bucket (${this.bucketName}): ${storageKey}`);
         await this.s3Client.send(
@@ -81,7 +119,7 @@ export class StorageService {
       }
     }
 
-    // Default & Local Protected Storage Fallback
+    // 3. Default & Local Protected Storage Fallback
     const fullPath = path.resolve(this.localBasePath, storageKey);
     const dir = path.dirname(fullPath);
     if (!fs.existsSync(dir)) {
@@ -99,7 +137,16 @@ export class StorageService {
   }
 
   public async deleteAsset(storageKey: string): Promise<boolean> {
-    if (this.provider === 's3' && this.s3Client) {
+    if (this.supabaseClient) {
+      try {
+        await this.supabaseClient.storage.from(this.bucketName).remove([storageKey]);
+        return true;
+      } catch (err) {
+        console.error('[STORAGE SUPABASE DELETE ERROR]', err);
+      }
+    }
+
+    if (this.s3Client) {
       try {
         await this.s3Client.send(
           new DeleteObjectCommand({
@@ -135,8 +182,24 @@ export class StorageService {
     return fs.createReadStream(fullPath);
   }
 
-  public async getS3ObjectStream(storageKey: string): Promise<Readable | null> {
-    if (this.provider === 's3' && this.s3Client) {
+  public async getCloudObjectStream(storageKey: string): Promise<Readable | null> {
+    if (this.supabaseClient) {
+      try {
+        const { data, error } = await this.supabaseClient.storage
+          .from(this.bucketName)
+          .download(storageKey);
+
+        if (data && !error) {
+          const arrayBuffer = await data.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          return Readable.from(buffer);
+        }
+      } catch (err) {
+        console.error('[STORAGE SUPABASE DOWNLOAD ERROR]', err);
+      }
+    }
+
+    if (this.s3Client) {
       try {
         const response = await this.s3Client.send(
           new GetObjectCommand({
