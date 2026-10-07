@@ -56,9 +56,29 @@ export const Home: React.FC = () => {
   }, [typedText, isDeleting, loopNum, typingSpeed]);
 
   useEffect(() => {
+    // Instant cache read for 0ms page load
+    const cachedCategories = localStorage.getItem('cg_cached_categories');
+    const cachedFeatured = localStorage.getItem('cg_cached_featured');
+
+    if (cachedCategories) {
+      try { setCategories(JSON.parse(cachedCategories)); } catch (e) {}
+    }
+    if (cachedFeatured && !selectedCategory) {
+      try {
+        const parsed = JSON.parse(cachedFeatured);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setFeaturedProducts(parsed);
+          setLoading(false);
+        }
+      } catch (e) {}
+    }
+
     const fetchData = async () => {
       try {
-        setLoading(true);
+        // Only set loading true if no cached data exists
+        if (!cachedFeatured || selectedCategory) {
+          setLoading(true);
+        }
         const [catRes, prodRes] = await Promise.all([
           api.get('/categories'),
           api.get(`/products?limit=6${selectedCategory ? `&category=${selectedCategory}` : ''}`),
@@ -66,9 +86,13 @@ export const Home: React.FC = () => {
 
         if (catRes.data.success) {
           setCategories(catRes.data.categories);
+          localStorage.setItem('cg_cached_categories', JSON.stringify(catRes.data.categories));
         }
         if (prodRes.data.success) {
           setFeaturedProducts(prodRes.data.products);
+          if (!selectedCategory) {
+            localStorage.setItem('cg_cached_featured', JSON.stringify(prodRes.data.products));
+          }
         }
       } catch (error) {
         console.error('Failed to load homepage data', error);

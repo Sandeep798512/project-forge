@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import api from './services/api';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { WhatsAppButton } from './components/common/WhatsAppButton';
@@ -83,6 +84,11 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 };
 
 export const App: React.FC = () => {
+  useEffect(() => {
+    // Background server warmup ping
+    api.get('/health').catch(() => {});
+  }, []);
+
   return (
     <AuthProvider>
       <BrowserRouter>

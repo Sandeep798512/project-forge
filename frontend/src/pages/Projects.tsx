@@ -21,11 +21,17 @@ export const Projects: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
 
   useEffect(() => {
+    const cachedCategories = localStorage.getItem('cg_cached_categories');
+    if (cachedCategories) {
+      try { setCategories(JSON.parse(cachedCategories)); } catch (e) {}
+    }
+
     const fetchCategories = async () => {
       try {
         const res = await api.get('/categories');
         if (res.data.success) {
           setCategories(res.data.categories);
+          localStorage.setItem('cg_cached_categories', JSON.stringify(res.data.categories));
         }
       } catch (err) {
         console.error(err);
@@ -35,9 +41,24 @@ export const Projects: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const isDefaultFilter = !search && !category && !difficulty && sort === 'createdAt' && page === 1;
+    const cachedCatalog = localStorage.getItem('cg_cached_catalog');
+
+    if (isDefaultFilter && cachedCatalog) {
+      try {
+        const parsed = JSON.parse(cachedCatalog);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setProducts(parsed);
+          setLoading(false);
+        }
+      } catch (e) {}
+    }
+
     const fetchProducts = async () => {
       try {
-        setLoading(true);
+        if (!isDefaultFilter || !cachedCatalog) {
+          setLoading(true);
+        }
         const params = new URLSearchParams();
         if (search) params.set('search', search);
         if (category) params.set('category', category);
@@ -50,6 +71,9 @@ export const Projects: React.FC = () => {
         if (res.data.success) {
           setProducts(res.data.products);
           setTotalPages(res.data.pagination.pages || 1);
+          if (isDefaultFilter) {
+            localStorage.setItem('cg_cached_catalog', JSON.stringify(res.data.products));
+          }
         }
       } catch (err) {
         console.error('Error fetching products catalog', err);
