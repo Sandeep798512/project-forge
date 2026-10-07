@@ -1,10 +1,21 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import api from './services/api';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { WhatsAppButton } from './components/common/WhatsAppButton';
 import { AuthProvider, useAuth } from './context/AuthContext';
+
+// Scroll To Top Component on Route Change
+const ScrollToTop: React.FC = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as any });
+  }, [pathname]);
+
+  return null;
+};
 
 // Public Pages
 import { Home } from './pages/Home';
@@ -92,6 +103,7 @@ export const App: React.FC = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
