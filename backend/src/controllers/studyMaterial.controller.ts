@@ -1,9 +1,13 @@
 import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
+import jwt from 'jsonwebtoken';
 import StudyMaterial, { MaterialType } from '../models/StudyMaterial';
+import StudyMaterialDownloadLog from '../models/StudyMaterialDownloadLog';
 import { storageService } from '../utils/storage.service';
 import { AuthRequest } from '../middlewares/auth.middleware';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'projectforge_super_secret_jwt_key_2026_change_in_production';
 
 /**
  * Public: Get published study materials with search & filter
@@ -80,7 +84,7 @@ export const getPublicStudyMaterials = async (req: Request, res: Response): Prom
 };
 
 /**
- * Public: Stream / Download free study material without creating DB logs or requiring authentication
+ * Public: Stream / Download free study material (Strict Max 1 Download per user/IP)
  */
 export const downloadFreeStudyMaterial = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -91,6 +95,65 @@ export const downloadFreeStudyMaterial = async (req: Request, res: Response): Pr
       res.status(404).json({ success: false, message: 'Study material not found or unavailable' });
       return;
     }
+
+    // Identify requester by IP address and optional Bearer Token
+    const ipAddress =
+      (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() ||
+      req.ip ||
+      req.socket.remoteAddress ||
+      '127.0.0.1';
+
+    let userId: string | undefined = undefined;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decoded: any = jwt.verify(token, JWT_SECRET);
+        userId = decoded.id;
+      } catch (e) {}
+    }
+
+    // Check if user or IP has already downloaded this specific study material
+    const queryConditions: any[] = [{ ipAddress }];
+    if (userId) {
+      queryConditions.push({ user: userId });
+    }
+
+    const existingDownload = await StudyMaterialDownloadLog.findOne({
+      material: id,
+      $or: queryConditions,
+    });
+
+    if (existingDownload) {
+      res.status(403).send(
+        `<!DOCTYPE html>
+        <html>
+          <head><title>Download Limit Exceeded</title></head>
+          <body style="font-family: system-ui, -apple-system, sans-serif; background-color: #0B0F19; color: #fff; padding: 60px 20px; text-align: center;">
+            <div style="max-width: 500px; margin: 0 auto; background-color: #111827; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 16px; padding: 32px;">
+              <h2 style="color: #ef4444; font-size: 20px; margin-top: 0;">⚠️ Download Limit Reached (Max 1 Download Allowed)</h2>
+              <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
+                Free study materials and notes can only be downloaded <strong>1 time</strong> per user/device. You have already downloaded <strong>${material.title}</strong> once.
+              </p>
+              <a href="/study-materials" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 13px; display: inline-block;">
+                Back to Study Materials Catalog
+              </a>
+            </div>
+          </body>
+        </html>`
+      );
+      return;
+    }
+
+    // Record 1-time download log before streaming
+    await StudyMaterialDownloadLog.create({
+      material: id,
+      user: userId || null,
+      ipAddress,
+      userAgent: Array.isArray(req.headers['user-agent'])
+        ? req.headers['user-agent'].join(' ')
+        : req.headers['user-agent'] || 'Browser',
+    });
 
     const filePath = storageService.getAbsolutePath(material.storageKey);
 

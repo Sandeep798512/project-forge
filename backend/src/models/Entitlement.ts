@@ -21,7 +21,7 @@ const EntitlementSchema: Schema = new Schema(
     purchasedVersion: { type: String, default: '1.0.0' },
     grantedAt: { type: Date, default: Date.now },
     downloadCount: { type: Number, default: 0 },
-    maxDownloads: { type: Number, default: 5 },
+    maxDownloads: { type: Number, default: 2 },
     isRevoked: { type: Boolean, default: false },
   },
   { timestamps: true }

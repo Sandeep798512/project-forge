@@ -39,10 +39,11 @@ export const requestDownloadToken = async (req: AuthRequest, res: Response): Pro
       return;
     }
 
-    if (entitlement.downloadCount >= entitlement.maxDownloads) {
+    const effectiveMaxDownloads = Math.min(entitlement.maxDownloads || 2, 2);
+    if (entitlement.downloadCount >= effectiveMaxDownloads) {
       res.status(403).json({
         success: false,
-        message: `Download limit reached (${entitlement.maxDownloads} downloads used). Please contact support.`,
+        message: `Download limit reached (${entitlement.downloadCount}/2 downloads used). Maximum 2 downloads allowed per purchased project file. Please contact support.`,
       });
       return;
     }
@@ -100,11 +101,11 @@ export const requestAssetDownload = async (req: AuthRequest, res: Response): Pro
       return;
     }
 
-    // 2. Verify entitlement download limit
-    if (entitlement.downloadCount >= entitlement.maxDownloads) {
+    const effectiveMaxDownloads = Math.min(entitlement.maxDownloads || 2, 2);
+    if (entitlement.downloadCount >= effectiveMaxDownloads) {
       res.status(403).json({
         success: false,
-        message: `Download limit reached (${entitlement.maxDownloads} downloads used). Please contact support to reset access.`,
+        message: `Download limit reached (${entitlement.downloadCount}/2 downloads used). Maximum 2 downloads allowed per purchased project file. Please contact support.`,
       });
       return;
     }
@@ -199,6 +200,12 @@ export const serveProtectedFile = async (req: AuthRequest, res: Response): Promi
     const entitlement = await Entitlement.findById(entitlementId);
     if (!entitlement || entitlement.isRevoked) {
       res.status(403).send('Entitlement revoked or missing.');
+      return;
+    }
+
+    const effectiveMaxDownloads = Math.min(entitlement.maxDownloads || 2, 2);
+    if (entitlement.downloadCount >= effectiveMaxDownloads) {
+      res.status(403).send('Download limit reached. Maximum 2 downloads allowed per purchased project file. Please contact support if you need access.');
       return;
     }
 
