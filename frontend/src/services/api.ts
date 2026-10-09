@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const getBaseURL = () => {
+export const getBaseURL = () => {
   const metaEnv = (import.meta as any).env;
   if (metaEnv && metaEnv.VITE_API_URL) {
     const url = String(metaEnv.VITE_API_URL).replace(/\/$/, '');

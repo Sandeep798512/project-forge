@@ -155,9 +155,30 @@ export const downloadFreeStudyMaterial = async (req: Request, res: Response): Pr
         : req.headers['user-agent'] || 'Browser',
     });
 
+    const mimeType = material.mimeType || storageService.detectMimeType(material.fileName);
+
+    res.setHeader('Content-Type', mimeType);
+
+    if (mimeType === 'application/pdf') {
+      res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(material.fileName)}"`);
+    } else {
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(material.fileName)}"`);
+    }
+
+    // 1. Try streaming from Supabase / Cloud Object Storage first
+    try {
+      const cloudStream = await storageService.getCloudObjectStream(material.storageKey);
+      if (cloudStream) {
+        cloudStream.pipe(res);
+        return;
+      }
+    } catch (cloudErr) {
+      console.error('[CLOUD STREAMING ERROR]', cloudErr);
+    }
+
+    // 2. Fallback to local disk file stream
     const filePath = storageService.getAbsolutePath(material.storageKey);
 
-    // Fallback if file missing on disk (for sample data)
     if (!fs.existsSync(filePath)) {
       console.warn(`[STORAGE WARNING] Free material file missing on disk: ${filePath}. Generating fallback deliverable.`);
       const storageDir = path.dirname(filePath);
@@ -168,16 +189,6 @@ export const downloadFreeStudyMaterial = async (req: Request, res: Response): Pr
         : `CampusGet Free Study Material Deliverable: ${material.title}\nUniversity: ${material.university}`;
 
       fs.writeFileSync(filePath, sampleContent);
-    }
-
-    const mimeType = material.mimeType || storageService.detectMimeType(material.fileName);
-
-    res.setHeader('Content-Type', mimeType);
-
-    if (mimeType === 'application/pdf') {
-      res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(material.fileName)}"`);
-    } else {
-      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(material.fileName)}"`);
     }
 
     const fileStream = fs.createReadStream(filePath);

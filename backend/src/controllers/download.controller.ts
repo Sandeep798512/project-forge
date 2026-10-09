@@ -281,6 +281,18 @@ export const serveProtectedFile = async (req: AuthRequest, res: Response): Promi
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     }
 
+    // 1. Try streaming from Supabase / Cloud Object Storage first
+    try {
+      const cloudStream = await storageService.getCloudObjectStream(finalStorageKey);
+      if (cloudStream) {
+        cloudStream.pipe(res);
+        return;
+      }
+    } catch (cloudErr) {
+      console.error('[CLOUD STREAMING ERROR]', cloudErr);
+    }
+
+    // 2. Fallback to local disk file stream
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);
   } catch (error: any) {

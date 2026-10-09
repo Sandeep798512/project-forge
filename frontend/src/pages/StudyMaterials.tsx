@@ -13,7 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import api from '../services/api';
+import api, { getBaseURL } from '../services/api';
 
 export interface StudyMaterialItem {
   _id: string;
@@ -340,7 +340,7 @@ export const StudyMaterials: React.FC = () => {
                   </div>
 
                   <a
-                    href={`/api/study-materials/${item._id}/download`}
+                    href={`${getBaseURL()}/study-materials/${item._id}/download`}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-glow-sm transition-all duration-200"
