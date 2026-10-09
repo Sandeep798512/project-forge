@@ -184,6 +184,7 @@ export class StorageService {
 
   public async getCloudObjectStream(storageKey: string): Promise<Readable | null> {
     if (this.supabaseClient) {
+      // 1. Try SDK Download
       try {
         const { data, error } = await this.supabaseClient.storage
           .from(this.bucketName)
@@ -192,10 +193,37 @@ export class StorageService {
         if (data && !error) {
           const arrayBuffer = await data.arrayBuffer();
           const buffer = Buffer.from(arrayBuffer);
-          return Readable.from(buffer);
+          if (buffer.length > 0) {
+            return Readable.from(buffer);
+          }
+        } else if (error) {
+          console.error('[STORAGE SUPABASE SDK DOWNLOAD ERROR]', error);
         }
       } catch (err) {
-        console.error('[STORAGE SUPABASE DOWNLOAD ERROR]', err);
+        console.error('[STORAGE SUPABASE DOWNLOAD EXCEPTION]', err);
+      }
+
+      // 2. Fallback to Direct Supabase Public CDN HTTP Fetch
+      try {
+        const { data: publicData } = this.supabaseClient.storage
+          .from(this.bucketName)
+          .getPublicUrl(storageKey);
+
+        if (publicData?.publicUrl) {
+          console.log(`[STORAGE SUPABASE] Attempting CDN Fetch: ${publicData.publicUrl}`);
+          const cdnRes = await fetch(publicData.publicUrl);
+          if (cdnRes.ok) {
+            const arrayBuffer = await cdnRes.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            if (buffer.length > 0) {
+              return Readable.from(buffer);
+            }
+          } else {
+            console.error(`[STORAGE SUPABASE CDN FETCH FAILED] Status ${cdnRes.status} for ${publicData.publicUrl}`);
+          }
+        }
+      } catch (cdnErr) {
+        console.error('[STORAGE SUPABASE CDN FETCH EXCEPTION]', cdnErr);
       }
     }
 
