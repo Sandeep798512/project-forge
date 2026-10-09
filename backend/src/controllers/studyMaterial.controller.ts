@@ -119,21 +119,21 @@ export const downloadFreeStudyMaterial = async (req: Request, res: Response): Pr
       queryConditions.push({ user: userId });
     }
 
-    const existingDownload = await StudyMaterialDownloadLog.findOne({
+    const dlCount = await StudyMaterialDownloadLog.countDocuments({
       material: id,
       $or: queryConditions,
     });
 
-    if (existingDownload) {
+    if (dlCount >= 10) {
       res.status(403).send(
         `<!DOCTYPE html>
         <html>
           <head><title>Download Limit Exceeded</title></head>
           <body style="font-family: system-ui, -apple-system, sans-serif; background-color: #0B0F19; color: #fff; padding: 60px 20px; text-align: center;">
             <div style="max-width: 500px; margin: 0 auto; background-color: #111827; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 16px; padding: 32px;">
-              <h2 style="color: #ef4444; font-size: 20px; margin-top: 0;">⚠️ Download Limit Reached (Max 1 Download Allowed)</h2>
+              <h2 style="color: #ef4444; font-size: 20px; margin-top: 0;">⚠️ Download Limit Reached (10/10 Downloads Used)</h2>
               <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
-                Free study materials and notes can only be downloaded <strong>1 time</strong> per user/device. You have already downloaded <strong>${material.title}</strong> once.
+                You have reached the max download limit of 10 downloads for <strong>${material.title}</strong>.
               </p>
               <a href="/study-materials" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 13px; display: inline-block;">
                 Back to Study Materials Catalog
@@ -145,7 +145,7 @@ export const downloadFreeStudyMaterial = async (req: Request, res: Response): Pr
       return;
     }
 
-    // Record 1-time download log before streaming
+    // Record download log
     await StudyMaterialDownloadLog.create({
       material: id,
       user: userId || null,
@@ -165,7 +165,15 @@ export const downloadFreeStudyMaterial = async (req: Request, res: Response): Pr
       res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(material.fileName)}"`);
     }
 
-    // 1. Try streaming from Supabase / Cloud Object Storage first
+    // 1. Try local disk stream first (0ms instant speed)
+    const filePath = storageService.getAbsolutePath(material.storageKey);
+    if (fs.existsSync(filePath)) {
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+      return;
+    }
+
+    // 2. Fallback to Supabase Cloud Storage stream
     try {
       const cloudStream = await storageService.getCloudObjectStream(material.storageKey);
       if (cloudStream) {
@@ -176,20 +184,16 @@ export const downloadFreeStudyMaterial = async (req: Request, res: Response): Pr
       console.error('[CLOUD STREAMING ERROR]', cloudErr);
     }
 
-    // 2. Fallback to local disk file stream
-    const filePath = storageService.getAbsolutePath(material.storageKey);
+    // 3. Fallback deliverable if file missing everywhere
+    console.warn(`[STORAGE WARNING] Free material file missing: ${filePath}. Generating fallback deliverable.`);
+    const storageDir = path.dirname(filePath);
+    if (!fs.existsSync(storageDir)) fs.mkdirSync(storageDir, { recursive: true });
 
-    if (!fs.existsSync(filePath)) {
-      console.warn(`[STORAGE WARNING] Free material file missing on disk: ${filePath}. Generating fallback deliverable.`);
-      const storageDir = path.dirname(filePath);
-      if (!fs.existsSync(storageDir)) fs.mkdirSync(storageDir, { recursive: true });
+    const sampleContent = material.fileName.endsWith('.pdf')
+      ? `%PDF-1.4\n% CampusGet Free Study Material: ${material.title}\nUniversity: ${material.university} | Branch: ${material.branch}`
+      : `CampusGet Free Study Material Deliverable: ${material.title}\nUniversity: ${material.university}`;
 
-      const sampleContent = material.fileName.endsWith('.pdf')
-        ? `%PDF-1.4\n% CampusGet Free Study Material: ${material.title}\nUniversity: ${material.university} | Branch: ${material.branch}`
-        : `CampusGet Free Study Material Deliverable: ${material.title}\nUniversity: ${material.university}`;
-
-      fs.writeFileSync(filePath, sampleContent);
-    }
+    fs.writeFileSync(filePath, sampleContent);
 
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);

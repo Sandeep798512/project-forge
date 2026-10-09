@@ -203,9 +203,9 @@ export const serveProtectedFile = async (req: AuthRequest, res: Response): Promi
       return;
     }
 
-    const effectiveMaxDownloads = Math.min(entitlement.maxDownloads || 2, 2);
+    const effectiveMaxDownloads = entitlement.maxDownloads || 10;
     if (entitlement.downloadCount >= effectiveMaxDownloads) {
-      res.status(403).send('Download limit reached. Maximum 2 downloads allowed per purchased project file. Please contact support if you need access.');
+      res.status(403).send(`Download limit reached (${entitlement.downloadCount}/${effectiveMaxDownloads} downloads used). Please contact support if you need a limit reset.`);
       return;
     }
 
@@ -281,7 +281,14 @@ export const serveProtectedFile = async (req: AuthRequest, res: Response): Promi
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     }
 
-    // 1. Try streaming from Supabase / Cloud Object Storage first
+    // 1. Try local disk file stream first (0ms instant speed)
+    if (fs.existsSync(filePath)) {
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+      return;
+    }
+
+    // 2. Fallback to Supabase Cloud Storage stream
     try {
       const cloudStream = await storageService.getCloudObjectStream(finalStorageKey);
       if (cloudStream) {
@@ -291,10 +298,6 @@ export const serveProtectedFile = async (req: AuthRequest, res: Response): Promi
     } catch (cloudErr) {
       console.error('[CLOUD STREAMING ERROR]', cloudErr);
     }
-
-    // 2. Fallback to local disk file stream
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
   } catch (error: any) {
     console.error('[SERVE FILE ERROR]', error);
     res.status(500).send('Internal server error streaming file.');

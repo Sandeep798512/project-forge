@@ -71,7 +71,19 @@ export class StorageService {
   public async uploadAsset(storageKey: string, buffer: Buffer): Promise<StorageFileMeta> {
     const mimeType = this.detectMimeType(storageKey);
 
-    // 1. Supabase Upload
+    // 1. Always save copy to local disk cache for 0ms instant local streaming
+    try {
+      const fullPath = path.resolve(this.localBasePath, storageKey);
+      const dir = path.dirname(fullPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFileSync(fullPath, buffer);
+    } catch (localWriteErr) {
+      console.warn('[STORAGE LOCAL DISK WRITE WARNING]', localWriteErr);
+    }
+
+    // 2. Upload to Supabase Cloud Storage
     if (this.supabaseClient) {
       try {
         console.log(`[STORAGE] Uploading to Supabase Bucket (${this.bucketName}): ${storageKey}`);
@@ -82,21 +94,15 @@ export class StorageService {
             upsert: true,
           });
 
-        if (!error) {
-          return {
-            key: storageKey,
-            size: buffer.length,
-            mimeType,
-            exists: true,
-          };
+        if (error) {
+          console.error('[STORAGE SUPABASE UPLOAD ERROR]', error);
         }
-        console.error('[STORAGE SUPABASE UPLOAD ERROR]', error);
       } catch (supaErr) {
         console.error('[STORAGE SUPABASE EXCEPTION, FALLING BACK]', supaErr);
       }
     }
 
-    // 2. S3 / Cloudflare R2 Upload
+    // 3. S3 / Cloudflare R2 Upload
     if (this.s3Client) {
       try {
         console.log(`[STORAGE] Uploading to S3/R2 Bucket (${this.bucketName}): ${storageKey}`);
@@ -108,25 +114,10 @@ export class StorageService {
             ContentType: mimeType,
           })
         );
-        return {
-          key: storageKey,
-          size: buffer.length,
-          mimeType,
-          exists: true,
-        };
       } catch (s3Err) {
         console.error('[STORAGE S3 UPLOAD ERROR, FALLING BACK TO LOCAL]', s3Err);
       }
     }
-
-    // 3. Default & Local Protected Storage Fallback
-    const fullPath = path.resolve(this.localBasePath, storageKey);
-    const dir = path.dirname(fullPath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-
-    fs.writeFileSync(fullPath, buffer);
 
     return {
       key: storageKey,
