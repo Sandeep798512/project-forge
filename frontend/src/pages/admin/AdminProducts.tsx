@@ -47,8 +47,12 @@ export const AdminProducts: React.FC = () => {
     demoVideoUrl: '',
     currentVersion: '1.0.0',
     isPublished: true,
-    hasDocumentation: true,
+    hasCode: true,
     hasPPT: true,
+    hasReport: true,
+    hasSupport: true,
+    hasDoc: true,
+    hasDocumentation: true,
     hasVivaQA: true,
     hasSetupSupport: true,
   };
@@ -127,10 +131,14 @@ export const AdminProducts: React.FC = () => {
       category: p.category?._id || p.category || categories[0]?._id,
       techStack: Array.isArray(p.techStack) ? p.techStack.join(', ') : p.techStack,
       screenshots: Array.isArray(p.screenshots) ? p.screenshots : [],
-      hasDocumentation: p.hasDocumentation !== false,
+      hasCode: p.hasCode !== false,
       hasPPT: p.hasPPT !== false,
+      hasReport: p.hasReport !== false,
+      hasSupport: p.hasSupport !== undefined ? p.hasSupport !== false : p.hasSetupSupport !== false,
+      hasDoc: p.hasDoc !== undefined ? p.hasDoc !== false : p.hasDocumentation !== false,
+      hasDocumentation: p.hasDoc !== undefined ? p.hasDoc !== false : p.hasDocumentation !== false,
       hasVivaQA: p.hasVivaQA !== false,
-      hasSetupSupport: p.hasSetupSupport !== false,
+      hasSetupSupport: p.hasSupport !== undefined ? p.hasSupport !== false : p.hasSetupSupport !== false,
     });
     setStatusMessage(null);
     setModalOpen(true);
@@ -146,10 +154,14 @@ export const AdminProducts: React.FC = () => {
       category: p.category?._id || p.category || categories[0]?._id,
       techStack: Array.isArray(p.techStack) ? p.techStack.join(', ') : p.techStack,
       screenshots: Array.isArray(p.screenshots) ? p.screenshots : [],
-      hasDocumentation: p.hasDocumentation !== false,
+      hasCode: p.hasCode !== false,
       hasPPT: p.hasPPT !== false,
+      hasReport: p.hasReport !== false,
+      hasSupport: p.hasSupport !== undefined ? p.hasSupport !== false : p.hasSetupSupport !== false,
+      hasDoc: p.hasDoc !== undefined ? p.hasDoc !== false : p.hasDocumentation !== false,
+      hasDocumentation: p.hasDoc !== undefined ? p.hasDoc !== false : p.hasDocumentation !== false,
       hasVivaQA: p.hasVivaQA !== false,
-      hasSetupSupport: p.hasSetupSupport !== false,
+      hasSetupSupport: p.hasSupport !== undefined ? p.hasSupport !== false : p.hasSetupSupport !== false,
     });
     setStatusMessage(null);
     setModalOpen(true);
@@ -180,16 +192,21 @@ export const AdminProducts: React.FC = () => {
         screenshots: Array.isArray(formData.screenshots) ? formData.screenshots : [],
         techStack: typeof formData.techStack === 'string' ? formData.techStack.split(',').map((s: string) => s.trim()) : formData.techStack,
         category: formData.category || categories[0]?._id,
-        hasDocumentation: formData.hasDocumentation !== false,
+        hasCode: formData.hasCode !== false,
         hasPPT: formData.hasPPT !== false,
+        hasReport: formData.hasReport !== false,
+        hasSupport: formData.hasSupport !== false,
+        hasDoc: formData.hasDoc !== false,
+        hasDocumentation: formData.hasDoc !== false,
+        hasSetupSupport: formData.hasSupport !== false,
         hasVivaQA: formData.hasVivaQA !== false,
-        hasSetupSupport: formData.hasSetupSupport !== false,
         deliverables: [
-          { name: 'Complete Source Code & DB Exports', included: true, fileKey: 'packages/sample-project.zip' },
-          ...(formData.hasDocumentation !== false ? [{ name: 'Project Documentation & Report', included: true }] : []),
+          ...(formData.hasCode !== false ? [{ name: 'Complete Source Code & DB Exports', included: true, fileKey: 'packages/sample-project.zip' }] : []),
+          ...(formData.hasReport !== false ? [{ name: 'Complete Project Report & Synopsis', included: true }] : []),
           ...(formData.hasPPT !== false ? [{ name: 'PPT Presentation Slides', included: true }] : []),
+          ...(formData.hasDoc !== false ? [{ name: 'Project Documentation & Setup Guide', included: true }] : []),
           ...(formData.hasVivaQA !== false ? [{ name: 'Viva Voce QA Bank', included: true }] : []),
-          ...(formData.hasSetupSupport !== false ? [{ name: 'WhatsApp Setup Support', included: true }] : []),
+          ...(formData.hasSupport !== false ? [{ name: 'WhatsApp Setup Support', included: true }] : []),
         ],
       };
 
@@ -367,7 +384,18 @@ export const AdminProducts: React.FC = () => {
                   <tr key={p._id} className="hover:bg-surface-hover">
                     <td className="p-3.5 flex items-center space-x-3 font-bold">
                       <img src={p.thumbnail} alt={p.title} className="w-10 h-10 rounded-lg object-cover" />
-                      <span>{p.title}</span>
+                      <div>
+                        <span>{p.title}</span>
+                        <div className="text-[10px] text-emerald-400 font-mono font-normal">
+                          {[
+                            p.hasCode !== false && 'Code',
+                            p.hasPPT !== false && 'PPT',
+                            p.hasReport !== false && 'Report',
+                            (p.hasSupport ?? p.hasSetupSupport) !== false && 'Support',
+                            (p.hasDoc ?? p.hasDocumentation) !== false && 'Doc'
+                          ].filter(Boolean).join(' + ')}
+                        </div>
+                      </div>
                     </td>
                     <td className="p-3.5 text-gray-400">{p.category?.name || 'General'}</td>
                     <td className="p-3.5 font-bold text-white">{BRAND.currency.symbol}{p.price}</td>
@@ -736,51 +764,89 @@ export const AdminProducts: React.FC = () => {
                   />
                 </div>
 
-                {/* Deliverables & Reports Inclusion Checkboxes */}
-                <div className="space-y-2 p-4 rounded-xl bg-background border border-border/80">
-                  <label className="block font-bold text-gray-200 text-xs">
-                    Included Deliverables & Reports <span className="text-[10px] text-gray-400 font-normal">(Select what is included with this project package)</span>
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                    <label className="flex items-center space-x-2 bg-surface p-2.5 rounded-lg border border-border/60 cursor-pointer hover:border-primary-500/40">
+                {/* Deliverables & Badge Inclusions Checkboxes */}
+                <div className="space-y-3 p-4 rounded-xl bg-background border border-border/80">
+                  <div className="flex items-center justify-between">
+                    <label className="block font-bold text-gray-200 text-xs">
+                      Included Package Deliverables & Card Badges
+                    </label>
+                    <span className="text-[10px] text-gray-400">Mark whatever is included in this project</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
+                    <label className={`flex items-center space-x-2.5 p-2.5 rounded-lg border cursor-pointer transition-colors ${formData.hasCode !== false ? 'bg-primary-950/20 border-primary-500/50 text-white' : 'bg-surface border-border/60 text-gray-400'}`}>
                       <input
                         type="checkbox"
-                        checked={formData.hasDocumentation !== false}
-                        onChange={(e) => setFormData({ ...formData, hasDocumentation: e.target.checked })}
+                        checked={formData.hasCode !== false}
+                        onChange={(e) => setFormData({ ...formData, hasCode: e.target.checked })}
                         className="rounded border-border text-primary-600 focus:ring-primary-500 w-4 h-4"
                       />
-                      <span className="font-semibold text-gray-200">Project Documentation & Report</span>
+                      <span className="font-semibold">Code (Source Code)</span>
                     </label>
 
-                    <label className="flex items-center space-x-2 bg-surface p-2.5 rounded-lg border border-border/60 cursor-pointer hover:border-primary-500/40">
+                    <label className={`flex items-center space-x-2.5 p-2.5 rounded-lg border cursor-pointer transition-colors ${formData.hasPPT !== false ? 'bg-primary-950/20 border-primary-500/50 text-white' : 'bg-surface border-border/60 text-gray-400'}`}>
                       <input
                         type="checkbox"
                         checked={formData.hasPPT !== false}
                         onChange={(e) => setFormData({ ...formData, hasPPT: e.target.checked })}
                         className="rounded border-border text-primary-600 focus:ring-primary-500 w-4 h-4"
                       />
-                      <span className="font-semibold text-gray-200">PPT Presentation Slides</span>
+                      <span className="font-semibold">PPT (Slides)</span>
                     </label>
 
-                    <label className="flex items-center space-x-2 bg-surface p-2.5 rounded-lg border border-border/60 cursor-pointer hover:border-primary-500/40">
+                    <label className={`flex items-center space-x-2.5 p-2.5 rounded-lg border cursor-pointer transition-colors ${formData.hasReport !== false ? 'bg-primary-950/20 border-primary-500/50 text-white' : 'bg-surface border-border/60 text-gray-400'}`}>
+                      <input
+                        type="checkbox"
+                        checked={formData.hasReport !== false}
+                        onChange={(e) => setFormData({ ...formData, hasReport: e.target.checked })}
+                        className="rounded border-border text-primary-600 focus:ring-primary-500 w-4 h-4"
+                      />
+                      <span className="font-semibold">Report (Project Report)</span>
+                    </label>
+
+                    <label className={`flex items-center space-x-2.5 p-2.5 rounded-lg border cursor-pointer transition-colors ${formData.hasSupport !== false ? 'bg-primary-950/20 border-primary-500/50 text-white' : 'bg-surface border-border/60 text-gray-400'}`}>
+                      <input
+                        type="checkbox"
+                        checked={formData.hasSupport !== false}
+                        onChange={(e) => setFormData({ ...formData, hasSupport: e.target.checked, hasSetupSupport: e.target.checked })}
+                        className="rounded border-border text-primary-600 focus:ring-primary-500 w-4 h-4"
+                      />
+                      <span className="font-semibold">Support (Setup Support)</span>
+                    </label>
+
+                    <label className={`flex items-center space-x-2.5 p-2.5 rounded-lg border cursor-pointer transition-colors ${formData.hasDoc !== false ? 'bg-primary-950/20 border-primary-500/50 text-white' : 'bg-surface border-border/60 text-gray-400'}`}>
+                      <input
+                        type="checkbox"
+                        checked={formData.hasDoc !== false}
+                        onChange={(e) => setFormData({ ...formData, hasDoc: e.target.checked, hasDocumentation: e.target.checked })}
+                        className="rounded border-border text-primary-600 focus:ring-primary-500 w-4 h-4"
+                      />
+                      <span className="font-semibold">Doc (Documentation)</span>
+                    </label>
+
+                    <label className={`flex items-center space-x-2.5 p-2.5 rounded-lg border cursor-pointer transition-colors ${formData.hasVivaQA !== false ? 'bg-primary-950/20 border-primary-500/50 text-white' : 'bg-surface border-border/60 text-gray-400'}`}>
                       <input
                         type="checkbox"
                         checked={formData.hasVivaQA !== false}
                         onChange={(e) => setFormData({ ...formData, hasVivaQA: e.target.checked })}
                         className="rounded border-border text-primary-600 focus:ring-primary-500 w-4 h-4"
                       />
-                      <span className="font-semibold text-gray-200">Viva Voce QA Bank</span>
+                      <span className="font-semibold">Viva QA Bank</span>
                     </label>
+                  </div>
 
-                    <label className="flex items-center space-x-2 bg-surface p-2.5 rounded-lg border border-border/60 cursor-pointer hover:border-primary-500/40">
-                      <input
-                        type="checkbox"
-                        checked={formData.hasSetupSupport !== false}
-                        onChange={(e) => setFormData({ ...formData, hasSetupSupport: e.target.checked })}
-                        className="rounded border-border text-primary-600 focus:ring-primary-500 w-4 h-4"
-                      />
-                      <span className="font-semibold text-gray-200">WhatsApp Setup Support</span>
-                    </label>
+                  {/* Live Card Badge Preview */}
+                  <div className="mt-2 p-2.5 rounded-lg bg-surface/90 border border-emerald-500/30 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <span className="text-gray-400 font-medium">Card Badge Preview:</span>
+                    <span className="font-bold text-emerald-400 font-mono tracking-wide">
+                      {[
+                        formData.hasCode !== false && 'Code',
+                        formData.hasPPT !== false && 'PPT',
+                        formData.hasReport !== false && 'Report',
+                        formData.hasSupport !== false && 'Support',
+                        formData.hasDoc !== false && 'Doc'
+                      ].filter(Boolean).join(' + ') || '(None)'}
+                    </span>
                   </div>
                 </div>
 

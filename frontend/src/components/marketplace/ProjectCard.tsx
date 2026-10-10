@@ -20,6 +20,13 @@ export interface ProductCardProps {
     ratingAverage?: number;
     ratingCount?: number;
     category?: { name: string; slug: string } | any;
+    hasCode?: boolean;
+    hasPPT?: boolean;
+    hasReport?: boolean;
+    hasSupport?: boolean;
+    hasDoc?: boolean;
+    hasDocumentation?: boolean;
+    hasSetupSupport?: boolean;
   };
 }
 
@@ -29,6 +36,16 @@ export const ProjectCard: React.FC<ProductCardProps> = ({ product }) => {
     Intermediate: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
     Advanced: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
   };
+
+  // Build dynamic deliverables badges based on what was marked
+  const badges: string[] = [];
+  if (product.hasCode !== false) badges.push('Code');
+  if (product.hasPPT !== false) badges.push('PPT');
+  if (product.hasReport !== false) badges.push('Report');
+  if ((product.hasSupport ?? product.hasSetupSupport) !== false) badges.push('Support');
+  if ((product.hasDoc ?? product.hasDocumentation) !== false) badges.push('Doc');
+
+  const badgeText = badges.join(' + ');
 
   return (
     <div className="bg-surface/80 border border-border/80 rounded-2xl overflow-hidden hover:border-primary-500/50 hover:shadow-glow-md transition-all duration-300 flex flex-col group">
@@ -125,12 +142,16 @@ export const ProjectCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Deliverables Checklist highlight */}
         <div className="pt-2 border-t border-border/40 flex items-center justify-between text-[11px] text-gray-400">
-          <span className="flex items-center space-x-1 text-emerald-400 font-medium">
-            <CheckCircle className="w-3.5 h-3.5" />
-            <span>Code + PPT + Report</span>
-          </span>
+          {badgeText ? (
+            <span className="flex items-center space-x-1 text-emerald-400 font-medium truncate max-w-[220px]" title={badgeText}>
+              <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="truncate">{badgeText}</span>
+            </span>
+          ) : (
+            <span />
+          )}
           {product.ratingAverage && (
-            <div className="flex items-center space-x-1 text-amber-400">
+            <div className="flex items-center space-x-1 text-amber-400 flex-shrink-0">
               <Star className="w-3.5 h-3.5 fill-current" />
               <span className="font-bold text-gray-200">{product.ratingAverage.toFixed(1)}</span>
               {product.ratingCount ? <span className="text-gray-500">({product.ratingCount})</span> : null}

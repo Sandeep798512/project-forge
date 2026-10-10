@@ -95,7 +95,7 @@ export const getProductBySlug = async (req: Request, res: Response): Promise<voi
       _id: { $ne: product._id },
       isPublished: true,
     })
-      .select('title slug shortDescription price originalPrice thumbnail techStack difficulty ratingAverage')
+      .select('title slug shortDescription price originalPrice thumbnail techStack difficulty ratingAverage hasCode hasPPT hasReport hasSupport hasDoc hasDocumentation hasSetupSupport')
       .limit(3);
 
     res.status(200).json({

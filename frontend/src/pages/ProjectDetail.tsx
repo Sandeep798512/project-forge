@@ -423,37 +423,40 @@ export const ProjectDetail: React.FC = () => {
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                   <span>Instant Download Access</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span>Complete Source Code & DB Exports</span>
-                </div>
-                {(() => {
-                  const hasDoc = product.hasDocumentation !== false;
-                  const hasPpt = product.hasPPT !== false;
-                  const hasViva = product.hasVivaQA !== false;
-
-                  if (!hasDoc && !hasPpt && !hasViva) return null;
-
-                  let label = '';
-                  if (hasDoc && hasPpt && hasViva) label = 'Documentation, PPT & Viva QA';
-                  else if (hasDoc && hasPpt) label = 'Documentation & PPT Presentation';
-                  else if (hasDoc && hasViva) label = 'Documentation & Viva QA';
-                  else if (hasPpt && hasViva) label = 'PPT Presentation & Viva QA';
-                  else if (hasDoc) label = 'Project Documentation & Report';
-                  else if (hasPpt) label = 'PPT Presentation Slides';
-                  else if (hasViva) label = 'Viva Voce QA Bank';
-
-                  return (
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                      <span>{label}</span>
-                    </div>
-                  );
-                })()}
-                {product.hasSetupSupport !== false && (
+                {product.hasCode !== false && (
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <span>Complete Source Code & DB Exports</span>
+                  </div>
+                )}
+                {product.hasReport !== false && (
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <span>Complete Project Report & Synopsis</span>
+                  </div>
+                )}
+                {product.hasPPT !== false && (
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <span>PPT Presentation Slides</span>
+                  </div>
+                )}
+                {(product.hasDoc ?? product.hasDocumentation) !== false && (
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <span>Project Documentation & Guide</span>
+                  </div>
+                )}
+                {(product.hasSupport ?? product.hasSetupSupport) !== false && (
                   <div className="flex items-center space-x-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                     <span>WhatsApp Setup Support</span>
+                  </div>
+                )}
+                {product.hasVivaQA !== false && (
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <span>Viva Voce QA Bank</span>
                   </div>
                 )}
               </div>
