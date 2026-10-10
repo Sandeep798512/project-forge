@@ -18,6 +18,7 @@ export const getPublicStudyMaterials = async (req: Request, res: Response): Prom
       search,
       university,
       branch,
+      year,
       semester,
       subject,
       materialType,
@@ -26,16 +27,40 @@ export const getPublicStudyMaterials = async (req: Request, res: Response): Prom
     } = req.query;
 
     const query: any = { isPublished: true };
+    const andConditions: any[] = [];
 
     if (search && typeof search === 'string' && search.trim()) {
       const searchRegex = new RegExp(search.trim(), 'i');
-      query.$or = [
-        { title: searchRegex },
-        { subject: searchRegex },
-        { description: searchRegex },
-        { university: searchRegex },
-        { branch: searchRegex },
-      ];
+      andConditions.push({
+        $or: [
+          { title: searchRegex },
+          { subject: searchRegex },
+          { description: searchRegex },
+          { university: searchRegex },
+          { branch: searchRegex },
+        ],
+      });
+    }
+
+    if (year && typeof year === 'string' && year !== 'ALL') {
+      const yearStr = year.trim();
+      const semMap: Record<string, string[]> = {
+        '1': ['1', '2'],
+        '2': ['3', '4'],
+        '3': ['5', '6'],
+        '4': ['7', '8'],
+      };
+      const matchingSems = semMap[yearStr] || [yearStr];
+      andConditions.push({
+        $or: [
+          { year: yearStr },
+          { semester: { $in: matchingSems } },
+        ],
+      });
+    }
+
+    if (andConditions.length > 0) {
+      query.$and = andConditions;
     }
 
     if (university && typeof university === 'string' && university !== 'ALL') {
@@ -208,18 +233,42 @@ export const downloadFreeStudyMaterial = async (req: Request, res: Response): Pr
  */
 export const getAdminStudyMaterials = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { search, university, branch, materialType, isPublished, page = 1, limit = 20 } = req.query;
+    const { search, university, branch, year, semester, materialType, isPublished, page = 1, limit = 20 } = req.query;
 
     const query: any = {};
+    const andConditions: any[] = [];
 
     if (search && typeof search === 'string' && search.trim()) {
       const searchRegex = new RegExp(search.trim(), 'i');
-      query.$or = [
-        { title: searchRegex },
-        { subject: searchRegex },
-        { university: searchRegex },
-        { branch: searchRegex },
-      ];
+      andConditions.push({
+        $or: [
+          { title: searchRegex },
+          { subject: searchRegex },
+          { university: searchRegex },
+          { branch: searchRegex },
+        ],
+      });
+    }
+
+    if (year && typeof year === 'string' && year !== 'ALL') {
+      const yearStr = year.trim();
+      const semMap: Record<string, string[]> = {
+        '1': ['1', '2'],
+        '2': ['3', '4'],
+        '3': ['5', '6'],
+        '4': ['7', '8'],
+      };
+      const matchingSems = semMap[yearStr] || [yearStr];
+      andConditions.push({
+        $or: [
+          { year: yearStr },
+          { semester: { $in: matchingSems } },
+        ],
+      });
+    }
+
+    if (andConditions.length > 0) {
+      query.$and = andConditions;
     }
 
     if (university && typeof university === 'string' && university !== 'ALL') {
@@ -228,6 +277,10 @@ export const getAdminStudyMaterials = async (req: AuthRequest, res: Response): P
 
     if (branch && typeof branch === 'string' && branch !== 'ALL') {
       query.branch = branch.trim();
+    }
+
+    if (semester && typeof semester === 'string' && semester !== 'ALL') {
+      query.semester = semester.trim();
     }
 
     if (materialType && typeof materialType === 'string' && materialType !== 'ALL') {
@@ -273,6 +326,7 @@ export const createStudyMaterial = async (req: AuthRequest, res: Response): Prom
       description,
       university,
       branch,
+      year,
       semester,
       subject,
       materialType,
@@ -290,6 +344,9 @@ export const createStudyMaterial = async (req: AuthRequest, res: Response): Prom
       return;
     }
 
+    const semNum = parseInt(semester.trim(), 10);
+    const derivedYear = year ? String(year).trim() : (semNum ? String(Math.ceil(semNum / 2)) : '1');
+
     // Decode base64 buffer
     const buffer = Buffer.from(fileBase64, 'base64');
     const storageKey = storageService.generateKey('study-materials', materialType, fileName);
@@ -301,6 +358,7 @@ export const createStudyMaterial = async (req: AuthRequest, res: Response): Prom
       description: description ? description.trim() : '',
       university: university.trim().toUpperCase(),
       branch: branch.trim().toUpperCase(),
+      year: derivedYear,
       semester: semester.trim(),
       subject: subject.trim(),
       materialType: (materialType.trim().toUpperCase() as MaterialType) || 'NOTES',
@@ -329,6 +387,7 @@ export const updateStudyMaterial = async (req: AuthRequest, res: Response): Prom
       description,
       university,
       branch,
+      year,
       semester,
       subject,
       materialType,
@@ -348,6 +407,12 @@ export const updateStudyMaterial = async (req: AuthRequest, res: Response): Prom
     if (description !== undefined) material.description = description.trim();
     if (university) material.university = university.trim().toUpperCase();
     if (branch) material.branch = branch.trim().toUpperCase();
+    if (year) {
+      material.year = year.trim();
+    } else if (semester) {
+      const semNum = parseInt(semester.trim(), 10);
+      if (semNum) material.year = String(Math.ceil(semNum / 2));
+    }
     if (semester) material.semester = semester.trim();
     if (subject) material.subject = subject.trim();
     if (materialType) material.materialType = materialType.trim().toUpperCase() as MaterialType;

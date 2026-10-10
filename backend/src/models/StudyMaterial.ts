@@ -7,6 +7,7 @@ export interface IStudyMaterial extends Document {
   description?: string;
   university: string;
   branch: string;
+  year?: string;
   semester: string;
   subject: string;
   materialType: MaterialType;
@@ -25,6 +26,7 @@ const StudyMaterialSchema: Schema = new Schema(
     description: { type: String, trim: true },
     university: { type: String, required: true, trim: true, default: 'AKTU', index: true },
     branch: { type: String, required: true, trim: true, index: true },
+    year: { type: String, trim: true, index: true },
     semester: { type: String, required: true, trim: true, index: true },
     subject: { type: String, required: true, trim: true, index: true },
     materialType: {
@@ -45,7 +47,7 @@ const StudyMaterialSchema: Schema = new Schema(
 );
 
 // Compound and text indexes for fast filtering & search
-StudyMaterialSchema.index({ university: 1, branch: 1, semester: 1, materialType: 1, isPublished: 1 });
+StudyMaterialSchema.index({ university: 1, branch: 1, year: 1, semester: 1, materialType: 1, isPublished: 1 });
 StudyMaterialSchema.index({ title: 'text', subject: 'text', description: 'text' });
 
 export default mongoose.model<IStudyMaterial>('StudyMaterial', StudyMaterialSchema);

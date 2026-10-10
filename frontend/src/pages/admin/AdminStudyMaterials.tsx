@@ -24,6 +24,7 @@ export interface AdminMaterialItem {
   description?: string;
   university: string;
   branch: string;
+  year?: string;
   semester: string;
   subject: string;
   materialType: 'NOTES' | 'PYQ' | 'PPT' | 'SYLLABUS' | 'LAB_MANUAL' | 'OTHER';
@@ -41,6 +42,7 @@ export const AdminStudyMaterials: React.FC = () => {
   const [search, setSearch] = useState<string>('');
   const [universityFilter, setUniversityFilter] = useState<string>('ALL');
   const [branchFilter, setBranchFilter] = useState<string>('ALL');
+  const [yearFilter, setYearFilter] = useState<string>('ALL');
   const [materialTypeFilter, setMaterialTypeFilter] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
@@ -52,6 +54,7 @@ export const AdminStudyMaterials: React.FC = () => {
     description: '',
     university: 'AKTU',
     branch: 'CSE',
+    year: '1',
     semester: '1',
     subject: '',
     materialType: 'NOTES' as 'NOTES' | 'PYQ' | 'PPT' | 'SYLLABUS' | 'LAB_MANUAL' | 'OTHER',
@@ -70,6 +73,7 @@ export const AdminStudyMaterials: React.FC = () => {
       if (search.trim()) params.append('search', search.trim());
       if (universityFilter !== 'ALL') params.append('university', universityFilter);
       if (branchFilter !== 'ALL') params.append('branch', branchFilter);
+      if (yearFilter !== 'ALL') params.append('year', yearFilter);
       if (materialTypeFilter !== 'ALL') params.append('materialType', materialTypeFilter);
       if (statusFilter !== 'ALL') params.append('isPublished', statusFilter);
       params.append('limit', '50');
@@ -87,7 +91,7 @@ export const AdminStudyMaterials: React.FC = () => {
 
   useEffect(() => {
     fetchMaterials();
-  }, [search, universityFilter, branchFilter, materialTypeFilter, statusFilter]);
+  }, [search, universityFilter, branchFilter, yearFilter, materialTypeFilter, statusFilter]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -114,6 +118,7 @@ export const AdminStudyMaterials: React.FC = () => {
       description: '',
       university: 'AKTU',
       branch: 'CSE',
+      year: '1',
       semester: '1',
       subject: '',
       materialType: 'NOTES',
@@ -133,6 +138,7 @@ export const AdminStudyMaterials: React.FC = () => {
       description: item.description || '',
       university: item.university,
       branch: item.branch,
+      year: item.year || (item.semester ? String(Math.ceil(Number(item.semester) / 2)) : '1'),
       semester: item.semester,
       subject: item.subject,
       materialType: item.materialType,
@@ -242,7 +248,7 @@ export const AdminStudyMaterials: React.FC = () => {
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="bg-surface border border-border/80 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="bg-surface border border-border/80 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
@@ -281,6 +287,18 @@ export const AdminStudyMaterials: React.FC = () => {
         </select>
 
         <select
+          value={yearFilter}
+          onChange={(e) => setYearFilter(e.target.value)}
+          className="bg-background border border-border/60 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        >
+          <option value="ALL">All Years</option>
+          <option value="1">1st Year</option>
+          <option value="2">2nd Year</option>
+          <option value="3">3rd Year</option>
+          <option value="4">4th Year</option>
+        </select>
+
+        <select
           value={materialTypeFilter}
           onChange={(e) => setMaterialTypeFilter(e.target.value)}
           className="bg-background border border-border/60 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -316,7 +334,7 @@ export const AdminStudyMaterials: React.FC = () => {
                 <tr>
                   <th className="px-4 py-3">Title & Subject</th>
                   <th className="px-4 py-3">University</th>
-                  <th className="px-4 py-3">Branch / Sem</th>
+                  <th className="px-4 py-3">Branch / Year / Sem</th>
                   <th className="px-4 py-3">Type</th>
                   <th className="px-4 py-3">File Name & Size</th>
                   <th className="px-4 py-3 text-center">Status</th>
@@ -337,7 +355,9 @@ export const AdminStudyMaterials: React.FC = () => {
                     </td>
                     <td className="px-4 py-3">
                       <span>{item.branch}</span>
-                      <span className="text-gray-500"> • Sem {item.semester}</span>
+                      <span className="text-gray-500">
+                        {' '}• {item.year ? `${item.year === '1' ? '1st' : item.year === '2' ? '2nd' : item.year === '3' ? '3rd' : `${item.year}th`} Yr` : `${Math.ceil(Number(item.semester) / 2) || 1} Yr`} • Sem {item.semester}
+                      </span>
                     </td>
                     <td className="px-4 py-3 font-mono font-bold text-[10px]">
                       <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded">
@@ -464,8 +484,8 @@ export const AdminStudyMaterials: React.FC = () => {
                 </div>
               </div>
 
-              {/* Branch, Semester, Material Type */}
-              <div className="grid grid-cols-3 gap-3">
+              {/* Branch, Year, Semester, Material Type */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
                   <label className="block text-gray-300 font-semibold mb-1">Branch *</label>
                   <select
@@ -484,10 +504,36 @@ export const AdminStudyMaterials: React.FC = () => {
                 </div>
 
                 <div>
+                  <label className="block text-gray-300 font-semibold mb-1">Year *</label>
+                  <select
+                    value={formData.year}
+                    onChange={(e) => {
+                      const yr = e.target.value;
+                      setFormData({
+                        ...formData,
+                        year: yr,
+                        semester: String((Number(yr) * 2) - 1),
+                      });
+                    }}
+                    className="w-full bg-background border border-border/60 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                  </select>
+                </div>
+
+                <div>
                   <label className="block text-gray-300 font-semibold mb-1">Semester *</label>
                   <select
                     value={formData.semester}
-                    onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
+                    onChange={(e) => {
+                      const sem = e.target.value;
+                      const semNum = Number(sem);
+                      const yr = String(Math.ceil(semNum / 2) || '1');
+                      setFormData({ ...formData, semester: sem, year: yr });
+                    }}
                     className="w-full bg-background border border-border/60 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (

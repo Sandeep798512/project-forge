@@ -7,6 +7,7 @@ import {
   GraduationCap,
   Sparkles,
   Filter,
+  Calendar,
   CheckCircle,
   FileSpreadsheet,
   FileCode,
@@ -21,6 +22,7 @@ export interface StudyMaterialItem {
   description?: string;
   university: string;
   branch: string;
+  year?: string;
   semester: string;
   subject: string;
   materialType: 'NOTES' | 'PYQ' | 'PPT' | 'SYLLABUS' | 'LAB_MANUAL' | 'OTHER';
@@ -37,6 +39,7 @@ export const StudyMaterials: React.FC = () => {
   const [search, setSearch] = useState<string>('');
   const [university, setUniversity] = useState<string>('ALL');
   const [branch, setBranch] = useState<string>('ALL');
+  const [year, setYear] = useState<string>('ALL');
   const [semester, setSemester] = useState<string>('ALL');
   const [materialType, setMaterialType] = useState<string>('ALL');
   const [page, setPage] = useState<number>(1);
@@ -50,6 +53,7 @@ export const StudyMaterials: React.FC = () => {
       if (search.trim()) params.append('search', search.trim());
       if (university !== 'ALL') params.append('university', university);
       if (branch !== 'ALL') params.append('branch', branch);
+      if (year !== 'ALL') params.append('year', year);
       if (semester !== 'ALL') params.append('semester', semester);
       if (materialType !== 'ALL') params.append('materialType', materialType);
       params.append('page', String(page));
@@ -70,7 +74,7 @@ export const StudyMaterials: React.FC = () => {
 
   useEffect(() => {
     fetchMaterials();
-  }, [page, university, branch, semester, materialType]);
+  }, [page, university, branch, year, semester, materialType]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,7 +164,7 @@ export const StudyMaterials: React.FC = () => {
           </form>
 
           {/* Filter Options */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-2">
             
             {/* University */}
             <div>
@@ -203,6 +207,25 @@ export const StudyMaterials: React.FC = () => {
                 <option value="CIVIL">Civil Engg</option>
                 <option value="BCA">BCA / MCA</option>
                 <option value="OTHER">Other</option>
+              </select>
+            </div>
+
+            {/* Year */}
+            <div>
+              <label className="block text-[11px] font-medium text-gray-400 mb-1 flex items-center space-x-1">
+                <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Year</span>
+              </label>
+              <select
+                value={year}
+                onChange={(e) => { setYear(e.target.value); setPage(1); }}
+                className="w-full bg-background border border-border/60 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              >
+                <option value="ALL">All Years</option>
+                <option value="1">1st Year (Sem 1 & 2)</option>
+                <option value="2">2nd Year (Sem 3 & 4)</option>
+                <option value="3">3rd Year (Sem 5 & 6)</option>
+                <option value="4">4th Year (Sem 7 & 8)</option>
               </select>
             </div>
 
@@ -259,12 +282,13 @@ export const StudyMaterials: React.FC = () => {
             Showing <strong className="text-white">{materials.length}</strong> of{' '}
             <strong className="text-emerald-400">{totalCount}</strong> free study materials
           </span>
-          {(university !== 'ALL' || branch !== 'ALL' || semester !== 'ALL' || materialType !== 'ALL' || search) && (
+          {(university !== 'ALL' || branch !== 'ALL' || year !== 'ALL' || semester !== 'ALL' || materialType !== 'ALL' || search) && (
             <button
               onClick={() => {
                 setSearch('');
                 setUniversity('ALL');
                 setBranch('ALL');
+                setYear('ALL');
                 setSemester('ALL');
                 setMaterialType('ALL');
                 setPage(1);
@@ -302,7 +326,11 @@ export const StudyMaterials: React.FC = () => {
                     </span>
 
                     <span className="text-[11px] font-medium text-gray-400 bg-background/80 px-2.5 py-0.5 rounded border border-border/40">
-                      Sem {item.semester} • {item.branch}
+                      {(() => {
+                        const y = item.year || (item.semester ? String(Math.ceil(Number(item.semester) / 2)) : '');
+                        const yText = y === '1' ? '1st Year' : y === '2' ? '2nd Year' : y === '3' ? '3rd Year' : y === '4' ? '4th Year' : y ? `Year ${y}` : '';
+                        return yText ? `${yText} • Sem ${item.semester} • ${item.branch}` : `Sem ${item.semester} • ${item.branch}`;
+                      })()}
                     </span>
                   </div>
 
