@@ -2,7 +2,7 @@ export const BRAND = {
   name: 'CampusGet',
   tagline: 'Build. Understand. Showcase.',
   supportingText: 'Industry-style software projects and developer resources for students.',
-  description: 'Production-ready software projects with source code, documentation, setup guides, and technical support — helping students learn, customize, and showcase real development work.',
+  description: 'Production-style software projects with complete source code, documentation & setup guides — plus 100% Free Study Materials, University Lecture Notes & PYQs to help CSE/IT students learn, build, and excel.',
   whatsappNumber: '918081220303',
   supportEmail: 'campusget.in@gmail.com',
   currency: {
