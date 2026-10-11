@@ -273,3 +273,67 @@ export const Disclaimer: React.FC = () => {
     </div>
   );
 };
+
+export const ShippingPolicy: React.FC = () => {
+  return (
+    <div className="py-16 bg-background min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-gray-300 text-sm leading-relaxed">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Shipping & Delivery Policy</h1>
+          <p className="text-xs text-gray-400 mt-2">Last updated: October 11, 2026 • Effective Date: October 11, 2026</p>
+        </div>
+
+        <div className="bg-surface/60 p-6 sm:p-8 rounded-2xl border border-border/60 space-y-6">
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">1. 100% Digital Delivery (No Physical Shipping)</h2>
+            <p>
+              CampusGet operates exclusively as an online educational marketplace for software development projects, academic study materials, previous year questions (PYQs), source codes, presentation slides (PPTs), and project documentation.
+            </p>
+            <p className="text-emerald-400 font-medium">
+              All deliverables sold or provided on CampusGet are 100% digital goods. We do not dispatch, courier, or deliver any physical items, CDs, or printed books to postal addresses.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">2. Delivery Timeline & Fulfillment Process</h2>
+            <ul className="list-disc list-inside space-y-2 text-gray-300">
+              <li>
+                <strong>Instant Access:</strong> Upon successful payment completion via Razorpay, digital access is provisioned immediately (within 0 to 60 seconds).
+              </li>
+              <li>
+                <strong>Customer Dashboard:</strong> Purchased packages are instantly accessible from your <strong>My Purchases</strong> dashboard (<a href="/dashboard/purchases" className="text-primary-400 hover:underline">/dashboard/purchases</a>).
+              </li>
+              <li>
+                <strong>Download Links:</strong> You can download your source code archives (.ZIP), documentation (.PDF), and presentation files directly to your device at any time.
+              </li>
+              <li>
+                <strong>Email Confirmation:</strong> A payment receipt along with purchase reference details is dispatched to your registered email address automatically upon transaction success.
+              </li>
+            </ul>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">3. Shipping & Delivery Charges</h2>
+            <p>
+              Because all products are delivered electronically over the internet, <strong>shipping and delivery charges are completely ₹0 (Free)</strong> across all project packages.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">4. Technical Delivery Assistance</h2>
+            <p>
+              If you experience any network interruption during checkout, or if your download access is delayed past 5 minutes, please reach out directly to our developer helpdesk:
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-gray-300">
+              <li>Email: <a href={`mailto:${BRAND.supportEmail}`} className="text-primary-400 hover:underline">{BRAND.supportEmail}</a></li>
+              <li>WhatsApp Support: <a href={`https://wa.me/${BRAND.whatsappNumber}`} className="text-emerald-400 hover:underline">+{BRAND.whatsappNumber}</a></li>
+            </ul>
+            <p className="text-xs text-gray-400">
+              Our support team will verify your transaction reference and provision direct access links within 1 to 2 business hours.
+            </p>
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+};

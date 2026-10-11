@@ -106,23 +106,38 @@ export const Checkout: React.FC = () => {
             email: user?.email,
           },
           theme: { color: '#4F46E5' },
+          modal: {
+            ondismiss: () => {
+              setProcessing(false);
+            },
+          },
           handler: async (response: any) => {
-            // Send payment details to backend for signature verification
-            const verifyRes = await api.post('/payments/verify', {
-              razorpayOrderId: response.razorpay_order_id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature,
-            });
+            try {
+              // Send payment details to backend for signature verification
+              const verifyRes = await api.post('/payments/verify', {
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature,
+              });
 
-            if (verifyRes.data.success) {
-              navigate('/dashboard/purchases');
-            } else {
-              setError('Payment verification failed server-side.');
+              if (verifyRes.data.success) {
+                navigate('/dashboard/purchases');
+              } else {
+                setError(verifyRes.data.message || 'Payment verification failed server-side.');
+              }
+            } catch (vErr: any) {
+              setError(vErr.response?.data?.message || 'Payment verification error.');
+            } finally {
+              setProcessing(false);
             }
           },
         };
 
         const rzp = new (window as any).Razorpay(options);
+        rzp.on('payment.failed', (resp: any) => {
+          setError(resp.error?.description || 'Payment was unsuccessful. Please retry with UPI or another card.');
+          setProcessing(false);
+        });
         rzp.open();
       } else {
         // Test Mode Simulated Checkout Flow (Ensures 100% working verification even without live API keys)

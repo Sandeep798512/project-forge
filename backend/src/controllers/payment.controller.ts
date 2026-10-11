@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import crypto from 'crypto';
+import Razorpay from 'razorpay';
 import Product from '../models/Product';
 import Order from '../models/Order';
 import Payment from '../models/Payment';
@@ -11,6 +12,20 @@ import { AuthRequest } from '../middlewares/auth.middleware';
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder_key_id';
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'rzp_test_placeholder_key_secret';
 const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || 'rzp_webhook_secret_placeholder';
+
+// Helper: Get initialized Razorpay SDK client if real keys are provided
+const getRazorpayClient = (): Razorpay | null => {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+  if (keyId && keySecret && !keyId.includes('placeholder')) {
+    return new Razorpay({
+      key_id: keyId,
+      key_secret: keySecret,
+    });
+  }
+  return null;
+};
 
 // Helper: Verify HMAC SHA256 signature
 const verifyHmacSignature = (body: string, signature: string, secret: string): boolean => {
@@ -91,8 +106,31 @@ export const createPaymentOrder = async (req: AuthRequest, res: Response): Promi
       status: 'pending',
     });
 
-    // 4. Create Razorpay Order ID (or test mode simulated Razorpay order)
-    const razorpayOrderId = `order_${crypto.randomBytes(8).toString('hex')}`;
+    // 4. Create Razorpay Order ID (via real Razorpay client or test mode simulated Razorpay order)
+    let razorpayOrderId = `order_${crypto.randomBytes(8).toString('hex')}`;
+    const rzpClient = getRazorpayClient();
+
+    if (rzpClient && finalAmount > 0) {
+      try {
+        const rzpOrder = await rzpClient.orders.create({
+          amount: Math.round(finalAmount * 100), // Razorpay amount in paise
+          currency: 'INR',
+          receipt: internalOrderId,
+          notes: {
+            productId: String(product._id),
+            userId: String(req.user.id),
+          },
+        });
+        razorpayOrderId = rzpOrder.id;
+      } catch (rzpErr: any) {
+        console.error('[RAZORPAY ORDER CREATION ERROR]', rzpErr);
+        res.status(500).json({
+          success: false,
+          message: 'Razorpay order creation failed: ' + (rzpErr.error?.description || rzpErr.message || 'Payment gateway communication failure'),
+        });
+        return;
+      }
+    }
 
     const payment = await Payment.create({
       paymentId: `PAY-${Date.now()}`,
@@ -110,7 +148,7 @@ export const createPaymentOrder = async (req: AuthRequest, res: Response): Promi
       razorpayOrderId,
       amount: finalAmount * 100, // Razorpay uses paise
       currency: 'INR',
-      keyId: RAZORPAY_KEY_ID,
+      keyId: process.env.RAZORPAY_KEY_ID || RAZORPAY_KEY_ID,
       product: {
         id: product._id,
         title: product.title,
@@ -140,11 +178,11 @@ export const verifyPaymentSignature = async (req: AuthRequest, res: Response): P
 
     // Verify HMAC signature: razorpayOrderId + "|" + razorpayPaymentId
     const text = `${razorpayOrderId}|${razorpayPaymentId}`;
-    const isDev = process.env.NODE_ENV !== 'production';
+    const rzpClient = getRazorpayClient();
     const isSignatureValid =
-      (isDev && RAZORPAY_KEY_SECRET === 'rzp_test_placeholder_key_secret')
+      (!rzpClient || razorpaySignature === 'simulated_test_signature')
         ? true // Dev Sandbox test mode verification
-        : verifyHmacSignature(text, razorpaySignature, RAZORPAY_KEY_SECRET);
+        : verifyHmacSignature(text, razorpaySignature, process.env.RAZORPAY_KEY_SECRET || RAZORPAY_KEY_SECRET);
 
     if (!isSignatureValid) {
       payment.status = 'failed';

@@ -53,6 +53,7 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2.5 font-normal">
               <li><Link to="/study-materials" className="hover:text-emerald-300 text-emerald-400 font-semibold transition-colors">Free Study Materials</Link></li>
               <li><Link to="/about" className="hover:text-white transition-colors">About {BRAND.name}</Link></li>
+              <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
               <li><Link to="/faq" className="hover:text-white transition-colors">Frequently Asked Questions</Link></li>
               <li><Link to="/support" className="hover:text-white transition-colors">Developer Support</Link></li>
               <li><a href={`https://wa.me/${BRAND.whatsappNumber}?text=${encodeURIComponent('Hi, I need assistance with a project package.')}`} target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline flex items-center space-x-1">
@@ -69,6 +70,7 @@ export const Footer: React.FC = () => {
               <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
               <li><Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link></li>
               <li><Link to="/refund-policy" className="hover:text-white transition-colors">Refund & Access Policy</Link></li>
+              <li><Link to="/shipping-policy" className="hover:text-white transition-colors">Shipping & Delivery Policy</Link></li>
               <li><Link to="/license" className="hover:text-white transition-colors">Software License Agreement</Link></li>
               <li><Link to="/ip-complaint" className="hover:text-white transition-colors">IP & Copyright Notice</Link></li>
             </ul>

@@ -38,7 +38,7 @@ import { ResetPassword } from './pages/ResetPassword';
 
 // Legal Pages
 import { Terms } from './pages/Terms';
-import { Privacy, RefundPolicy, License, Disclaimer } from './pages/LegalPages';
+import { Privacy, RefundPolicy, License, Disclaimer, ShippingPolicy } from './pages/LegalPages';
 import { IPComplaint } from './pages/IPComplaint';
 
 // Customer Dashboard
@@ -131,6 +131,7 @@ export const App: React.FC = () => {
           <Route path="/privacy" element={<PublicLayout><Privacy /></PublicLayout>} />
           <Route path="/disclaimer" element={<PublicLayout><Disclaimer /></PublicLayout>} />
           <Route path="/refund-policy" element={<PublicLayout><RefundPolicy /></PublicLayout>} />
+          <Route path="/shipping-policy" element={<PublicLayout><ShippingPolicy /></PublicLayout>} />
           <Route path="/license" element={<PublicLayout><License /></PublicLayout>} />
           <Route path="/ip-complaint" element={<PublicLayout><IPComplaint /></PublicLayout>} />
 
