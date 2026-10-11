@@ -86,7 +86,7 @@ export const Contact: React.FC = () => {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full bg-background border border-border/80 rounded-xl px-4 py-2 text-sm text-gray-100 placeholder-gray-500"
-                    placeholder="Sandeep Gaud"
+                    placeholder=""
                   />
                 </div>
 
@@ -98,7 +98,7 @@ export const Contact: React.FC = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full bg-background border border-border/80 rounded-xl px-4 py-2 text-sm text-gray-100 placeholder-gray-500"
-                    placeholder="sandeep@example.com"
+                    placeholder="developer@example.com"
                   />
                 </div>
 

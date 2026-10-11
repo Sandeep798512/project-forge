@@ -38,25 +38,25 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-surface/90 border border-border/80 p-8 rounded-2xl shadow-2xl">
+    <div className="min-h-screen bg-background flex items-center justify-center py-6 px-4 sm:px-6">
+      <div className="max-w-md w-full space-y-5 bg-surface/90 border border-border/80 p-6 sm:p-7 rounded-2xl shadow-2xl my-auto">
         
         {/* Brand Header */}
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-1">
           <Link to="/" className="inline-flex items-center space-x-2">
             <img
               src="/campusget-icon-light-tile.png"
               alt={BRAND.name}
-              className="w-10 h-10 rounded-xl object-contain shadow-glow-sm"
+              className="w-9 h-9 rounded-xl object-contain shadow-glow-sm"
             />
             <span className="font-extrabold text-2xl text-white tracking-tight">{BRAND.name}</span>
           </Link>
-          <h2 className="text-xl font-bold text-white tracking-tight pt-2">Welcome back</h2>
+          <h2 className="text-lg font-bold text-white tracking-tight pt-1">Welcome back</h2>
           <p className="text-xs text-gray-400">Sign in to access your purchased projects and downloads</p>
         </div>
 
         {error && (
-          <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center space-x-2">
+          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center space-x-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span>{error}</span>
           </div>

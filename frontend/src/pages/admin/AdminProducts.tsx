@@ -859,7 +859,7 @@ export const AdminProducts: React.FC = () => {
                       type="url"
                       value={formData.liveDemoUrl || ''}
                       onChange={(e) => setFormData({ ...formData, liveDemoUrl: e.target.value })}
-                      placeholder="e.g. https://sandeep-hospital-frontend.vercel.app/"
+                      placeholder="e.g. https://demo-project.vercel.app/"
                       className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100 font-mono"
                     />
                   </div>
