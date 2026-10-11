@@ -4,7 +4,7 @@ export const BRAND = {
   supportingText: 'Industry-style software projects and developer resources for students.',
   description: 'Production-ready software projects with source code, documentation, setup guides, and technical support — helping students learn, customize, and showcase real development work.',
   whatsappNumber: '918081220303',
-  supportEmail: 'support@campusget.in',
+  supportEmail: 'campusget.in@gmail.com',
   currency: {
     code: 'INR',
     symbol: '₹',

@@ -25,13 +25,13 @@ export const seedDatabase = async () => {
     // 1. Create Default Admin User
     const adminPasswordHash = await hashPassword('Admin@123456');
     const adminUser = await User.create({
-      name: 'ProjectForge Super Admin',
-      email: 'admin@projectforge.dev',
+      name: 'CampusGet Super Admin',
+      email: 'admin@campusget.in',
       password: adminPasswordHash,
       role: 'admin',
       rbacRole: 'SUPER_ADMIN',
       isVerified: true,
-      referralCode: 'FORGE-ADMIN01',
+      referralCode: 'CAMPUS-ADMIN01',
     });
     console.log(`[SEED] Created default admin account: ${adminUser.email} / Admin@123456`);
 

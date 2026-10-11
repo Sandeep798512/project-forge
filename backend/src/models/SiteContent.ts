@@ -30,12 +30,12 @@ const SiteContentSchema: Schema = new Schema(
     promoBannerText: { type: String, default: '🎉 Special Instagram Offer: Use code CODE20 for 20% instant discount!' },
     promoBannerActive: { type: Boolean, default: true },
     whatsappNumber: { type: String, default: '918081220303' },
-    defaultWhatsAppMessage: { type: String, default: 'Hi! I have a question about project packages on ProjectForge.' },
-    supportEmail: { type: String, default: 'support@projectforge.dev' },
+    defaultWhatsAppMessage: { type: String, default: 'Hi! I have a question about project packages on CampusGet.' },
+    supportEmail: { type: String, default: 'campusget.in@gmail.com' },
     socialLinks: {
-      github: { type: String, default: 'https://github.com/Sandeep798512/project-forge' },
-      instagram: { type: String, default: 'https://instagram.com/projectforge.dev' },
-      youtube: { type: String, default: 'https://youtube.com/@projectforge' },
+      github: { type: String, default: 'https://github.com/campusget' },
+      instagram: { type: String, default: 'https://instagram.com/campusget.in' },
+      youtube: { type: String, default: 'https://youtube.com/@campusget' },
     },
   },
   { timestamps: true }

@@ -18,16 +18,16 @@ export const createSupportTicket = async (req: AuthRequest, res: Response): Prom
 
     let userId = req.user?.id;
     if (!userId) {
-      const userEmail = (email || 'guest@projectforge.dev').toLowerCase();
+      const userEmail = (email || 'guest@campusget.in').toLowerCase();
       const existing = await User.findOne({ email: userEmail });
       if (existing) {
         userId = (existing._id as any).toString();
       } else {
         const guest = await User.findOneAndUpdate(
-          { email: 'guest@projectforge.dev' },
+          { email: 'guest@campusget.in' },
           {
             name: name || 'Guest User',
-            email: 'guest@projectforge.dev',
+            email: 'guest@campusget.in',
             password: 'GuestPassword123!',
             role: 'user',
             isVerified: true,
