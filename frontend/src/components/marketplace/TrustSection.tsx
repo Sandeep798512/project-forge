@@ -6,12 +6,12 @@ export const TrustSection: React.FC = () => {
     {
       icon: Code,
       title: 'Complete Source Code',
-      desc: 'Fully modular, clean TypeScript & React/Node.js codebase ready for local run or deployment.',
+      desc: 'Fully modular, clean codebases across multiple modern tech stacks & programming languages, ready for local run or deployment.',
     },
     {
       icon: FileText,
       title: 'Academic Report & PPT',
-      desc: '30-50 page project report (.PDF) and 20+ slide presentation (.PPTX) formatted to university standards.',
+      desc: 'Comprehensive project report (.PDF) and presentation slide deck (.PPTX) formatted to university standards.',
     },
     {
       icon: Database,
