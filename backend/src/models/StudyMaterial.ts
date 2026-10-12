@@ -15,6 +15,8 @@ export interface IStudyMaterial extends Document {
   storageKey: string;
   fileSize: number;
   mimeType?: string;
+  thumbnailUrl?: string;
+  thumbnailBase64?: string;
   isPublished: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -39,6 +41,8 @@ const StudyMaterialSchema: Schema = new Schema(
     storageKey: { type: String, required: true },
     fileSize: { type: Number, required: true, default: 0 },
     mimeType: { type: String },
+    thumbnailUrl: { type: String },
+    thumbnailBase64: { type: String },
     isPublished: { type: Boolean, default: true, index: true },
   },
   {

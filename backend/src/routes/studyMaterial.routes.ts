@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   getPublicStudyMaterials,
   downloadFreeStudyMaterial,
+  previewStudyMaterial,
   getAdminStudyMaterials,
   createStudyMaterial,
   updateStudyMaterial,
@@ -14,6 +15,7 @@ const router = Router();
 // Public Routes
 router.get('/study-materials', getPublicStudyMaterials);
 router.get('/study-materials/:id/download', downloadFreeStudyMaterial);
+router.get('/study-materials/:id/preview', previewStudyMaterial);
 
 // Admin Protected Routes
 router.get('/admin/study-materials', authenticate, requireAdmin, getAdminStudyMaterials);

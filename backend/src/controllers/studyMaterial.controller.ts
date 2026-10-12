@@ -229,6 +229,51 @@ export const downloadFreeStudyMaterial = async (req: Request, res: Response): Pr
 };
 
 /**
+ * Public: Stream preview for PDF thumbnail / inline viewer (Does NOT count as download)
+ */
+export const previewStudyMaterial = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const material = await StudyMaterial.findById(id);
+    if (!material || !material.isPublished) {
+      res.status(404).json({ success: false, message: 'Study material not found or unavailable' });
+      return;
+    }
+
+    const mimeType = material.mimeType || storageService.detectMimeType(material.fileName);
+
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(material.fileName)}"`);
+    res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+
+    // 1. Try local disk stream first (0ms instant speed)
+    const filePath = storageService.getAbsolutePath(material.storageKey);
+    if (fs.existsSync(filePath)) {
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+      return;
+    }
+
+    // 2. Fallback to Supabase Cloud Storage stream
+    try {
+      const cloudStream = await storageService.getCloudObjectStream(material.storageKey);
+      if (cloudStream) {
+        cloudStream.pipe(res);
+        return;
+      }
+    } catch (cloudErr) {
+      console.error('[PREVIEW CLOUD STREAM ERROR]', cloudErr);
+    }
+
+    res.status(404).json({ success: false, message: 'File stream not found' });
+  } catch (error: any) {
+    console.error('[PREVIEW STUDY MATERIAL ERROR]', error);
+    res.status(500).json({ success: false, message: 'Failed to stream preview' });
+  }
+};
+
+/**
  * Admin: Get all study materials (paginated & searchable)
  */
 export const getAdminStudyMaterials = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -333,6 +378,8 @@ export const createStudyMaterial = async (req: AuthRequest, res: Response): Prom
       fileName,
       fileBase64,
       mimeType,
+      thumbnailUrl,
+      thumbnailBase64,
       isPublished = true,
     } = req.body;
 
@@ -366,6 +413,8 @@ export const createStudyMaterial = async (req: AuthRequest, res: Response): Prom
       storageKey,
       fileSize: meta.size,
       mimeType: mimeType || meta.mimeType,
+      thumbnailUrl: thumbnailUrl || '',
+      thumbnailBase64: thumbnailBase64 || '',
       isPublished: Boolean(isPublished),
     });
 
@@ -394,6 +443,8 @@ export const updateStudyMaterial = async (req: AuthRequest, res: Response): Prom
       fileName,
       fileBase64,
       mimeType,
+      thumbnailUrl,
+      thumbnailBase64,
       isPublished,
     } = req.body;
 
@@ -416,6 +467,8 @@ export const updateStudyMaterial = async (req: AuthRequest, res: Response): Prom
     if (semester) material.semester = semester.trim();
     if (subject) material.subject = subject.trim();
     if (materialType) material.materialType = materialType.trim().toUpperCase() as MaterialType;
+    if (thumbnailUrl !== undefined) material.thumbnailUrl = thumbnailUrl;
+    if (thumbnailBase64 !== undefined) material.thumbnailBase64 = thumbnailBase64;
     if (isPublished !== undefined) material.isPublished = Boolean(isPublished);
 
     // Handle replacement file if base64 provided

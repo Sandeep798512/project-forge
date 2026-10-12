@@ -15,6 +15,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import api, { getBaseURL } from '../services/api';
+import { PdfThumbnail } from '../components/common/PdfThumbnail';
 
 export interface StudyMaterialItem {
   _id: string;
@@ -29,6 +30,8 @@ export interface StudyMaterialItem {
   fileName: string;
   fileSize: number;
   mimeType?: string;
+  thumbnailUrl?: string;
+  thumbnailBase64?: string;
   isPublished: boolean;
   createdAt: string;
 }
@@ -312,70 +315,85 @@ export const StudyMaterials: React.FC = () => {
             {materials.map((item) => (
               <div
                 key={item._id}
-                className="bg-surface border border-border/70 rounded-2xl p-6 flex flex-col justify-between hover:border-emerald-500/40 transition-all duration-200 shadow-md group"
+                className="bg-surface border border-border/70 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-emerald-500/40 transition-all duration-200 shadow-md group"
               >
-                <div className="space-y-4">
-                  {/* Top Badges */}
-                  <div className="flex items-center justify-between gap-2">
-                    <span
-                      className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-md uppercase border ${getBadgeStyle(
-                        item.materialType
-                      )}`}
-                    >
-                      {item.materialType === 'PYQ' ? 'Previous Year Qs' : item.materialType}
-                    </span>
-
-                    <span className="text-[11px] font-medium text-gray-400 bg-background/80 px-2.5 py-0.5 rounded border border-border/40">
-                      {(() => {
-                        const y = item.year || (item.semester ? String(Math.ceil(Number(item.semester) / 2)) : '');
-                        const yText = y === '1' ? '1st Year' : y === '2' ? '2nd Year' : y === '3' ? '3rd Year' : y === '4' ? '4th Year' : y ? `Year ${y}` : '';
-                        return yText ? `${yText} • Sem ${item.semester} • ${item.branch}` : `Sem ${item.semester} • ${item.branch}`;
-                      })()}
-                    </span>
-                  </div>
-
-                  {/* Title & Subject */}
-                  <div>
-                    <h3 className="font-bold text-base text-white group-hover:text-emerald-300 transition-colors line-clamp-2">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs font-medium text-emerald-400/90 mt-1">
-                      Subject: {item.subject}
-                    </p>
-                  </div>
-
-                  {/* Description */}
-                  {item.description && (
-                    <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">
-                      {item.description}
-                    </p>
-                  )}
-
-                  {/* Info Tags */}
-                  <div className="flex flex-wrap items-center gap-2 text-[11px] text-gray-400 pt-1">
-                    <span className="bg-background px-2 py-0.5 rounded border border-border/40 font-mono">
-                      {item.university}
-                    </span>
-                    <span className="text-gray-500">•</span>
-                    <span>{formatFileSize(item.fileSize)}</span>
-                  </div>
+                {/* 1st Page Thumbnail Preview Banner */}
+                <div className="relative aspect-[16/10] w-full bg-slate-900 border-b border-border/50 overflow-hidden">
+                  <PdfThumbnail
+                    fileUrl={`${getBaseURL()}/study-materials/${item._id}/preview`}
+                    thumbnailUrl={item.thumbnailUrl}
+                    thumbnailBase64={item.thumbnailBase64}
+                    title={item.title}
+                    subject={item.subject}
+                    materialType={item.materialType}
+                    className="w-full h-full"
+                  />
                 </div>
 
-                {/* Bottom Action */}
-                <div className="pt-6 mt-4 border-t border-border/50 flex items-center justify-between">
-                  <div className="text-[11px] text-gray-500 truncate max-w-[150px]">
-                    {item.fileName}
+                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                  <div className="space-y-4">
+                    {/* Top Badges */}
+                    <div className="flex items-center justify-between gap-2">
+                      <span
+                        className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-md uppercase border ${getBadgeStyle(
+                          item.materialType
+                        )}`}
+                      >
+                        {item.materialType === 'PYQ' ? 'Previous Year Qs' : item.materialType}
+                      </span>
+
+                      <span className="text-[11px] font-medium text-gray-400 bg-background/80 px-2.5 py-0.5 rounded border border-border/40">
+                        {(() => {
+                          const y = item.year || (item.semester ? String(Math.ceil(Number(item.semester) / 2)) : '');
+                          const yText = y === '1' ? '1st Year' : y === '2' ? '2nd Year' : y === '3' ? '3rd Year' : y === '4' ? '4th Year' : y ? `Year ${y}` : '';
+                          return yText ? `${yText} • Sem ${item.semester} • ${item.branch}` : `Sem ${item.semester} • ${item.branch}`;
+                        })()}
+                      </span>
+                    </div>
+
+                    {/* Title & Subject */}
+                    <div>
+                      <h3 className="font-bold text-base text-white group-hover:text-emerald-300 transition-colors line-clamp-2">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs font-medium text-emerald-400/90 mt-1">
+                        Subject: {item.subject}
+                      </p>
+                    </div>
+
+                    {/* Description */}
+                    {item.description && (
+                      <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">
+                        {item.description}
+                      </p>
+                    )}
+
+                    {/* Info Tags */}
+                    <div className="flex flex-wrap items-center gap-2 text-[11px] text-gray-400 pt-1">
+                      <span className="bg-background px-2 py-0.5 rounded border border-border/40 font-mono">
+                        {item.university}
+                      </span>
+                      <span className="text-gray-500">•</span>
+                      <span>{formatFileSize(item.fileSize)}</span>
+                    </div>
                   </div>
 
-                  <a
-                    href={`${getBaseURL()}/study-materials/${item._id}/download`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-glow-sm transition-all duration-200"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Free Download</span>
-                  </a>
+                  {/* Bottom Action */}
+                  <div className="pt-4 border-t border-border/50 flex items-center justify-between">
+                    <div className="text-[11px] text-gray-500 truncate max-w-[150px]">
+                      {item.fileName}
+                    </div>
+
+                    <a
+                      href={`${getBaseURL()}/study-materials/${item._id}/download`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-glow-sm transition-all duration-200"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Free Download</span>
+                    </a>
+                  </div>
                 </div>
               </div>
             ))}
