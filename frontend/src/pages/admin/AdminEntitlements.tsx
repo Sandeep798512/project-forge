@@ -54,7 +54,7 @@ export const AdminEntitlements: React.FC = () => {
   };
 
   const handleSetCustomLimit = async (id: string, currentLimit: number) => {
-    const newLimitStr = window.prompt('Set custom maximum download limit for this customer entitlement:', String(currentLimit || 5));
+    const newLimitStr = window.prompt('Set custom maximum download limit for this customer entitlement:', String(currentLimit || 20));
     if (newLimitStr !== null && newLimitStr.trim() !== '') {
       const newLimit = parseInt(newLimitStr.trim(), 10);
       if (!isNaN(newLimit) && newLimit >= 0) {
@@ -82,7 +82,7 @@ export const AdminEntitlements: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-white">Product Entitlement Administration</h1>
-          <p className="text-gray-400 text-xs mt-1">Manage verified access rights, default 5-download limits, and entitlement revocation.</p>
+          <p className="text-gray-400 text-xs mt-1">Manage verified access rights, default 20-download limits, and entitlement revocation.</p>
         </div>
       </div>
 
@@ -123,7 +123,7 @@ export const AdminEntitlements: React.FC = () => {
               <tbody className="divide-y divide-border/40 text-gray-200">
                 {entitlements.map((e) => {
                   const used = e.downloadCount || 0;
-                  const max = e.maxDownloads || 5;
+                  const max = e.maxDownloads || 20;
                   const isLimitReached = used >= max;
 
                   return (

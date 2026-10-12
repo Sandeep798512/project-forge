@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import StudyMaterial, { MaterialType } from '../models/StudyMaterial';
 import StudyMaterialDownloadLog from '../models/StudyMaterialDownloadLog';
@@ -121,12 +122,27 @@ export const downloadFreeStudyMaterial = async (req: Request, res: Response): Pr
       return;
     }
 
-    // Identify requester by IP address and optional Bearer Token
+    // 1. Identify requester device by Device ID, IP address, and User-Agent fingerprint
     const ipAddress =
       (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() ||
       req.ip ||
       req.socket.remoteAddress ||
       '127.0.0.1';
+
+    const userAgent = Array.isArray(req.headers['user-agent'])
+      ? req.headers['user-agent'].join(' ')
+      : req.headers['user-agent'] || 'Browser';
+
+    const deviceId =
+      (typeof req.query.deviceId === 'string' && req.query.deviceId.trim()) ||
+      (req.headers['x-device-id'] as string) ||
+      (req as any).cookies?.cg_device_id ||
+      undefined;
+
+    const deviceFingerprint = crypto
+      .createHash('sha256')
+      .update(`${ipAddress}::${userAgent}`)
+      .digest('hex');
 
     let userId: string | undefined = undefined;
     const authHeader = req.headers.authorization;
@@ -138,8 +154,13 @@ export const downloadFreeStudyMaterial = async (req: Request, res: Response): Pr
       } catch (e) {}
     }
 
-    // Check if user or IP has already downloaded this specific study material
-    const queryConditions: any[] = [{ ipAddress }];
+    // Check if this device has already downloaded this specific study material
+    const queryConditions: any[] = [];
+    if (deviceId) {
+      queryConditions.push({ deviceId });
+    }
+    queryConditions.push({ deviceFingerprint });
+    queryConditions.push({ ipAddress, userAgent });
     if (userId) {
       queryConditions.push({ user: userId });
     }
@@ -149,18 +170,34 @@ export const downloadFreeStudyMaterial = async (req: Request, res: Response): Pr
       $or: queryConditions,
     });
 
-    if (dlCount >= 10) {
+    const MAX_FREE_PDF_DOWNLOADS_PER_DEVICE = 3;
+
+    if (dlCount >= MAX_FREE_PDF_DOWNLOADS_PER_DEVICE) {
       res.status(403).send(
         `<!DOCTYPE html>
         <html>
-          <head><title>Download Limit Exceeded</title></head>
-          <body style="font-family: system-ui, -apple-system, sans-serif; background-color: #0B0F19; color: #fff; padding: 60px 20px; text-align: center;">
-            <div style="max-width: 500px; margin: 0 auto; background-color: #111827; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 16px; padding: 32px;">
-              <h2 style="color: #ef4444; font-size: 20px; margin-top: 0;">⚠️ Download Limit Reached (10/10 Downloads Used)</h2>
-              <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
-                You have reached the max download limit of 10 downloads for <strong>${material.title}</strong>.
+          <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>Download Limit Exceeded - CampusGet</title>
+          </head>
+          <body style="font-family: system-ui, -apple-system, sans-serif; background-color: #0B0F19; color: #fff; padding: 60px 20px; text-align: center; margin: 0;">
+            <div style="max-width: 520px; margin: 0 auto; background-color: #111827; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 20px; padding: 36px; box-shadow: 0 15px 35px rgba(0,0,0,0.6);">
+              <div style="font-size: 42px; margin-bottom: 14px;">📄⚠️</div>
+              <h2 style="color: #ef4444; font-size: 22px; margin-top: 0; margin-bottom: 12px; font-weight: 800;">
+                Download Limit Reached (3/3 Downloads Used)
+              </h2>
+              <p style="color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 22px;">
+                Aap is study material PDF ko is device se maximum <strong>3 baar</strong> download kar chuke hain.
+                <br/>
+                Fair-use policy ke anusaar ek device se ek PDF ko maximum <strong>3 downloads</strong> allowed hain.
               </p>
-              <a href="/study-materials" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 13px; display: inline-block;">
+              <div style="background-color: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 16px; margin-bottom: 26px; text-align: left; font-size: 13px; color: #cbd5e1; line-height: 1.6;">
+                <div><strong style="color: #fff;">Title:</strong> ${material.title}</div>
+                <div><strong style="color: #fff;">Subject:</strong> ${material.subject}</div>
+                <div><strong style="color: #fff;">Device Limit:</strong> 3 of 3 Allowed Downloads Completed</div>
+              </div>
+              <a href="/study-materials" style="background-color: #10b981; color: white; padding: 12px 28px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 13px; display: inline-block; transition: all 0.2s;">
                 Back to Study Materials Catalog
               </a>
             </div>
@@ -170,14 +207,21 @@ export const downloadFreeStudyMaterial = async (req: Request, res: Response): Pr
       return;
     }
 
-    // Record download log
+    // Record download log with deviceId and deviceFingerprint
     await StudyMaterialDownloadLog.create({
       material: id,
       user: userId || null,
+      deviceId: deviceId || null,
+      deviceFingerprint,
       ipAddress,
-      userAgent: Array.isArray(req.headers['user-agent'])
-        ? req.headers['user-agent'].join(' ')
-        : req.headers['user-agent'] || 'Browser',
+      userAgent,
+    });
+
+    const effectiveCookieDeviceId = deviceId || deviceFingerprint;
+    res.cookie('cg_device_id', effectiveCookieDeviceId, {
+      maxAge: 365 * 24 * 60 * 60 * 1000,
+      sameSite: 'lax',
+      path: '/',
     });
 
     const mimeType = material.mimeType || storageService.detectMimeType(material.fileName);

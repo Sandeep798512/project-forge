@@ -224,7 +224,7 @@ export const verifyPaymentSignature = async (req: AuthRequest, res: Response): P
             product: item.product,
             order: order._id,
             purchasedVersion: product?.currentVersion || '1.0.0',
-            maxDownloads: product?.maxDownloadsAllowed || 2,
+            maxDownloads: product?.maxDownloadsAllowed || 20,
           });
 
           if (product) {
@@ -306,7 +306,7 @@ export const handleRazorpayWebhook = async (req: AuthRequest, res: Response): Pr
                   product: item.product,
                   order: order._id,
                   purchasedVersion: product?.currentVersion || '1.0.0',
-                  maxDownloads: product?.maxDownloadsAllowed || 2,
+                  maxDownloads: product?.maxDownloadsAllowed || 20,
                 });
               }
             }

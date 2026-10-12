@@ -36,6 +36,19 @@ export interface StudyMaterialItem {
   createdAt: string;
 }
 
+const getOrCreateDeviceId = (): string => {
+  try {
+    let id = localStorage.getItem('cg_device_id');
+    if (!id) {
+      id = 'dev_' + Math.random().toString(36).substring(2, 12) + '_' + Date.now().toString(36);
+      localStorage.setItem('cg_device_id', id);
+    }
+    return id;
+  } catch {
+    return 'browser_device';
+  }
+};
+
 export const StudyMaterials: React.FC = () => {
   const [materials, setMaterials] = useState<StudyMaterialItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -385,7 +398,7 @@ export const StudyMaterials: React.FC = () => {
                     </div>
 
                     <a
-                      href={`${getBaseURL()}/study-materials/${item._id}/download`}
+                      href={`${getBaseURL()}/study-materials/${item._id}/download?deviceId=${getOrCreateDeviceId()}`}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-glow-sm transition-all duration-200"
