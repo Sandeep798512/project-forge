@@ -17,6 +17,9 @@ interface SendPasswordChangedParams {
  * Check which email transport is configured
  */
 const getEmailConfig = () => {
+  const brevoApiKey = process.env.BREVO_API_KEY;
+  const isBrevo = Boolean(brevoApiKey);
+
   const resendApiKey = process.env.RESEND_API_KEY || process.env.EMAIL_API_KEY;
   const isResend = Boolean(resendApiKey && resendApiKey.startsWith('re_'));
 
@@ -29,6 +32,8 @@ const getEmailConfig = () => {
   const isSmtp = Boolean(smtpUser && smtpPass);
 
   return {
+    isBrevo,
+    brevoApiKey,
     isResend,
     resendApiKey,
     isSmtp,
@@ -39,6 +44,58 @@ const getEmailConfig = () => {
     smtpSecure,
     fromEmail: process.env.EMAIL_FROM || BRAND.supportEmail || 'campusget.in@gmail.com',
   };
+};
+
+/**
+ * Send email using Brevo HTTPS REST API (Port 443 - 100% immune to Render firewall port blocks)
+ */
+const sendViaBrevo = async (
+  apiKey: string,
+  fromEmail: string,
+  to: string,
+  toName: string,
+  subject: string,
+  html: string,
+  text: string
+): Promise<{ success: boolean; id?: string; error?: string }> => {
+  try {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'api-key': apiKey,
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        sender: {
+          name: 'CampusGet',
+          email: fromEmail || 'campusget.in@gmail.com',
+        },
+        to: [
+          {
+            email: to,
+            name: toName || 'Student',
+          },
+        ],
+        subject,
+        htmlContent: html,
+        textContent: text,
+      }),
+    });
+
+    const data: any = await response.json();
+
+    if (!response.ok) {
+      console.error('[BREVO API ERROR]', data);
+      return { success: false, error: data.message || 'Brevo API request failed' };
+    }
+
+    console.log(`[EMAIL SENT VIA BREVO] Message ID: ${data.messageId} to ${to}`);
+    return { success: true, id: data.messageId };
+  } catch (error: any) {
+    console.error('[BREVO FETCH ERROR]', error);
+    return { success: false, error: error.message };
+  }
 };
 
 /**
@@ -249,21 +306,27 @@ export const sendPasswordResetEmail = async ({
   const html = buildPasswordResetHtml(name, resetUrl, expiresInMinutes);
   const text = `Hi ${name},\n\nYou requested a password reset for your CampusGet account.\nClick the link below to set a new password:\n\n${resetUrl}\n\nThis link will expire in ${expiresInMinutes} minutes.\nIf you did not request this, please ignore this email.\n\n- CampusGet Support`;
 
-  // 1. Try Resend if API key available (Best for Render/Cloud)
+  // 1. Try Brevo if API key available (300 free emails/day, Port 443 HTTPS - 100% immune to Render blocks)
+  if (config.isBrevo && config.brevoApiKey) {
+    const result = await sendViaBrevo(config.brevoApiKey, config.fromEmail, to, name, subject, html, text);
+    if (result.success) return { success: true };
+  }
+
+  // 2. Try Resend if API key available (Best for Render/Cloud, Port 443 HTTPS)
   if (config.isResend && config.resendApiKey) {
     const result = await sendViaResend(config.resendApiKey, config.fromEmail, to, subject, html, text);
     if (result.success) return { success: true };
   }
 
-  // 2. Try SMTP if configured (Gmail App Password, Brevo, custom SMTP)
+  // 3. Try SMTP if configured (Gmail App Password, Brevo, custom SMTP)
   if (config.isSmtp) {
     const result = await sendViaSmtp(config, to, subject, html, text);
     if (result.success) return { success: true };
   }
 
-  // 3. Fallback when keys are not set yet
+  // 4. Fallback when keys are not set yet
   console.warn(
-    `[EMAIL SERVICE WARNING] No active email provider configured (Set RESEND_API_KEY or SMTP_USER/SMTP_PASS in environment).`
+    `[EMAIL SERVICE WARNING] No active email provider configured (Set BREVO_API_KEY, RESEND_API_KEY, or SMTP in environment).`
   );
   console.log(`[EMAIL DISPATCH PREVIEW]\nTo: ${to}\nReset URL: ${resetUrl}\nExpires: ${expiresInMinutes} mins\n`);
 
@@ -296,7 +359,9 @@ export const sendPasswordChangedConfirmationEmail = async ({
   const text = `Hello ${name},\nYour CampusGet account password was successfully updated.\nIf you did not do this, please contact support immediately.\n- CampusGet`;
 
   try {
-    if (config.isResend && config.resendApiKey) {
+    if (config.isBrevo && config.brevoApiKey) {
+      await sendViaBrevo(config.brevoApiKey, config.fromEmail, to, name, subject, html, text);
+    } else if (config.isResend && config.resendApiKey) {
       await sendViaResend(config.resendApiKey, config.fromEmail, to, subject, html, text);
     } else if (config.isSmtp) {
       await sendViaSmtp(config, to, subject, html, text);
