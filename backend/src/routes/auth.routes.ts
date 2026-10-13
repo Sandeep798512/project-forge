@@ -5,18 +5,30 @@ import { authenticate } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-const authLimiter = rateLimit({
+// Shared-network friendly general auth limiter (avoids blocking students sharing campus Wi-Fi)
+const generalAuthLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 mins
-  max: 20, // max 20 requests per IP
-  message: { success: false, message: 'Too many auth requests from this IP. Please try again in 15 minutes.' },
+  max: 60, // 60 requests per 15 mins per IP across campus networks
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many auth requests from this network. Please try again in 15 minutes.' },
 });
 
-router.post('/register', authLimiter, register);
-router.post('/login', authLimiter, login);
+// Dedicated IP limiter for password reset requests (accommodates shared campus NAT routers)
+const forgotPasswordIpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 mins
+  max: 30, // max 30 requests per IP per 15 mins (individual emails are strictly limited to 3 in controller)
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many password reset requests from this network. Please wait 15 minutes before trying again.' },
+});
+
+router.post('/register', generalAuthLimiter, register);
+router.post('/login', generalAuthLimiter, login);
 router.get('/me', authenticate, getMe);
 router.delete('/me', authenticate, deleteAccount);
-router.post('/forgot-password', authLimiter, forgotPassword);
-router.post('/reset-password', authLimiter, resetPassword);
+router.post('/forgot-password', forgotPasswordIpLimiter, forgotPassword);
+router.post('/reset-password', generalAuthLimiter, resetPassword);
 router.put('/update-password', authenticate, updatePassword);
 
 export default router;

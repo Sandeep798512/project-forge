@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import User from '../models/User';
 import Entitlement from '../models/Entitlement';
 import AuditLog from '../models/AuditLog';
+import PasswordResetAttempt from '../models/PasswordResetAttempt';
 import { hashPassword, comparePassword } from '../utils/passwords';
 import { generateToken } from '../utils/jwt';
 import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '../validators/auth.validator';
@@ -161,7 +162,68 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     }
 
     const { email } = parseResult.data;
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const cleanEmail = email.toLowerCase().trim();
+
+    // Extract client IP safely (supports proxies, reverse proxy headers, and local direct)
+    const ipAddress =
+      (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() ||
+      req.ip ||
+      req.socket.remoteAddress ||
+      '127.0.0.1';
+
+    // 1. Rate Limit Check: 15-minute per-email limit (Max 3 attempts)
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+    const emailAttempts15m = await PasswordResetAttempt.countDocuments({
+      email: cleanEmail,
+      createdAt: { $gte: fifteenMinutesAgo },
+    });
+
+    if (emailAttempts15m >= 3) {
+      res.status(429).json({
+        success: false,
+        message: 'Too many password reset requests for this email address. Maximum 3 attempts allowed in 15 minutes. Please check your inbox or wait 15 minutes before trying again.',
+      });
+      return;
+    }
+
+    // 2. Rate Limit Check: 24-hour per-email limit (Max 5 attempts)
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const emailAttempts24h = await PasswordResetAttempt.countDocuments({
+      email: cleanEmail,
+      createdAt: { $gte: twentyFourHoursAgo },
+    });
+
+    if (emailAttempts24h >= 5) {
+      res.status(429).json({
+        success: false,
+        message: 'Daily password reset limit reached for this email address (maximum 5 requests per 24 hours). Please contact support if you need immediate assistance.',
+      });
+      return;
+    }
+
+    // 3. Rate Limit Check: IP-based shared-network friendly limit
+    // High threshold (25 per 15 min) prevents bot flooding while safely accommodating
+    // genuine students sharing public NAT IP on university/hostel Wi-Fi
+    const ipAttempts15m = await PasswordResetAttempt.countDocuments({
+      ipAddress,
+      createdAt: { $gte: fifteenMinutesAgo },
+    });
+
+    if (ipAttempts15m >= 25) {
+      res.status(429).json({
+        success: false,
+        message: 'High volume of reset requests detected from your network. Please wait 15 minutes before trying again.',
+      });
+      return;
+    }
+
+    // Log this attempt in MongoDB (will automatically expire after 24 hours via TTL index)
+    await PasswordResetAttempt.create({
+      email: cleanEmail,
+      ipAddress,
+    });
+
+    const user = await User.findOne({ email: cleanEmail });
 
     if (!user) {
       // Don't leak user existence (Security Best Practice)
