@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, Star, ArrowRight, Code2, Sparkles, CheckCircle, Play } from 'lucide-react';
+import { ExternalLink, ArrowRight, Code2, Sparkles, CheckCircle, Play } from 'lucide-react';
 import { BRAND } from '../../config/brand.config';
 
 export interface ProductCardProps {
@@ -141,23 +141,14 @@ export const ProjectCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         {/* Deliverables Checklist highlight */}
-        <div className="pt-2 border-t border-border/40 flex items-center justify-between text-[11px] text-gray-400">
-          {badgeText ? (
-            <span className="flex items-center space-x-1 text-emerald-400 font-medium truncate max-w-[220px]" title={badgeText}>
+        {badgeText && (
+          <div className="pt-2 border-t border-border/40 flex items-center text-[11px] text-gray-400">
+            <span className="flex items-center space-x-1 text-emerald-400 font-medium truncate" title={badgeText}>
               <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" />
               <span className="truncate">{badgeText}</span>
             </span>
-          ) : (
-            <span />
-          )}
-          {product.ratingAverage && (
-            <div className="flex items-center space-x-1 text-amber-400 flex-shrink-0">
-              <Star className="w-3.5 h-3.5 fill-current" />
-              <span className="font-bold text-gray-200">{product.ratingAverage.toFixed(1)}</span>
-              {product.ratingCount ? <span className="text-gray-500">({product.ratingCount})</span> : null}
-            </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Pricing & Footer Actions (Flipkart Style Discount) */}
         <div className="pt-3 border-t border-border/60 flex items-center justify-between">

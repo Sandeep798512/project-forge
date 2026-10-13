@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ExternalLink, CheckCircle2, ShieldCheck, Play, ArrowLeft, Star, FileText, Database, Layers, HelpCircle, Code, ShoppingCart, MessageSquare, Download, Video, Maximize2 } from 'lucide-react';
+import { ExternalLink, CheckCircle2, ShieldCheck, Play, ArrowLeft, FileText, Database, Layers, HelpCircle, Code, ShoppingCart, MessageSquare, Download, Video, Maximize2 } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
 import { WhatsAppButton } from '../components/common/WhatsAppButton';
 import { useAuth } from '../context/AuthContext';
