@@ -7,6 +7,7 @@ import { hashPassword, comparePassword } from '../utils/passwords';
 import { generateToken } from '../utils/jwt';
 import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '../validators/auth.validator';
 import { AuthRequest } from '../middlewares/auth.middleware';
+import { sendPasswordResetEmail, sendPasswordChangedConfirmationEmail } from '../utils/email.service';
 
 const generateReferralCode = (name: string): string => {
   const prefix = name.replace(/[^a-zA-Z]/g, '').substring(0, 4).toUpperCase() || 'FORGE';
@@ -163,22 +164,51 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
-      // Don't leak user existence
-      res.status(200).json({ success: true, message: 'If that email exists in our records, a reset token has been issued.' });
+      // Don't leak user existence (Security Best Practice)
+      res.status(200).json({
+        success: true,
+        message: 'If that email exists in our records, a password reset link has been sent.',
+      });
       return;
     }
 
+    // 1. Generate secure crypto reset token (32 bytes = 64 hex chars)
     const resetToken = crypto.randomBytes(32).toString('hex');
     user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
     user.resetPasswordExpire = new Date(Date.now() + 30 * 60 * 1000); // 30 mins
     await user.save();
 
+    // 2. Resolve frontend client origin dynamically
+    const rawOrigin = req.headers.origin || req.headers.referer;
+    let clientUrl = process.env.CLIENT_URL;
+    if (!clientUrl && rawOrigin) {
+      try {
+        const parsed = new URL(rawOrigin);
+        clientUrl = parsed.origin;
+      } catch {}
+    }
+    if (!clientUrl) {
+      clientUrl = 'https://campusget.vercel.app';
+    }
+
+    const resetUrl = `${clientUrl.replace(/\/$/, '')}/reset-password?token=${resetToken}`;
+
+    // 3. Dispatch email via Resend API or SMTP
+    const emailResult = await sendPasswordResetEmail({
+      to: user.email,
+      name: user.name,
+      resetUrl,
+      expiresInMinutes: 30,
+    });
+
     res.status(200).json({
       success: true,
-      message: 'Password reset token generated successfully.',
-      ...(process.env.NODE_ENV === 'development' ? { resetToken } : {}),
+      message: 'Password reset link has been sent to your email address.',
+      emailDelivered: emailResult.success,
+      ...(process.env.NODE_ENV === 'development' ? { resetToken, resetUrl } : {}),
     });
   } catch (error: any) {
+    console.error('[AUTH FORGOT PASSWORD ERROR]', error);
     res.status(500).json({ success: false, message: 'Error processing forgot password request.' });
   }
 };
@@ -200,7 +230,10 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     });
 
     if (!user) {
-      res.status(400).json({ success: false, message: 'Invalid or expired password reset token.' });
+      res.status(400).json({
+        success: false,
+        message: 'Invalid or expired password reset link. Please request a new one.',
+      });
       return;
     }
 
@@ -209,8 +242,18 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     user.resetPasswordExpire = undefined;
     await user.save();
 
-    res.status(200).json({ success: true, message: 'Password has been reset successfully! You can now log in.' });
+    // Send confirmation email asynchronously (fire-and-forget)
+    sendPasswordChangedConfirmationEmail({
+      to: user.email,
+      name: user.name,
+    }).catch((err) => console.error('[CONFIRMATION EMAIL ERROR]', err));
+
+    res.status(200).json({
+      success: true,
+      message: 'Password has been reset successfully! You can now log in.',
+    });
   } catch (error: any) {
+    console.error('[AUTH RESET PASSWORD ERROR]', error);
     res.status(500).json({ success: false, message: 'Error resetting password.' });
   }
 };
