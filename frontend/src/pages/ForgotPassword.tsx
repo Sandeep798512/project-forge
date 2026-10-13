@@ -7,7 +7,6 @@ import { authService } from '../services/auth.service';
 export const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const [resetTokenInfo, setResetTokenInfo] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -16,11 +15,8 @@ export const ForgotPassword: React.FC = () => {
     setError(null);
     setLoading(true);
     try {
-      const res = await authService.forgotPassword(email);
+      await authService.forgotPassword(email);
       setSubmitted(true);
-      if (res.resetToken) {
-        setResetTokenInfo(res.resetToken);
-      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to process password reset request. Please check your network and try again.');
     } finally {
@@ -66,21 +62,11 @@ export const ForgotPassword: React.FC = () => {
               </div>
             </div>
 
-            {resetTokenInfo && (
-              <div className="p-3.5 bg-background border border-emerald-500/30 rounded-xl font-mono text-xs text-gray-300 space-y-1">
-                <span className="text-emerald-400 block text-[10px] font-bold">LOCAL DEV PREVIEW LINK:</span>
-                <Link to={`/reset-password?token=${resetTokenInfo}`} className="text-primary-400 underline font-bold break-all block">
-                  Click here to Reset Password
-                </Link>
-              </div>
-            )}
-
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
               <button
                 type="button"
                 onClick={() => {
                   setSubmitted(false);
-                  setResetTokenInfo(null);
                 }}
                 className="text-gray-400 hover:text-white transition-colors"
               >

@@ -240,22 +240,30 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     user.resetPasswordExpire = new Date(Date.now() + 30 * 60 * 1000); // 30 mins
     await user.save();
 
-    // 2. Resolve frontend client origin dynamically
+    // 2. Resolve frontend client origin dynamically (Ensures real production link in emails)
+    let clientUrl = '';
     const rawOrigin = req.headers.origin || req.headers.referer;
-    let clientUrl = process.env.CLIENT_URL;
-    if (!clientUrl && rawOrigin) {
+    if (rawOrigin) {
       try {
         const parsed = new URL(rawOrigin);
-        clientUrl = parsed.origin;
+        if (parsed.protocol.startsWith('http') && !parsed.hostname.includes('localhost')) {
+          clientUrl = parsed.origin;
+        }
       } catch {}
     }
+
+    if (!clientUrl && process.env.CLIENT_URL && !process.env.CLIENT_URL.includes('localhost')) {
+      clientUrl = process.env.CLIENT_URL;
+    }
+
+    // Default to official live production domain
     if (!clientUrl) {
       clientUrl = 'https://campusget.vercel.app';
     }
 
     const resetUrl = `${clientUrl.replace(/\/$/, '')}/reset-password?token=${resetToken}`;
 
-    // 3. Dispatch email via Resend API or SMTP
+    // 3. Dispatch email via Brevo API, Resend API, or SMTP
     const emailResult = await sendPasswordResetEmail({
       to: user.email,
       name: user.name,
@@ -267,7 +275,6 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
       success: true,
       message: 'Password reset link has been sent to your email address.',
       emailDelivered: emailResult.success,
-      ...(process.env.NODE_ENV === 'development' ? { resetToken, resetUrl } : {}),
     });
   } catch (error: any) {
     console.error('[AUTH FORGOT PASSWORD ERROR]', error);
