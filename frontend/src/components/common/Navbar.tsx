@@ -57,9 +57,7 @@ export const Navbar: React.FC = () => {
           {/* Desktop Nav Links */}
           <nav className="hidden lg:flex items-center space-x-5 text-sm font-medium text-gray-300">
             <Link to="/projects" className="hover:text-white transition-colors">Projects</Link>
-            <Link to="/placement-prep" className="hover:text-amber-300 text-amber-400 font-semibold transition-colors flex items-center space-x-1">
-              <span>Placement & Roadmaps</span>
-            </Link>
+            <Link to="/placement-prep" className="hover:text-white transition-colors">Placement & Roadmaps</Link>
             <Link to="/study-materials" className="hover:text-emerald-300 text-emerald-400 font-semibold transition-colors flex items-center space-x-1">
               <span>Free Notes & PYQs</span>
             </Link>
@@ -152,7 +150,7 @@ export const Navbar: React.FC = () => {
 
           <nav className="flex flex-col space-y-2 text-sm font-medium text-gray-300">
             <Link to="/projects" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-white">Explore Projects</Link>
-            <Link to="/placement-prep" onClick={() => setMobileMenuOpen(false)} className="py-2 text-amber-400 font-semibold hover:text-amber-300">🚀 Placement & Roadmaps</Link>
+            <Link to="/placement-prep" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-white">Placement & Roadmaps</Link>
             <Link to="/study-materials" onClick={() => setMobileMenuOpen(false)} className="py-2 text-emerald-400 font-semibold hover:text-emerald-300">📚 Free Notes & PYQs</Link>
             <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-white">About Platform</Link>
             <Link to="/pricing" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-white">Pricing & Customization</Link>

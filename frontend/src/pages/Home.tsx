@@ -133,7 +133,7 @@ export const Home: React.FC = () => {
 
             {/* Supporting Text */}
             <p className="text-gray-300 text-base sm:text-lg leading-relaxed max-w-3xl mx-auto">
-              Production-style software projects with complete source code & setup guides — plus <strong className="text-amber-400 font-semibold">Placement Prep Guides & Career Roadmaps</strong> and <strong className="text-emerald-400 font-semibold">100% Free Study Materials & PYQs</strong> to help CSE/IT students learn, build, crack interviews, and excel.
+              Production-style software projects with complete source code & setup guides — plus <strong className="text-white font-semibold">Placement Prep Guides & Career Roadmaps</strong> and <strong className="text-emerald-400 font-semibold">100% Free Study Materials & PYQs</strong> to help CSE/IT students learn, build, crack interviews, and excel.
             </p>
 
             {/* Hero CTAs */}
@@ -178,7 +178,7 @@ export const Home: React.FC = () => {
                 <span>Free Study Notes & PYQs</span>
               </div>
               <div className="flex items-center space-x-1.5">
-                <CheckCircle className="w-4 h-4 text-amber-400" />
+                <CheckCircle className="w-4 h-4 text-emerald-400" />
                 <span>Placement Guides & Roadmaps</span>
               </div>
             </div>
