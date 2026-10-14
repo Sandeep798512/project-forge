@@ -57,6 +57,8 @@ export const ProjectCard: React.FC<ProductCardProps> = ({ product }) => {
         <img
           src={product.thumbnail}
           alt=""
+          loading="lazy"
+          decoding="async"
           className="absolute inset-0 w-full h-full object-cover blur-md opacity-25 scale-105 pointer-events-none"
         />
 
@@ -64,8 +66,9 @@ export const ProjectCard: React.FC<ProductCardProps> = ({ product }) => {
         <img
           src={product.thumbnail}
           alt={product.title}
-          className="relative z-10 max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
+          decoding="async"
+          className="relative z-10 max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500"
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-60 pointer-events-none z-10" />

@@ -17,8 +17,23 @@ const CAREER_TRACKS = [
 export const PlacementPrep: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [materials, setMaterials] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const getInitialPlacement = () => {
+    try {
+      const cached = localStorage.getItem('cg_cached_placement_prep');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  };
+
+  const [materials, setMaterials] = useState<any[]>(getInitialPlacement);
+  const [loading, setLoading] = useState<boolean>(() => {
+    const hasCached = getInitialPlacement().length > 0;
+    const isDefault = !searchParams.get('search') && (!searchParams.get('track') || searchParams.get('track') === 'ALL');
+    return !hasCached || !isDefault;
+  });
 
   const [search, setSearch] = useState<string>(searchParams.get('search') || '');
   const [track, setTrack] = useState<string>(searchParams.get('track') || 'ALL');
@@ -33,7 +48,10 @@ export const PlacementPrep: React.FC = () => {
 
   const fetchMaterials = async () => {
     try {
-      setLoading(true);
+      const isDefault = !search && track === 'ALL' && !difficulty && sort === 'createdAt' && page === 1;
+      if (!isDefault && materials.length === 0) {
+        setLoading(true);
+      }
       const params = new URLSearchParams();
       if (search) params.set('search', search);
       if (track && track !== 'ALL') params.set('track', track);
@@ -46,6 +64,9 @@ export const PlacementPrep: React.FC = () => {
       if (res.data.success) {
         setMaterials(res.data.materials);
         setTotalPages(res.data.pagination.pages || 1);
+        if (isDefault) {
+          localStorage.setItem('cg_cached_placement_prep', JSON.stringify(res.data.materials));
+        }
       }
     } catch (err) {
       console.error('[FETCH PLACEMENT PREP ERROR]', err);

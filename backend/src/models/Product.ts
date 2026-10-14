@@ -127,5 +127,7 @@ const ProductSchema: Schema = new Schema(
 
 ProductSchema.index({ title: 'text', techStack: 'text', tags: 'text' });
 ProductSchema.index({ productType: 1, isPublished: 1, careerTrack: 1 });
+ProductSchema.index({ isPublished: 1, createdAt: -1 });
+ProductSchema.index({ isPublished: 1, productType: 1, createdAt: -1 });
 
 export default mongoose.model<IProduct>('Product', ProductSchema);

@@ -76,13 +76,16 @@ export const getPublicPlacementPrep = async (req: Request, res: Response): Promi
     const limitNum = Math.max(1, Math.min(50, parseInt(String(limit), 10) || 12));
     const skip = (pageNum - 1) * limitNum;
 
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+
     const [materials, total] = await Promise.all([
       Product.find(query)
         .populate('category', 'name slug')
         .populate('assets', 'title assetType originalName size mimeType')
         .sort(sortOptions)
         .skip(skip)
-        .limit(limitNum),
+        .limit(limitNum)
+        .lean(),
       Product.countDocuments(query),
     ]);
 
@@ -108,6 +111,7 @@ export const getPublicPlacementPrep = async (req: Request, res: Response): Promi
 export const getPlacementPrepBySlug = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { slug } = req.params;
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
     const isId = mongoose.isValidObjectId(slug);
 
     const material = await Product.findOne({
@@ -116,7 +120,8 @@ export const getPlacementPrepBySlug = async (req: AuthRequest, res: Response): P
       isPublished: true,
     })
       .populate('category', 'name slug')
-      .populate('assets', 'title assetType originalName size mimeType');
+      .populate('assets', 'title assetType originalName size mimeType')
+      .lean();
 
     if (!material) {
       res.status(404).json({ success: false, message: 'Placement guide or roadmap not found' });

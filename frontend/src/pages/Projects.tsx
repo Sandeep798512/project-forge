@@ -8,9 +8,41 @@ import api from '../services/api';
 export const Projects: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   
-  const [products, setProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  // Instant synchronous cache helpers for 0ms initial render
+  const getInitialCatalog = () => {
+    try {
+      const cachedCatalog = localStorage.getItem('cg_cached_catalog');
+      if (cachedCatalog) {
+        const parsed = JSON.parse(cachedCatalog);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      const cachedFeatured = localStorage.getItem('cg_cached_featured');
+      if (cachedFeatured) {
+        const parsed = JSON.parse(cachedFeatured);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  };
+
+  const getInitialCategories = () => {
+    try {
+      const cached = localStorage.getItem('cg_cached_categories');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  };
+
+  const [products, setProducts] = useState<any[]>(getInitialCatalog);
+  const [categories, setCategories] = useState<CategoryItem[]>(getInitialCategories);
+  const [loading, setLoading] = useState<boolean>(() => {
+    const hasCached = getInitialCatalog().length > 0;
+    const isDefault = !searchParams.get('search') && !searchParams.get('category') && !searchParams.get('difficulty');
+    return !hasCached || !isDefault;
+  });
 
   // Filters state
   const [search, setSearch] = useState<string>(searchParams.get('search') || '');
@@ -21,11 +53,6 @@ export const Projects: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
 
   useEffect(() => {
-    const cachedCategories = localStorage.getItem('cg_cached_categories');
-    if (cachedCategories) {
-      try { setCategories(JSON.parse(cachedCategories)); } catch (e) {}
-    }
-
     const fetchCategories = async () => {
       try {
         const res = await api.get('/categories');
@@ -42,21 +69,11 @@ export const Projects: React.FC = () => {
 
   useEffect(() => {
     const isDefaultFilter = !search && !category && !difficulty && sort === 'createdAt' && page === 1;
-    const cachedCatalog = localStorage.getItem('cg_cached_catalog');
-
-    if (isDefaultFilter && cachedCatalog) {
-      try {
-        const parsed = JSON.parse(cachedCatalog);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setProducts(parsed);
-          setLoading(false);
-        }
-      } catch (e) {}
-    }
 
     const fetchProducts = async () => {
       try {
-        if (!isDefaultFilter || !cachedCatalog) {
+        // Show loading skeleton only when we have no items yet or when applying filters
+        if (!isDefaultFilter && products.length === 0) {
           setLoading(true);
         }
         const params = new URLSearchParams();
@@ -70,7 +87,7 @@ export const Projects: React.FC = () => {
         const res = await api.get(`/products?${params.toString()}`);
         if (res.data.success) {
           setProducts(res.data.products);
-          setTotalPages(res.data.pagination.pages || 1);
+          setTotalPages(res.data.pagination?.pages || 1);
           if (isDefaultFilter) {
             localStorage.setItem('cg_cached_catalog', JSON.stringify(res.data.products));
           }
