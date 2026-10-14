@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Product from '../models/Product';
 import Category from '../models/Category';
 
@@ -13,9 +14,15 @@ export const getCategories = async (req: Request, res: Response): Promise<void> 
 
 export const getProducts = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { category, search, difficulty, minPrice, maxPrice, sort, page = 1, limit = 12 } = req.query;
+    const { category, search, difficulty, minPrice, maxPrice, sort, productType, page = 1, limit = 12 } = req.query;
 
     const query: any = { isPublished: true };
+
+    if (productType) {
+      query.productType = productType;
+    } else {
+      query.productType = { $ne: 'placement_prep' };
+    }
 
     if (category) {
       const catObj = await Category.findOne({ slug: category });
@@ -82,7 +89,11 @@ export const getProducts = async (req: Request, res: Response): Promise<void> =>
 export const getProductBySlug = async (req: Request, res: Response): Promise<void> => {
   try {
     const { slug } = req.params;
-    const product = await Product.findOne({ slug, isPublished: true }).populate('category', 'name slug');
+    const isId = mongoose.isValidObjectId(slug);
+    const product = await Product.findOne({
+      $or: [{ slug }, ...(isId ? [{ _id: slug }] : [])],
+      isPublished: true,
+    }).populate('category', 'name slug');
 
     if (!product) {
       res.status(404).json({ success: false, message: 'Project package not found' });

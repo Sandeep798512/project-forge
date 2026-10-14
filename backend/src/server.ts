@@ -15,6 +15,8 @@ import adminEnhancedRoutes from './routes/admin.enhanced.routes';
 import supportRoutes from './routes/support.routes';
 import studyMaterialRoutes from './routes/studyMaterial.routes';
 import analyticsRoutes from './routes/analytics.routes';
+import placementPrepRoutes from './routes/placementPrep.routes';
+import { seedInitialPlacementMaterials } from './controllers/placementPrep.controller';
 import { getRobotsTxt, getSitemapXml } from './controllers/seo.controller';
 
 dotenv.config();
@@ -63,6 +65,7 @@ app.use('/api/admin', adminEnhancedRoutes);
 app.use('/api', supportRoutes);
 app.use('/api', studyMaterialRoutes);
 app.use('/api', analyticsRoutes);
+app.use('/api', placementPrepRoutes);
 
 // Global Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
@@ -98,6 +101,7 @@ const validateProductionSecrets = () => {
 const startServer = async () => {
   validateProductionSecrets();
   await connectDB();
+  await seedInitialPlacementMaterials().catch((e) => console.error('[SEED INIT PLACEMENT ERROR]', e));
   app.listen(PORT, () => {
     console.log(`[SERVER] ${BRAND.name} API running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
   });

@@ -29,6 +29,8 @@ import { Contact } from './pages/Contact';
 import { Support } from './pages/Support';
 import { Checkout } from './pages/Checkout';
 import { StudyMaterials } from './pages/StudyMaterials';
+import { PlacementPrep } from './pages/PlacementPrep';
+import { PlacementPrepDetail } from './pages/PlacementPrepDetail';
 
 // Auth Pages
 import { Login } from './pages/Login';
@@ -69,6 +71,7 @@ import { AdminContent } from './pages/admin/AdminContent';
 import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminAuditLogs } from './pages/admin/AdminAuditLogs';
 import { AdminStudyMaterials } from './pages/admin/AdminStudyMaterials';
+import { AdminPlacementPrep } from './pages/admin/AdminPlacementPrep';
 
 // Protected Route Guard
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -111,6 +114,8 @@ export const App: React.FC = () => {
           <Route path="/projects/:slug" element={<PublicLayout><ProjectDetail /></PublicLayout>} />
           <Route path="/go/:slug" element={<PublicLayout><CampaignPage /></PublicLayout>} />
           <Route path="/study-materials" element={<PublicLayout><StudyMaterials /></PublicLayout>} />
+          <Route path="/placement-prep" element={<PublicLayout><PlacementPrep /></PublicLayout>} />
+          <Route path="/placement-prep/:slug" element={<PublicLayout><PlacementPrepDetail /></PublicLayout>} />
           <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
           <Route path="/pricing" element={<PublicLayout><Pricing /></PublicLayout>} />
           <Route path="/faq" element={<PublicLayout><FAQPage /></PublicLayout>} />
@@ -178,6 +183,7 @@ export const App: React.FC = () => {
             <Route path="settings" element={<AdminSettings />} />
             <Route path="audit-logs" element={<AdminAuditLogs />} />
             <Route path="study-materials" element={<AdminStudyMaterials />} />
+            <Route path="placement-prep" element={<AdminPlacementPrep />} />
           </Route>
 
           {/* Fallback */}

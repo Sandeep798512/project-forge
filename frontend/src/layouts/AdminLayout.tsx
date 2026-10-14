@@ -23,6 +23,7 @@ import {
   X,
   Sparkles,
   BookOpen,
+  GraduationCap,
 } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
 import { useAuth } from '../context/AuthContext';
@@ -62,6 +63,7 @@ export const AdminLayout: React.FC = () => {
     { label: '15. Settings', path: '/admin/settings', icon: Settings },
     { label: '16. Audit Logs', path: '/admin/audit-logs', icon: Shield },
     { label: '17. Study Materials', path: '/admin/study-materials', icon: BookOpen },
+    { label: '18. Placement & Roadmaps', path: '/admin/placement-prep', icon: GraduationCap },
   ];
 
   return (

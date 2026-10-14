@@ -46,6 +46,12 @@ export interface IProduct extends Document {
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   freePreview: boolean;
   isPublished: boolean;
+  productType?: 'project' | 'placement_prep';
+  careerTrack?: string;
+  targetRole?: string;
+  pageCount?: number;
+  author?: string;
+  previewPdfUrl?: string;
   currentVersion: string;
   versions: IProductVersion[];
   downloadCount: number;
@@ -109,10 +115,17 @@ const ProductSchema: Schema = new Schema(
     ratingAverage: { type: Number, default: 0 },
     ratingCount: { type: Number, default: 0 },
     maxDownloadsAllowed: { type: Number, default: 20 },
+    productType: { type: String, enum: ['project', 'placement_prep'], default: 'project', index: true },
+    careerTrack: { type: String, trim: true, index: true },
+    targetRole: { type: String, trim: true },
+    pageCount: { type: Number, default: 0 },
+    author: { type: String, default: 'CampusGet Placement Cell' },
+    previewPdfUrl: { type: String },
   },
   { timestamps: true }
 );
 
 ProductSchema.index({ title: 'text', techStack: 'text', tags: 'text' });
+ProductSchema.index({ productType: 1, isPublished: 1, careerTrack: 1 });
 
 export default mongoose.model<IProduct>('Product', ProductSchema);

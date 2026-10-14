@@ -26,15 +26,25 @@ export const Checkout: React.FC = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        // Search product by ID or slug
-        const res = await api.get(`/products`);
-        if (res.data.success) {
-          const found = res.data.products.find((p: any) => p._id === productId || p.slug === productId);
-          const targetProduct = found || res.data.products[0];
-          setProduct(targetProduct);
-          if (targetProduct?._id) {
-            trackEvent('checkout_started', { productId: targetProduct._id });
+        let targetProduct: any = null;
+        try {
+          const directRes = await api.get(`/products/${productId}`);
+          if (directRes.data.success && directRes.data.product) {
+            targetProduct = directRes.data.product;
           }
+        } catch {}
+
+        if (!targetProduct) {
+          const res = await api.get(`/products`);
+          if (res.data.success) {
+            const found = res.data.products.find((p: any) => p._id === productId || p.slug === productId);
+            targetProduct = found || res.data.products[0];
+          }
+        }
+
+        setProduct(targetProduct);
+        if (targetProduct?._id) {
+          trackEvent('checkout_started', { productId: targetProduct._id });
         }
       } catch (err) {
         console.error('Checkout product fetch error', err);
