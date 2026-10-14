@@ -132,8 +132,8 @@ export const Home: React.FC = () => {
             </h1>
 
             {/* Supporting Text */}
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
-              Production-style software projects with complete source code, documentation & setup guides — plus <strong className="text-emerald-400 font-semibold">100% Free Study Materials, University Lecture Notes & PYQs</strong> to help CSE/IT students learn, build, and excel.
+            <p className="text-gray-300 text-base sm:text-lg leading-relaxed max-w-3xl mx-auto">
+              Production-style software projects with complete source code & setup guides — plus <strong className="text-amber-400 font-semibold">Placement Prep Guides & Career Roadmaps</strong> and <strong className="text-emerald-400 font-semibold">100% Free Study Materials & PYQs</strong> to help CSE/IT students learn, build, crack interviews, and excel.
             </p>
 
             {/* Hero CTAs */}
