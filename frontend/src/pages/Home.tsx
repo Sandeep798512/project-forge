@@ -254,6 +254,19 @@ export const Home: React.FC = () => {
             </div>
           )}
 
+          {/* Bottom View All Projects Button */}
+          {featuredProducts.length > 0 && (
+            <ScrollReveal animation="fade-up" delay={100} className="pt-6 flex justify-center">
+              <Link
+                to="/projects"
+                className="inline-flex items-center space-x-2.5 bg-gradient-to-r from-primary-600/90 via-primary-500 to-primary-600 hover:from-primary-500 hover:to-primary-400 text-white font-bold text-sm px-8 py-3.5 rounded-2xl shadow-glow-sm hover:shadow-glow-md border border-primary-400/30 transition-all duration-300 group"
+              >
+                <span>View All Projects Catalog</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </ScrollReveal>
+          )}
+
         </div>
       </section>
 
