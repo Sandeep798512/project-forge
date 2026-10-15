@@ -103,9 +103,13 @@ export const PlacementPrep: React.FC = () => {
         
         {/* HERO BANNER */}
         <ScrollReveal animation="fade-up">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-950/40 via-surface to-surface border border-amber-500/30 p-8 sm:p-12 shadow-2xl">
-            <div className="relative z-10 max-w-3xl space-y-4">
-              
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-950/40 via-surface to-surface border border-amber-500/30 p-6 sm:p-10 lg:p-12 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-8">
+            
+            {/* Ambient Background Glow behind Image */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Left Content Column */}
+            <div className="relative z-10 max-w-2xl space-y-4 flex-1 text-center lg:text-left">
               <div className="inline-flex items-center space-x-2 bg-amber-500/10 border border-amber-500/30 px-3.5 py-1.5 rounded-full text-xs font-semibold text-amber-300 backdrop-blur-md">
                 <GraduationCap className="w-4 h-4 text-amber-400" />
                 <span>Career & Placement Preparation Suite</span>
@@ -119,7 +123,7 @@ export const PlacementPrep: React.FC = () => {
                 Curated, high-yield preparation handbooks for CSE & IT students. Get complete roadmaps, top 450 DSA patterns, core CS cheatsheets (OS/DBMS/CN), and company-specific interview blueprints with instant PDF download access.
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 text-xs text-gray-400 pt-2">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-gray-400 pt-2">
                 <span className="flex items-center space-x-1.5 text-emerald-400 font-medium">
                   <CheckCircle className="w-4 h-4" /> Instant PDF Downloads
                 </span>
@@ -130,8 +134,39 @@ export const PlacementPrep: React.FC = () => {
                   <CheckCircle className="w-4 h-4" /> Lifetime Access & Re-downloads
                 </span>
               </div>
-
             </div>
+
+            {/* Right Hero Image Card */}
+            <div className="relative z-10 flex-shrink-0 w-full sm:w-80 md:w-96 lg:w-[380px] xl:w-[420px] flex items-center justify-center">
+              <div className="relative group rounded-2xl overflow-hidden border border-amber-500/30 bg-surface/90 shadow-2xl p-2 transition-all duration-300 hover:border-amber-400/60 hover:shadow-glow-md">
+                
+                {/* Soft ambient inner blur glow */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/10 via-transparent to-cyan-500/10 pointer-events-none z-10" />
+
+                <img
+                  src="/placement-prep-hero.jpg"
+                  alt="Software Engineer Career Roadmap & DSA Coding Interview Preparation"
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-auto aspect-square object-cover rounded-xl shadow-lg transition-transform duration-500 group-hover:scale-[1.02]"
+                />
+
+                {/* Floating highlight badge over image */}
+                <div className="absolute bottom-4 left-4 right-4 z-20 bg-slate-950/85 backdrop-blur-md border border-amber-500/30 rounded-xl px-3.5 py-2 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[11px] font-bold text-white tracking-wide">
+                      Top SDE & Tech Roadmaps
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono text-amber-400 font-semibold px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
+                    2026 Edition
+                  </span>
+                </div>
+
+              </div>
+            </div>
+
           </div>
         </ScrollReveal>
 
