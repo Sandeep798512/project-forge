@@ -1,18 +1,47 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
 export const HeroBackground: React.FC = () => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    // Ensure autoplay works across all modern browsers including Safari & mobile devices
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {
+        // Silent catch for browser autoplay restrictions
+      });
+    }
+  }, []);
+
   return (
     <div
       className="absolute inset-0 pointer-events-none overflow-hidden z-0 select-none"
       aria-hidden="true"
     >
-      {/* 1. Ultra-Soft Ambient Gradient Blobs (22s-28s Slow Drift) */}
+      {/* 1. 3D Holographic Developer Matrix Grid Video Layer */}
+      <div className="absolute inset-0 overflow-hidden">
+        <video
+          ref={videoRef}
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="/hero-matrix-poster.jpg"
+          className="w-full h-full object-cover object-center opacity-45 sm:opacity-55 mix-blend-screen scale-105 pointer-events-none transition-opacity duration-700 filter brightness-110 contrast-115"
+        >
+          <source src="/campusget_matrix_animated_bg.mp4" type="video/mp4" />
+        </video>
+
+        {/* Smooth Vignette Overlay to maintain contrast & high text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/45 to-background pointer-events-none" />
+      </div>
+
+      {/* 2. Ultra-Soft Ambient Gradient Blobs (22s-28s Slow Drift) */}
       <div className="absolute top-[10%] -left-[10%] w-[650px] h-[400px] rounded-full bg-gradient-to-tr from-primary-700/20 via-indigo-600/15 to-transparent blur-[140px] animate-hero-blob-1" />
       <div className="absolute top-[20%] -right-[10%] w-[550px] h-[380px] rounded-full bg-gradient-to-bl from-accent-600/20 via-cyan-600/10 to-transparent blur-[130px] animate-hero-blob-2" />
       <div className="absolute -bottom-[20%] left-[25%] w-[500px] h-[300px] rounded-full bg-gradient-to-t from-purple-700/15 via-primary-600/10 to-transparent blur-[120px] animate-hero-blob-3" />
 
-      {/* 2. Faint AI / Data Network SVG (Drifting peripheral nodes & thin connecting lines) */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-30 md:opacity-50 animate-hero-network-drift">
+      {/* 3. Faint AI / Data Network SVG (Drifting peripheral nodes & thin connecting lines) */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-25 md:opacity-40 animate-hero-network-drift">
         <svg
           className="w-full h-full max-w-7xl mx-auto"
           viewBox="0 0 1200 600"
@@ -56,7 +85,7 @@ export const HeroBackground: React.FC = () => {
         </svg>
       </div>
 
-      {/* 3. Tiny Ambient Floating Particles (Subtle Slow Floating Dots) */}
+      {/* 4. Tiny Ambient Floating Particles */}
       <div className="absolute inset-0 opacity-40 md:opacity-60">
         <div className="absolute top-[20%] left-[15%] w-1.5 h-1.5 rounded-full bg-indigo-400/40 animate-hero-particle-1" />
         <div className="absolute top-[65%] left-[8%] w-1 h-1 rounded-full bg-purple-400/30 animate-hero-particle-2" />
