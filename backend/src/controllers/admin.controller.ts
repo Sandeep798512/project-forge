@@ -81,6 +81,10 @@ export const createProductAdmin = async (req: AuthRequest, res: Response): Promi
       productData.productType = 'project';
     }
 
+    if (productData.isPinned) {
+      productData.pinnedAt = new Date();
+    }
+
     const product = await Product.create(productData);
 
     await AuditLog.create({
@@ -103,6 +107,14 @@ export const updateProductAdmin = async (req: AuthRequest, res: Response): Promi
     // Auto-calculate discount percentage Flipkart style
     if (updateData.originalPrice && updateData.price && updateData.originalPrice > updateData.price) {
       updateData.discountPercentage = Math.round(((updateData.originalPrice - updateData.price) / updateData.originalPrice) * 100);
+    }
+
+    if (updateData.isPinned !== undefined) {
+      if (updateData.isPinned) {
+        updateData.pinnedAt = updateData.pinnedAt || new Date();
+      } else {
+        updateData.pinnedAt = null;
+      }
     }
 
     const product = await Product.findByIdAndUpdate(id, updateData, { new: true });

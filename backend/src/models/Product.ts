@@ -47,6 +47,8 @@ export interface IProduct extends Document {
   freePreview: boolean;
   isPublished: boolean;
   productType?: 'project' | 'placement_prep';
+  isPinned?: boolean;
+  pinnedAt?: Date;
   careerTrack?: string;
   targetRole?: string;
   pageCount?: number;
@@ -116,6 +118,8 @@ const ProductSchema: Schema = new Schema(
     ratingCount: { type: Number, default: 0 },
     maxDownloadsAllowed: { type: Number, default: 20 },
     productType: { type: String, enum: ['project', 'placement_prep'], default: 'project', index: true },
+    isPinned: { type: Boolean, default: false, index: true },
+    pinnedAt: { type: Date },
     careerTrack: { type: String, trim: true, index: true },
     targetRole: { type: String, trim: true },
     pageCount: { type: Number, default: 0 },
@@ -131,5 +135,7 @@ ProductSchema.index({ isPublished: 1, createdAt: -1 });
 ProductSchema.index({ isPublished: 1, productType: 1, createdAt: -1 });
 ProductSchema.index({ productType: 1, createdAt: -1 });
 ProductSchema.index({ productType: 1, category: 1, createdAt: -1 });
+ProductSchema.index({ isPinned: -1, createdAt: -1 });
+ProductSchema.index({ isPublished: 1, isPinned: -1, createdAt: -1 });
 
 export default mongoose.model<IProduct>('Product', ProductSchema);

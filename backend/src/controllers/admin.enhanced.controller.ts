@@ -153,7 +153,7 @@ export const getAdminProducts = async (req: AuthRequest, res: Response): Promise
     const [products, total] = await Promise.all([
       Product.find(query)
         .populate('category', 'name slug')
-        .sort({ [String(sort)]: -1 })
+        .sort({ isPinned: -1, [String(sort)]: -1 })
         .skip(skip)
         .limit(limitNum)
         .lean(),
@@ -167,6 +167,39 @@ export const getAdminProducts = async (req: AuthRequest, res: Response): Promise
     });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to fetch admin products' });
+  }
+};
+
+export const toggleProductPinAdmin = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const product = await Product.findById(id);
+    if (!product) {
+      res.status(404).json({ success: false, message: 'Product not found' });
+      return;
+    }
+
+    product.isPinned = !product.isPinned;
+    if (product.isPinned) {
+      product.pinnedAt = new Date();
+    } else {
+      product.pinnedAt = undefined;
+    }
+    await product.save();
+
+    await AuditLog.create({
+      user: req.user?.id,
+      action: product.isPinned ? 'ADMIN_PRODUCT_PINNED' : 'ADMIN_PRODUCT_UNPINNED',
+      details: { title: product.title, productId: product._id, isPinned: product.isPinned },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: product.isPinned ? `"${product.title}" pinned to top successfully!` : `"${product.title}" unpinned successfully.`,
+      product,
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message || 'Failed to toggle pin status' });
   }
 };
 

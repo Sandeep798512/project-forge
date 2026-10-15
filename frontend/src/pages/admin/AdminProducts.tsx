@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, CheckCircle2, XCircle, Search, Copy, Sparkles, X, Save, Upload, FileText, Download, AlertCircle, Image as ImageIcon, Calendar, Clock } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle2, XCircle, Search, Copy, Sparkles, X, Save, Upload, FileText, Download, AlertCircle, Image as ImageIcon, Calendar, Clock, Pin } from 'lucide-react';
 import { BRAND } from '../../config/brand.config';
 import api from '../../services/api';
 
@@ -74,6 +74,7 @@ export const AdminProducts: React.FC = () => {
     currentVersion: '1.0.0',
     isPublished: true,
     productType: 'project',
+    isPinned: false,
     hasCode: true,
     hasPPT: true,
     hasReport: true,
@@ -180,6 +181,7 @@ export const AdminProducts: React.FC = () => {
       hasDocumentation: p.hasDoc !== undefined ? p.hasDoc !== false : p.hasDocumentation !== false,
       hasVivaQA: p.hasVivaQA !== false,
       hasSetupSupport: p.hasSupport !== undefined ? p.hasSupport !== false : p.hasSetupSupport !== false,
+      isPinned: p.isPinned === true,
     });
     setStatusMessage(null);
     setModalOpen(true);
@@ -230,6 +232,7 @@ export const AdminProducts: React.FC = () => {
       const payload = {
         ...formData,
         productType: formData.productType || 'project',
+        isPinned: formData.isPinned === true,
         thumbnail: formData.thumbnail ? formData.thumbnail.trim() : defaultThumbnail,
         screenshots: Array.isArray(formData.screenshots) ? formData.screenshots : [],
         techStack: typeof formData.techStack === 'string' ? formData.techStack.split(',').map((s: string) => s.trim()) : formData.techStack,
@@ -341,6 +344,29 @@ export const AdminProducts: React.FC = () => {
     }
   };
 
+  const handleTogglePin = async (id: string, currentPinStatus: boolean) => {
+    try {
+      // Optimistic instant UI update
+      setProducts((prev) =>
+        [...prev]
+          .map((p) => (p._id === id ? { ...p, isPinned: !currentPinStatus } : p))
+          .sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0))
+      );
+
+      const res = await api.patch(`/admin/products/${id}/pin`);
+      if (res.data.success) {
+        setStatusMessage({
+          type: 'success',
+          text: res.data.message || 'Pin status updated successfully!',
+        });
+        fetchData();
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Error updating pin status');
+      fetchData();
+    }
+  };
+
   const handleDuplicate = async (id: string) => {
     try {
       const res = await api.post(`/admin/products/${id}/duplicate`);
@@ -428,7 +454,15 @@ export const AdminProducts: React.FC = () => {
                     <td className="p-3.5 flex items-center space-x-3 font-bold">
                       <img src={p.thumbnail} alt={p.title} className="w-10 h-10 rounded-lg object-cover" />
                       <div>
-                        <span>{p.title}</span>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-white">{p.title}</span>
+                          {p.isPinned && (
+                            <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-mono font-bold flex items-center space-x-1">
+                              <Pin className="w-2.5 h-2.5 fill-amber-400 text-amber-400 rotate-45" />
+                              <span>PINNED</span>
+                            </span>
+                          )}
+                        </div>
                         <div className="text-[10px] text-emerald-400 font-mono font-normal">
                           {[
                             p.hasCode !== false && 'Code',
@@ -494,24 +528,35 @@ export const AdminProducts: React.FC = () => {
                         </span>
                       )}
                     </td>
-                    <td className="p-3.5 text-right space-x-2">
+                    <td className="p-3.5 text-right space-x-1.5 whitespace-nowrap">
+                      <button
+                        onClick={() => handleTogglePin(p._id, !!p.isPinned)}
+                        className={`p-1.5 rounded-lg border transition-all inline-block ${
+                          p.isPinned
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 hover:bg-amber-500/30 shadow-glow-sm'
+                            : 'text-gray-400 border-transparent hover:text-amber-400 hover:border-border/60'
+                        }`}
+                        title={p.isPinned ? 'Unpin from Top' : 'Pin to Top (Show First in Catalog)'}
+                      >
+                        <Pin className={`w-4 h-4 ${p.isPinned ? 'fill-amber-400 text-amber-400 rotate-45' : ''}`} />
+                      </button>
                       <button
                         onClick={() => handleEditProduct(p)}
-                        className="p-1.5 text-gray-400 hover:text-primary-400 transition-colors"
+                        className="p-1.5 text-gray-400 hover:text-primary-400 transition-colors inline-block"
                         title="Edit Product Details"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDuplicate(p._id)}
-                        className="p-1.5 text-gray-400 hover:text-accent-400 transition-colors"
+                        className="p-1.5 text-gray-400 hover:text-accent-400 transition-colors inline-block"
                         title="Duplicate Product"
                       >
                         <Copy className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(p._id)}
-                        className="p-1.5 text-red-400 hover:text-red-300 transition-colors"
+                        className="p-1.5 text-red-400 hover:text-red-300 transition-colors inline-block"
                         title="Delete Product"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -949,6 +994,26 @@ export const AdminProducts: React.FC = () => {
                       className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100 font-mono"
                     />
                   </div>
+                </div>
+
+                {/* Pin to Top Feature */}
+                <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
+                  <div className="flex items-center space-x-2.5">
+                    <Pin className={`w-4 h-4 ${formData.isPinned ? 'fill-amber-400 text-amber-400 rotate-45' : 'text-amber-400'}`} />
+                    <div>
+                      <span className="font-bold text-white text-xs block">Pin Project to Top (Featured)</span>
+                      <span className="text-[11px] text-gray-400">Keep this project pinned at the very top of the Homepage and Projects Catalog</span>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!!formData.isPinned}
+                      onChange={(e) => setFormData({ ...formData, isPinned: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-surface-hover peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                  </label>
                 </div>
 
                 <div className="pt-3 border-t border-border flex justify-end space-x-2">

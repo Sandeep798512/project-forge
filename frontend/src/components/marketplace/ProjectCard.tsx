@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, ArrowRight, Code2, Sparkles, CheckCircle, Play } from 'lucide-react';
+import { ExternalLink, ArrowRight, Code2, Sparkles, CheckCircle, Play, Pin } from 'lucide-react';
 import { BRAND } from '../../config/brand.config';
 
 export interface ProductCardProps {
@@ -15,6 +15,8 @@ export interface ProductCardProps {
     thumbnail: string;
     techStack: string[];
     difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+    isPinned?: boolean;
+    pinnedAt?: Date | string;
     liveDemoUrl?: string;
     demoVideoUrl?: string;
     ratingAverage?: number;
@@ -73,8 +75,14 @@ export const ProjectCard: React.FC<ProductCardProps> = ({ product }) => {
 
         <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-60 pointer-events-none z-10" />
         
-        {/* Difficulty Pill */}
-        <div className="absolute top-3 left-3 z-20">
+        {/* Difficulty & Pinned Badges */}
+        <div className="absolute top-3 left-3 z-20 flex items-center space-x-1.5">
+          {product.isPinned && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-amber-500/90 text-slate-950 border-amber-300 backdrop-blur-md shadow-glow-sm flex items-center space-x-1 font-mono uppercase tracking-wider">
+              <Pin className="w-2.5 h-2.5 fill-slate-950 text-slate-950 rotate-45" />
+              <span>Pinned</span>
+            </span>
+          )}
           <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border backdrop-blur-sm ${difficultyColors[product.difficulty] || difficultyColors.Intermediate}`}>
             {product.difficulty}
           </span>

@@ -52,11 +52,11 @@ export const getProducts = async (req: Request, res: Response): Promise<void> =>
       ];
     }
 
-    let sortOptions: any = { createdAt: -1 };
-    if (sort === 'price_asc') sortOptions = { price: 1 };
-    if (sort === 'price_desc') sortOptions = { price: -1 };
-    if (sort === 'popular') sortOptions = { downloadCount: -1 };
-    if (sort === 'rating') sortOptions = { ratingAverage: -1 };
+    let sortOptions: any = { isPinned: -1, createdAt: -1 };
+    if (sort === 'price_asc') sortOptions = { isPinned: -1, price: 1, createdAt: -1 };
+    if (sort === 'price_desc') sortOptions = { isPinned: -1, price: -1, createdAt: -1 };
+    if (sort === 'popular') sortOptions = { isPinned: -1, downloadCount: -1, createdAt: -1 };
+    if (sort === 'rating') sortOptions = { isPinned: -1, ratingAverage: -1, createdAt: -1 };
 
     const pageNum = Number(page);
     const limitNum = Number(limit);
@@ -66,7 +66,7 @@ export const getProducts = async (req: Request, res: Response): Promise<void> =>
     res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
 
     // Select only card fields to reduce payload from megabytes to few kilobytes
-    const cardFields = 'title slug shortDescription price originalPrice discountPercentage thumbnail techStack difficulty ratingAverage ratingCount hasCode hasPPT hasReport hasSupport hasDoc hasDocumentation hasSetupSupport demoVideoUrl liveDemoUrl productType category currentVersion createdAt';
+    const cardFields = 'title slug shortDescription price originalPrice discountPercentage thumbnail techStack difficulty ratingAverage ratingCount hasCode hasPPT hasReport hasSupport hasDoc hasDocumentation hasSetupSupport demoVideoUrl liveDemoUrl productType isPinned pinnedAt category currentVersion createdAt';
 
     const [products, total] = await Promise.all([
       Product.find(query)

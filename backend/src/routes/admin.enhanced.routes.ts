@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   getDashboardAnalytics,
   getAdminProducts,
+  toggleProductPinAdmin,
   duplicateProduct,
   getProductVersions,
   createProductVersion,
@@ -54,6 +55,7 @@ router.get('/products/enhanced', getAdminProducts);
 router.post('/products', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), createProductAdmin);
 router.put('/products/:id', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), updateProductAdmin);
 router.delete('/products/:id', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), deleteProductAdmin);
+router.patch('/products/:id/pin', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), toggleProductPinAdmin);
 router.post('/products/:id/duplicate', requireRbacRole(['SUPER_ADMIN', 'ADMIN']), duplicateProduct);
 
 // 3. Product Asset File Management
