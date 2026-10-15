@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search, Eye, CreditCard, Download, Wrench, MessageSquareText } from 'lucide-react';
 import { BRAND } from '../../config/brand.config';
+import { ScrollReveal, ScrollStagger } from '../common/ScrollReveal';
 
 export const HowItWorks: React.FC = () => {
   const steps = [
@@ -46,16 +47,20 @@ export const HowItWorks: React.FC = () => {
     <section className="py-16 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div className="text-center max-w-2xl mx-auto mb-12">
+        <ScrollReveal animation="fade-up" className="text-center max-w-2xl mx-auto mb-12">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
             How {BRAND.name} Works
           </h2>
           <p className="text-gray-400 text-sm mt-2">
             From discovering your project to running it locally in under 5 minutes.
           </p>
-        </div>
+        </ScrollReveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <ScrollStagger
+          staggerDelay={80}
+          animation="fade-up"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
           {steps.map((s, idx) => {
             const Icon = s.icon;
             return (
@@ -76,7 +81,7 @@ export const HowItWorks: React.FC = () => {
               </div>
             );
           })}
-        </div>
+        </ScrollStagger>
 
       </div>
     </section>

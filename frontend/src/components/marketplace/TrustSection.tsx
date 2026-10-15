@@ -1,5 +1,6 @@
 import React from 'react';
 import { Code, FileText, Database, Layers, Monitor, Server, HelpCircle, Headphones, CheckCircle2 } from 'lucide-react';
+import { ScrollReveal, ScrollStagger } from '../common/ScrollReveal';
 
 export const TrustSection: React.FC = () => {
   const features = [
@@ -49,7 +50,7 @@ export const TrustSection: React.FC = () => {
     <section className="py-16 bg-surface/50 border-y border-border/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div className="text-center max-w-3xl mx-auto mb-12">
+        <ScrollReveal animation="fade-up" className="text-center max-w-3xl mx-auto mb-12">
           <div className="inline-flex items-center space-x-2 bg-primary-500/10 border border-primary-500/20 px-3.5 py-1 rounded-full text-xs font-semibold text-primary-400 mb-3">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>Complete Project Deliverables</span>
@@ -60,9 +61,13 @@ export const TrustSection: React.FC = () => {
           <p className="text-gray-400 text-sm mt-2">
             No partial code or missing files. Everything is structured so you can run, understand, customize, and present with confidence.
           </p>
-        </div>
+        </ScrollReveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <ScrollStagger
+          staggerDelay={65}
+          animation="fade-up"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
           {features.map((item, idx) => {
             const Icon = item.icon;
             return (
@@ -78,7 +83,7 @@ export const TrustSection: React.FC = () => {
               </div>
             );
           })}
-        </div>
+        </ScrollStagger>
 
       </div>
     </section>

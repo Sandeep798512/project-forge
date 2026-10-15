@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Search, GraduationCap, BookOpen, CheckCircle, ArrowRight, Sparkles, Filter, RefreshCcw } from 'lucide-react';
 import { PlacementCard } from '../components/marketplace/PlacementCard';
+import { ScrollReveal, ScrollStagger } from '../components/common/ScrollReveal';
 import api from '../services/api';
 
 const CAREER_TRACKS = [
@@ -101,39 +102,41 @@ export const PlacementPrep: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* HERO BANNER */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-950/40 via-surface to-surface border border-amber-500/30 p-8 sm:p-12 shadow-2xl">
-          <div className="relative z-10 max-w-3xl space-y-4">
-            
-            <div className="inline-flex items-center space-x-2 bg-amber-500/10 border border-amber-500/30 px-3.5 py-1.5 rounded-full text-xs font-semibold text-amber-300 backdrop-blur-md">
-              <GraduationCap className="w-4 h-4 text-amber-400" />
-              <span>Career & Placement Preparation Suite</span>
+        <ScrollReveal animation="fade-up">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-950/40 via-surface to-surface border border-amber-500/30 p-8 sm:p-12 shadow-2xl">
+            <div className="relative z-10 max-w-3xl space-y-4">
+              
+              <div className="inline-flex items-center space-x-2 bg-amber-500/10 border border-amber-500/30 px-3.5 py-1.5 rounded-full text-xs font-semibold text-amber-300 backdrop-blur-md">
+                <GraduationCap className="w-4 h-4 text-amber-400" />
+                <span>Career & Placement Preparation Suite</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                Placement Roadmaps, DSA Sheets & Tech Interview E-Books
+              </h1>
+
+              <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                Curated, high-yield preparation handbooks for CSE & IT students. Get complete roadmaps, top 450 DSA patterns, core CS cheatsheets (OS/DBMS/CN), and company-specific interview blueprints with instant PDF download access.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4 text-xs text-gray-400 pt-2">
+                <span className="flex items-center space-x-1.5 text-emerald-400 font-medium">
+                  <CheckCircle className="w-4 h-4" /> Instant PDF Downloads
+                </span>
+                <span className="flex items-center space-x-1.5 text-emerald-400 font-medium">
+                  <CheckCircle className="w-4 h-4" /> Printable & Mobile-Friendly
+                </span>
+                <span className="flex items-center space-x-1.5 text-emerald-400 font-medium">
+                  <CheckCircle className="w-4 h-4" /> Lifetime Access & Re-downloads
+                </span>
+              </div>
+
             </div>
-
-            <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
-              Placement Roadmaps, DSA Sheets & Tech Interview E-Books
-            </h1>
-
-            <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-              Curated, high-yield preparation handbooks for CSE & IT students. Get complete roadmaps, top 450 DSA patterns, core CS cheatsheets (OS/DBMS/CN), and company-specific interview blueprints with instant PDF download access.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-4 text-xs text-gray-400 pt-2">
-              <span className="flex items-center space-x-1.5 text-emerald-400 font-medium">
-                <CheckCircle className="w-4 h-4" /> Instant PDF Downloads
-              </span>
-              <span className="flex items-center space-x-1.5 text-emerald-400 font-medium">
-                <CheckCircle className="w-4 h-4" /> Printable & Mobile-Friendly
-              </span>
-              <span className="flex items-center space-x-1.5 text-emerald-400 font-medium">
-                <CheckCircle className="w-4 h-4" /> Lifetime Access & Re-downloads
-              </span>
-            </div>
-
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* SEARCH & FILTERS BAR */}
-        <div className="bg-surface/80 border border-border/80 rounded-2xl p-4 space-y-4">
+        <ScrollReveal animation="fade-up" delay={80} className="bg-surface/80 border border-border/80 rounded-2xl p-4 space-y-4">
           <div className="flex flex-col md:flex-row items-center gap-4">
             
             {/* Search Input */}
@@ -213,7 +216,7 @@ export const PlacementPrep: React.FC = () => {
             })}
           </div>
 
-        </div>
+        </ScrollReveal>
 
         {/* MATERIAL GRID */}
         {loading ? (
@@ -223,11 +226,15 @@ export const PlacementPrep: React.FC = () => {
             ))}
           </div>
         ) : materials.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <ScrollStagger
+            staggerDelay={70}
+            animation="fade-up"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
             {materials.map((item) => (
               <PlacementCard key={item._id} material={item} />
             ))}
-          </div>
+          </ScrollStagger>
         ) : (
           <div className="text-center py-16 bg-surface/40 rounded-2xl border border-border/60 space-y-3">
             <BookOpen className="w-10 h-10 text-gray-500 mx-auto" />

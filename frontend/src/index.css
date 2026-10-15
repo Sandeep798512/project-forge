@@ -161,7 +161,73 @@
   animation: heroParticle3 12s ease-in-out infinite;
 }
 
-/* Reduced Motion Override */
+/* Smooth Scroll Behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ==========================================================================
+   High-Performance Scroll Reveal Animations (Desktop + Mobile)
+   ========================================================================== */
+.scroll-reveal {
+  opacity: 0;
+  will-change: transform, opacity;
+  transition-property: transform, opacity;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1) !important;
+}
+
+.scroll-reveal-fade-up {
+  transform: translate3d(0, 24px, 0);
+}
+
+.scroll-reveal-fade-down {
+  transform: translate3d(0, -24px, 0);
+}
+
+.scroll-reveal-fade-left {
+  transform: translate3d(24px, 0, 0);
+}
+
+.scroll-reveal-fade-right {
+  transform: translate3d(-24px, 0, 0);
+}
+
+.scroll-reveal-zoom-in {
+  transform: scale(0.95);
+}
+
+.scroll-reveal-fade {
+  transform: none;
+}
+
+/* Mobile Screens: Safe vertical animations with zero horizontal overflow */
+@media (max-width: 640px) {
+  .scroll-reveal-fade-up {
+    transform: translate3d(0, 16px, 0);
+  }
+  .scroll-reveal-fade-down {
+    transform: translate3d(0, -16px, 0);
+  }
+  .scroll-reveal-fade-left,
+  .scroll-reveal-fade-right {
+    transform: translate3d(0, 16px, 0);
+  }
+}
+
+/* Accessibility Reduced Motion Override */
 @media (prefers-reduced-motion: reduce) {
   .animate-hero-blob-1,
   .animate-hero-blob-2,
@@ -171,8 +237,12 @@
   .animate-hero-pulse-fast,
   .animate-hero-particle-1,
   .animate-hero-particle-2,
-  .animate-hero-particle-3 {
+  .animate-hero-particle-3,
+  .scroll-reveal {
     animation: none !important;
     transform: none !important;
+    opacity: 1 !important;
+    transition: none !important;
   }
 }
+

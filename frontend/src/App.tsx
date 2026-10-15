@@ -4,6 +4,7 @@ import api from './services/api';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { WhatsAppButton } from './components/common/WhatsAppButton';
+import { ScrollProgressBar } from './components/common/ScrollProgressBar';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Scroll To Top Component on Route Change
@@ -89,6 +90,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col justify-between bg-background">
+      <ScrollProgressBar />
       <Navbar />
       <main className="flex-1">{children}</main>
       <Footer />

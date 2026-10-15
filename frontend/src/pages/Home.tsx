@@ -8,6 +8,7 @@ import { HowItWorks } from '../components/marketplace/HowItWorks';
 import { FAQSection } from '../components/marketplace/FAQSection';
 import { CategoryFilter, CategoryItem } from '../components/marketplace/CategoryFilter';
 import { HeroBackground } from '../components/common/HeroBackground';
+import { ScrollReveal, ScrollStagger } from '../components/common/ScrollReveal';
 import api from '../services/api';
 
 export const Home: React.FC = () => {
@@ -117,71 +118,81 @@ export const Home: React.FC = () => {
           <div className="text-center max-w-3xl mx-auto space-y-6">
             
             {/* Top Pill */}
-            <div className="inline-flex items-center space-x-2 bg-surface/80 border border-primary-500/30 px-4 py-1.5 rounded-full text-xs font-medium text-primary-300 backdrop-blur-md">
-              <Sparkles className="w-4 h-4 text-primary-400" />
-              <span>Production-Ready Developer Marketplace for CSE/IT</span>
-            </div>
+            <ScrollReveal animation="fade-down" delay={50}>
+              <div className="inline-flex items-center space-x-2 bg-surface/80 border border-primary-500/30 px-4 py-1.5 rounded-full text-xs font-medium text-primary-300 backdrop-blur-md">
+                <Sparkles className="w-4 h-4 text-primary-400" />
+                <span>Production-Ready Developer Marketplace for CSE/IT</span>
+              </div>
+            </ScrollReveal>
 
             {/* Main Headline with Live Typewriter Effect */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight min-h-[100px] sm:min-h-[140px]">
-              Build Projects That You Can{' '}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-400 via-accent-400 to-cyan-400">
-                {typedText}
-              </span>
-              <span className="animate-pulse text-accent-400 font-mono font-light ml-0.5">|</span>
-            </h1>
+            <ScrollReveal animation="fade-up" delay={120}>
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight min-h-[100px] sm:min-h-[140px]">
+                Build Projects That You Can{' '}
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-400 via-accent-400 to-cyan-400">
+                  {typedText}
+                </span>
+                <span className="animate-pulse text-accent-400 font-mono font-light ml-0.5">|</span>
+              </h1>
+            </ScrollReveal>
 
             {/* Supporting Text */}
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed max-w-3xl mx-auto">
-              Production-style software projects with complete source code & setup guides — plus <strong className="text-white font-semibold">Placement Prep Guides & Career Roadmaps</strong> and <strong className="text-emerald-400 font-semibold">100% Free Study Materials & PYQs</strong> to help CSE/IT students learn, build, crack interviews, and excel.
-            </p>
+            <ScrollReveal animation="fade-up" delay={180}>
+              <p className="text-gray-300 text-base sm:text-lg leading-relaxed max-w-3xl mx-auto">
+                Production-style software projects with complete source code & setup guides — plus <strong className="text-white font-semibold">Placement Prep Guides & Career Roadmaps</strong> and <strong className="text-emerald-400 font-semibold">100% Free Study Materials & PYQs</strong> to help CSE/IT students learn, build, crack interviews, and excel.
+              </p>
+            </ScrollReveal>
 
             {/* Hero CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-4">
-              <Link
-                to="/projects"
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-semibold px-6 py-3.5 rounded-xl shadow-glow-md transition-all duration-200"
-              >
-                <span>Explore Projects</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+            <ScrollReveal animation="fade-up" delay={240}>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-4">
+                <Link
+                  to="/projects"
+                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-semibold px-6 py-3.5 rounded-xl shadow-glow-md transition-all duration-200"
+                >
+                  <span>Explore Projects</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
 
-              <Link
-                to="/study-materials"
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-semibold px-6 py-3.5 rounded-xl transition-all duration-200"
-              >
-                <BookOpen className="w-4 h-4 text-emerald-400" />
-                <span>Free Notes & PYQs</span>
-              </Link>
+                <Link
+                  to="/study-materials"
+                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-semibold px-6 py-3.5 rounded-xl transition-all duration-200"
+                >
+                  <BookOpen className="w-4 h-4 text-emerald-400" />
+                  <span>Free Notes & PYQs</span>
+                </Link>
 
-              <Link
-                to="/placement-prep"
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 hover:from-amber-500/30 hover:to-orange-500/30 border border-amber-500/40 text-amber-300 hover:text-amber-200 font-semibold px-6 py-3.5 rounded-xl shadow-glow-sm transition-all duration-200"
-              >
-                <GraduationCap className="w-4 h-4 text-amber-400" />
-                <span>Placement & Roadmaps</span>
-              </Link>
-            </div>
+                <Link
+                  to="/placement-prep"
+                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 hover:from-amber-500/30 hover:to-orange-500/30 border border-amber-500/40 text-amber-300 hover:text-amber-200 font-semibold px-6 py-3.5 rounded-xl shadow-glow-sm transition-all duration-200"
+                >
+                  <GraduationCap className="w-4 h-4 text-amber-400" />
+                  <span>Placement & Roadmaps</span>
+                </Link>
+              </div>
+            </ScrollReveal>
 
             {/* Trust Micro Features */}
-            <div className="pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-gray-400">
-              <div className="flex items-center space-x-1.5">
-                <CheckCircle className="w-4 h-4 text-emerald-400" />
-                <span>100% Executable Source Code</span>
+            <ScrollReveal animation="fade-up" delay={300}>
+              <div className="pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-gray-400">
+                <div className="flex items-center space-x-1.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-400" />
+                  <span>100% Executable Source Code</span>
+                </div>
+                <div className="flex items-center space-x-1.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-400" />
+                  <span>Documentation & PPT Included</span>
+                </div>
+                <div className="flex items-center space-x-1.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-400" />
+                  <span>Free Study Notes & PYQs</span>
+                </div>
+                <div className="flex items-center space-x-1.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-400" />
+                  <span>Placement Guides & Roadmaps</span>
+                </div>
               </div>
-              <div className="flex items-center space-x-1.5">
-                <CheckCircle className="w-4 h-4 text-emerald-400" />
-                <span>Documentation & PPT Included</span>
-              </div>
-              <div className="flex items-center space-x-1.5">
-                <CheckCircle className="w-4 h-4 text-emerald-400" />
-                <span>Free Study Notes & PYQs</span>
-              </div>
-              <div className="flex items-center space-x-1.5">
-                <CheckCircle className="w-4 h-4 text-emerald-400" />
-                <span>Placement Guides & Roadmaps</span>
-              </div>
-            </div>
+            </ScrollReveal>
 
           </div>
         </div>
@@ -191,7 +202,7 @@ export const Home: React.FC = () => {
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <ScrollReveal animation="fade-up" className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <div className="flex items-center space-x-2 text-primary-400 text-xs font-mono font-semibold uppercase tracking-wider mb-2">
                 <Terminal className="w-4 h-4" />
@@ -209,14 +220,16 @@ export const Home: React.FC = () => {
               <span>View All Projects Catalog</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
-          </div>
+          </ScrollReveal>
 
           {/* Category Filter Pills */}
-          <CategoryFilter
-            categories={categories}
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-          />
+          <ScrollReveal animation="fade-up" delay={80}>
+            <CategoryFilter
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+            />
+          </ScrollReveal>
 
           {/* Product Grid */}
           {loading ? (
@@ -226,11 +239,15 @@ export const Home: React.FC = () => {
               ))}
             </div>
           ) : featuredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <ScrollStagger
+              staggerDelay={80}
+              animation="fade-up"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
               {featuredProducts.map((product) => (
                 <ProjectCard key={product._id} product={product} />
               ))}
-            </div>
+            </ScrollStagger>
           ) : (
             <div className="text-center py-16 bg-surface/40 rounded-2xl border border-border/60">
               <p className="text-gray-400 text-sm">No projects found in this category.</p>
@@ -249,76 +266,80 @@ export const Home: React.FC = () => {
       {/* FREE STUDY MATERIALS PROMO BANNER */}
       <section className="py-16 bg-surface/60 border-y border-border/60 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="bg-gradient-to-r from-emerald-950/60 via-surface to-surface border border-emerald-500/30 rounded-3xl p-8 md:p-12 flex flex-col lg:flex-row items-center justify-between gap-8 shadow-2xl">
-            <div className="space-y-4 max-w-2xl text-center lg:text-left">
-              <div className="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-semibold text-emerald-400">
-                <BookOpen className="w-3.5 h-3.5" />
-                <span>100% Free Resources For Students</span>
+          <ScrollReveal animation="fade-up">
+            <div className="bg-gradient-to-r from-emerald-950/60 via-surface to-surface border border-emerald-500/30 rounded-3xl p-8 md:p-12 flex flex-col lg:flex-row items-center justify-between gap-8 shadow-2xl">
+              <div className="space-y-4 max-w-2xl text-center lg:text-left">
+                <div className="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-semibold text-emerald-400">
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>100% Free Resources For Students</span>
+                </div>
+
+                <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+                  Free Study Materials, Lecture Notes & PYQs
+                </h2>
+
+                <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                  Access verified university lecture notes, previous year exam questions (PYQs), lab manuals, and syllabus copies for Computer Science & IT — completely free with instant direct downloads.
+                </p>
+
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-gray-400 pt-2">
+                  <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> AKTU / VTU / DU Aligned</span>
+                  <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> No Login Required</span>
+                  <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> PDF & Document Downloads</span>
+                </div>
               </div>
 
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-                Free Study Materials, Lecture Notes & PYQs
-              </h2>
-
-              <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                Access verified university lecture notes, previous year exam questions (PYQs), lab manuals, and syllabus copies for Computer Science & IT — completely free with instant direct downloads.
-              </p>
-
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-gray-400 pt-2">
-                <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> AKTU / VTU / DU Aligned</span>
-                <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> No Login Required</span>
-                <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> PDF & Document Downloads</span>
+              <div className="flex flex-col sm:flex-row items-center gap-4 flex-shrink-0">
+                <Link
+                  to="/study-materials"
+                  className="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-7 py-4 rounded-2xl shadow-glow-sm transition-all duration-200 text-sm"
+                >
+                  <span>Explore Free Materials</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             </div>
-
-            <div className="flex flex-col sm:flex-row items-center gap-4 flex-shrink-0">
-              <Link
-                to="/study-materials"
-                className="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-7 py-4 rounded-2xl shadow-glow-sm transition-all duration-200 text-sm"
-              >
-                <span>Explore Free Materials</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* PLACEMENT & ROADMAPS PROMO BANNER */}
       <section className="py-16 bg-background relative overflow-hidden border-b border-border/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="bg-gradient-to-r from-amber-950/50 via-surface to-surface border border-amber-500/30 rounded-3xl p-8 md:p-12 flex flex-col lg:flex-row items-center justify-between gap-8 shadow-2xl">
-            <div className="space-y-4 max-w-2xl text-center lg:text-left">
-              <div className="inline-flex items-center space-x-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full text-xs font-semibold text-amber-300">
-                <GraduationCap className="w-3.5 h-3.5" />
-                <span>Crack On-Campus & Off-Campus Hiring</span>
+          <ScrollReveal animation="fade-up">
+            <div className="bg-gradient-to-r from-amber-950/50 via-surface to-surface border border-amber-500/30 rounded-3xl p-8 md:p-12 flex flex-col lg:flex-row items-center justify-between gap-8 shadow-2xl">
+              <div className="space-y-4 max-w-2xl text-center lg:text-left">
+                <div className="inline-flex items-center space-x-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full text-xs font-semibold text-amber-300">
+                  <GraduationCap className="w-3.5 h-3.5" />
+                  <span>Crack On-Campus & Off-Campus Hiring</span>
+                </div>
+
+                <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+                  Placement Prep Guides, DSA Sheets & 2026 Roadmaps
+                </h2>
+
+                <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                  Step-by-step career blueprints, top 450 DSA patterns with optimal solutions, Core CS viva handbooks (OS, DBMS, CN), and company-specific preparation guides with instant PDF downloads.
+                </p>
+
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-gray-400 pt-2">
+                  <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-amber-400" /> SDE & Tech Roles</span>
+                  <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-amber-400" /> Printable Cheatsheets</span>
+                  <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-amber-400" /> Lifetime Re-downloads</span>
+                </div>
               </div>
 
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-                Placement Prep Guides, DSA Sheets & 2026 Roadmaps
-              </h2>
-
-              <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                Step-by-step career blueprints, top 450 DSA patterns with optimal solutions, Core CS viva handbooks (OS, DBMS, CN), and company-specific preparation guides with instant PDF downloads.
-              </p>
-
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-gray-400 pt-2">
-                <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-amber-400" /> SDE & Tech Roles</span>
-                <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-amber-400" /> Printable Cheatsheets</span>
-                <span className="flex items-center space-x-1.5"><CheckCircle className="w-4 h-4 text-amber-400" /> Lifetime Re-downloads</span>
+              <div className="flex flex-col sm:flex-row items-center gap-4 flex-shrink-0">
+                <Link
+                  to="/placement-prep"
+                  className="inline-flex items-center space-x-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold px-7 py-4 rounded-2xl shadow-glow-sm transition-all duration-200 text-sm"
+                >
+                  <span>Explore Placement Roadmaps</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             </div>
-
-            <div className="flex flex-col sm:flex-row items-center gap-4 flex-shrink-0">
-              <Link
-                to="/placement-prep"
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold px-7 py-4 rounded-2xl shadow-glow-sm transition-all duration-200 text-sm"
-              >
-                <span>Explore Placement Roadmaps</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 

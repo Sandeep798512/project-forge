@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import api, { getBaseURL } from '../services/api';
 import { PdfThumbnail } from '../components/common/PdfThumbnail';
+import { ScrollReveal, ScrollStagger } from '../components/common/ScrollReveal';
 
 export interface StudyMaterialItem {
   _id: string;
@@ -128,7 +129,7 @@ export const StudyMaterials: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         
         {/* HERO HEADER */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
+        <ScrollReveal animation="fade-up" className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/30 px-4 py-1.5 rounded-full text-xs font-semibold text-emerald-400">
             <Sparkles className="w-4 h-4" />
             <span>100% Free Educational Resources</span>
@@ -156,10 +157,10 @@ export const StudyMaterials: React.FC = () => {
               <span>AKTU & University Aligned</span>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* SEARCH & FILTERS BAR */}
-        <div className="bg-surface border border-border/80 rounded-2xl p-5 shadow-xl space-y-4">
+        <ScrollReveal animation="fade-up" delay={80} className="bg-surface border border-border/80 rounded-2xl p-5 shadow-xl space-y-4">
           
           {/* Search Box */}
           <form onSubmit={handleSearchSubmit} className="relative">
@@ -290,7 +291,7 @@ export const StudyMaterials: React.FC = () => {
             </div>
 
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* RESULTS SUMMARY */}
         <div className="flex items-center justify-between text-xs text-gray-400 px-1">
@@ -324,7 +325,11 @@ export const StudyMaterials: React.FC = () => {
             ))}
           </div>
         ) : materials.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <ScrollStagger
+            staggerDelay={70}
+            animation="fade-up"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
             {materials.map((item) => (
               <div
                 key={item._id}
@@ -410,7 +415,7 @@ export const StudyMaterials: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
+          </ScrollStagger>
         ) : (
           <div className="text-center py-20 bg-surface/40 rounded-2xl border border-border/60 space-y-3">
             <BookOpen className="w-12 h-12 text-gray-500 mx-auto" />

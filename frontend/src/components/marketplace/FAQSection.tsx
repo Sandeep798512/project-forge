@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, HelpCircle } from 'lucide-react';
+import { ScrollReveal, ScrollStagger } from '../common/ScrollReveal';
 
 export interface FAQItem {
   question: string;
@@ -44,7 +45,7 @@ export const FAQSection: React.FC<{ items?: FAQItem[] }> = ({ items = defaultFAQ
     <section className="py-16 bg-surface/40">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div className="text-center mb-12">
+        <ScrollReveal animation="fade-up" className="text-center mb-12">
           <div className="inline-flex items-center space-x-2 bg-primary-500/10 border border-primary-500/20 px-3.5 py-1 rounded-full text-xs font-semibold text-primary-400 mb-3">
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Got Questions?</span>
@@ -55,9 +56,9 @@ export const FAQSection: React.FC<{ items?: FAQItem[] }> = ({ items = defaultFAQ
           <p className="text-gray-400 text-sm mt-2">
             Everything you need to know about our project packages, licensing, and support.
           </p>
-        </div>
+        </ScrollReveal>
 
-        <div className="space-y-4">
+        <ScrollStagger staggerDelay={50} animation="fade-up" className="space-y-4">
           {items.map((item, idx) => {
             const isOpen = openIndex === idx;
             return (
@@ -84,7 +85,7 @@ export const FAQSection: React.FC<{ items?: FAQItem[] }> = ({ items = defaultFAQ
               </div>
             );
           })}
-        </div>
+        </ScrollStagger>
 
       </div>
     </section>

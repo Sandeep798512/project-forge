@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Search, Filter, SlidersHorizontal, RefreshCcw } from 'lucide-react';
 import { ProjectCard } from '../components/marketplace/ProjectCard';
 import { CategoryFilter, CategoryItem } from '../components/marketplace/CategoryFilter';
+import { ScrollReveal, ScrollStagger } from '../components/common/ScrollReveal';
 import api from '../services/api';
 
 export const Projects: React.FC = () => {
@@ -116,17 +117,17 @@ export const Projects: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Title */}
-        <div className="mb-8">
+        <ScrollReveal animation="fade-up" className="mb-8">
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
             Software Project Marketplace
           </h1>
           <p className="text-gray-400 text-sm mt-1">
             Browse production-ready full-stack software packages with complete source code & documentation.
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* Search & Main Controls Bar */}
-        <div className="bg-surface/80 border border-border/80 rounded-2xl p-4 mb-8 space-y-4">
+        <ScrollReveal animation="fade-up" delay={80} className="bg-surface/80 border border-border/80 rounded-2xl p-4 mb-8 space-y-4">
           <div className="flex flex-col md:flex-row items-center gap-4">
             
             {/* Search Input */}
@@ -188,7 +189,7 @@ export const Projects: React.FC = () => {
               />
             </div>
           )}
-        </div>
+        </ScrollReveal>
 
         {/* Products Grid */}
         {loading ? (
@@ -199,11 +200,15 @@ export const Projects: React.FC = () => {
           </div>
         ) : products.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            <ScrollStagger
+              staggerDelay={70}
+              animation="fade-up"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
+            >
               {products.map((product) => (
                 <ProjectCard key={product._id} product={product} />
               ))}
-            </div>
+            </ScrollStagger>
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
