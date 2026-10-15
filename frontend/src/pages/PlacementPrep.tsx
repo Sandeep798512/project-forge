@@ -43,6 +43,55 @@ export const PlacementPrep: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
 
+  // Typewriter Animation State (Types exactly 2 times, then permanently stops with full text visible)
+  const fullHeadingText = 'Placement Roadmaps, DSA Sheets & Tech Interview E-Books';
+  const [typedHeading, setTypedHeading] = useState<string>(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return fullHeadingText;
+    }
+    return '';
+  });
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [cycleCount, setCycleCount] = useState<number>(0);
+  const [typingStopped, setTypingStopped] = useState<boolean>(() => {
+    return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
+  const [typingSpeed, setTypingSpeed] = useState<number>(45);
+
+  useEffect(() => {
+    if (typingStopped) return;
+
+    const handleType = () => {
+      if (isDeleting) {
+        setTypedHeading(fullHeadingText.substring(0, typedHeading.length - 1));
+        setTypingSpeed(20);
+      } else {
+        setTypedHeading(fullHeadingText.substring(0, typedHeading.length + 1));
+        setTypingSpeed(45);
+      }
+
+      // When full text is reached
+      if (!isDeleting && typedHeading === fullHeadingText) {
+        if (cycleCount >= 1) {
+          // Exactly 2 full typing cycles completed (0 is 1st, 1 is 2nd) -> STOP permanently!
+          setTypingStopped(true);
+          return;
+        }
+        // Pause 1.8s so user can read before backspacing for cycle 2
+        setTypingSpeed(1800);
+        setIsDeleting(true);
+      } else if (isDeleting && typedHeading === '') {
+        // Backspacing finished, start cycle 2
+        setIsDeleting(false);
+        setCycleCount((prev) => prev + 1);
+        setTypingSpeed(150);
+      }
+    };
+
+    const timer = setTimeout(handleType, typingSpeed);
+    return () => clearTimeout(timer);
+  }, [typedHeading, isDeleting, cycleCount, typingStopped, typingSpeed]);
+
   useEffect(() => {
     fetchMaterials();
   }, [search, track, difficulty, sort, page]);
@@ -115,8 +164,11 @@ export const PlacementPrep: React.FC = () => {
                 <span>Career & Placement Preparation Suite</span>
               </div>
 
-              <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
-                Placement Roadmaps, DSA Sheets & Tech Interview E-Books
+              <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight min-h-[72px] sm:min-h-[110px]">
+                {typedHeading || (typingStopped ? fullHeadingText : '')}
+                {!typingStopped && (
+                  <span className="animate-pulse text-amber-400 font-mono font-light ml-0.5">|</span>
+                )}
               </h1>
 
               <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
