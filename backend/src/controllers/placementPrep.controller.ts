@@ -198,12 +198,15 @@ export const getAdminPlacementPrep = async (req: AuthRequest, res: Response): Pr
     const limitNum = Math.max(1, Math.min(100, parseInt(String(limit), 10) || 20));
     const skip = (pageNum - 1) * limitNum;
 
+    res.setHeader('Cache-Control', 'no-cache, private');
+
     const [materials, total] = await Promise.all([
       Product.find(query)
         .populate('assets', 'title originalName size mimeType storageKey')
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limitNum),
+        .limit(limitNum)
+        .lean(),
       Product.countDocuments(query),
     ]);
 

@@ -118,8 +118,20 @@ export const getDashboardAnalytics = async (req: AuthRequest, res: Response): Pr
 // 2. PRODUCT MANAGEMENT (Extended CRUD)
 export const getAdminProducts = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { search, category, difficulty, isPublished, page = 1, limit = 10, sort = 'createdAt' } = req.query;
+    const { search, category, difficulty, isPublished, productType, page = 1, limit = 10, sort = 'createdAt' } = req.query;
     const query: any = {};
+
+    // Filter by productType:
+    // If explicitly requested as 'all', don't filter.
+    // If explicitly requested as 'placement_prep', filter by 'placement_prep'.
+    // Default: strictly filter { productType: { $ne: 'placement_prep' } } so only software projects appear!
+    if (productType === 'all') {
+      // no filter
+    } else if (productType === 'placement_prep') {
+      query.productType = 'placement_prep';
+    } else {
+      query.productType = { $ne: 'placement_prep' };
+    }
 
     if (search) {
       query.$or = [
@@ -132,16 +144,19 @@ export const getAdminProducts = async (req: AuthRequest, res: Response): Promise
     if (difficulty) query.difficulty = difficulty;
     if (isPublished !== undefined && isPublished !== '') query.isPublished = isPublished === 'true';
 
-    const pageNum = Number(page);
-    const limitNum = Number(limit);
+    const pageNum = Math.max(1, Number(page) || 1);
+    const limitNum = Math.max(1, Math.min(200, Number(limit) || 20));
     const skip = (pageNum - 1) * limitNum;
+
+    res.setHeader('Cache-Control', 'no-cache, private');
 
     const [products, total] = await Promise.all([
       Product.find(query)
         .populate('category', 'name slug')
         .sort({ [String(sort)]: -1 })
         .skip(skip)
-        .limit(limitNum),
+        .limit(limitNum)
+        .lean(),
       Product.countDocuments(query),
     ]);
 
@@ -168,6 +183,7 @@ export const duplicateProduct = async (req: AuthRequest, res: Response): Promise
     dupData.title = `${original.title} (Copy)`;
     dupData.slug = `${original.slug}-copy-${Date.now().toString().slice(-4)}`;
     dupData.isPublished = false;
+    dupData.productType = original.productType || 'project';
 
     const newProd = await Product.create(dupData);
 

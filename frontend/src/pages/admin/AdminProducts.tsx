@@ -4,9 +4,35 @@ import { BRAND } from '../../config/brand.config';
 import api from '../../services/api';
 
 export const AdminProducts: React.FC = () => {
-  const [products, setProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Read instant cache for 0ms initial render
+  const getInitialProducts = () => {
+    try {
+      const cached = sessionStorage.getItem('cg_admin_products_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.filter((p: any) => p.productType !== 'placement_prep');
+        }
+      }
+    } catch (e) {}
+    return [];
+  };
+
+  const getInitialCategories = () => {
+    try {
+      const cached = sessionStorage.getItem('cg_admin_categories_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  };
+
+  const initialProds = getInitialProducts();
+  const [products, setProducts] = useState<any[]>(initialProds);
+  const [categories, setCategories] = useState<any[]>(getInitialCategories);
+  const [loading, setLoading] = useState(initialProds.length === 0);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'info' | 'assets'>('info');
   const [savingProduct, setSavingProduct] = useState(false);
@@ -47,6 +73,7 @@ export const AdminProducts: React.FC = () => {
     demoVideoUrl: '',
     currentVersion: '1.0.0',
     isPublished: true,
+    productType: 'project',
     hasCode: true,
     hasPPT: true,
     hasReport: true,
@@ -65,13 +92,27 @@ export const AdminProducts: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      setLoading(true);
+      if (products.length === 0 || search || selectedCategory) {
+        setLoading(true);
+      }
       const [prodRes, catRes] = await Promise.all([
-        api.get(`/admin/products/enhanced?search=${search}&category=${selectedCategory}&limit=50`),
+        api.get(`/admin/products/enhanced?search=${encodeURIComponent(search)}&category=${encodeURIComponent(selectedCategory)}&productType=project&limit=100`),
         api.get('/categories'),
       ]);
-      if (prodRes.data.success) setProducts(prodRes.data.products);
-      if (catRes.data.success) setCategories(catRes.data.categories);
+      if (prodRes.data.success) {
+        // Strict frontend filter: software projects ONLY (never placement_prep)
+        const projectOnly = (prodRes.data.products || []).filter(
+          (p: any) => p.productType !== 'placement_prep'
+        );
+        setProducts(projectOnly);
+        if (!search && !selectedCategory) {
+          sessionStorage.setItem('cg_admin_products_cache', JSON.stringify(projectOnly));
+        }
+      }
+      if (catRes.data.success) {
+        setCategories(catRes.data.categories);
+        sessionStorage.setItem('cg_admin_categories_cache', JSON.stringify(catRes.data.categories));
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -188,6 +229,7 @@ export const AdminProducts: React.FC = () => {
 
       const payload = {
         ...formData,
+        productType: formData.productType || 'project',
         thumbnail: formData.thumbnail ? formData.thumbnail.trim() : defaultThumbnail,
         screenshots: Array.isArray(formData.screenshots) ? formData.screenshots : [],
         techStack: typeof formData.techStack === 'string' ? formData.techStack.split(',').map((s: string) => s.trim()) : formData.techStack,

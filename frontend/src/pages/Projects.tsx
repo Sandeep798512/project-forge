@@ -15,12 +15,16 @@ export const Projects: React.FC = () => {
       const cachedCatalog = localStorage.getItem('cg_cached_catalog');
       if (cachedCatalog) {
         const parsed = JSON.parse(cachedCatalog);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.filter((p: any) => p.productType !== 'placement_prep');
+        }
       }
       const cachedFeatured = localStorage.getItem('cg_cached_featured');
       if (cachedFeatured) {
         const parsed = JSON.parse(cachedFeatured);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.filter((p: any) => p.productType !== 'placement_prep');
+        }
       }
     } catch (e) {}
     return [];
@@ -87,10 +91,11 @@ export const Projects: React.FC = () => {
 
         const res = await api.get(`/products?${params.toString()}`);
         if (res.data.success) {
-          setProducts(res.data.products);
+          const projectOnly = (res.data.products || []).filter((p: any) => p.productType !== 'placement_prep');
+          setProducts(projectOnly);
           setTotalPages(res.data.pagination?.pages || 1);
           if (isDefaultFilter) {
-            localStorage.setItem('cg_cached_catalog', JSON.stringify(res.data.products));
+            localStorage.setItem('cg_cached_catalog', JSON.stringify(projectOnly));
           }
         }
       } catch (err) {

@@ -76,6 +76,11 @@ export const createProductAdmin = async (req: AuthRequest, res: Response): Promi
       productData.discountPercentage = Math.round(((productData.originalPrice - productData.price) / productData.originalPrice) * 100);
     }
 
+    // Default to software project
+    if (!productData.productType) {
+      productData.productType = 'project';
+    }
+
     const product = await Product.create(productData);
 
     await AuditLog.create({

@@ -31,9 +31,21 @@ const TRACKS = [
 ];
 
 export const AdminPlacementPrep: React.FC = () => {
+  const getInitialMaterials = () => {
+    try {
+      const cached = sessionStorage.getItem('cg_admin_placement_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  };
+
+  const initialMats = getInitialMaterials();
   const [activeTab, setActiveTab] = useState<'list' | 'create'>('list');
-  const [materials, setMaterials] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [materials, setMaterials] = useState<any[]>(initialMats);
+  const [loading, setLoading] = useState<boolean>(initialMats.length === 0);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -70,10 +82,13 @@ export const AdminPlacementPrep: React.FC = () => {
 
   const fetchAdminMaterials = async () => {
     try {
-      setLoading(true);
+      if (materials.length === 0) {
+        setLoading(true);
+      }
       const res = await api.get('/admin/placement-prep?limit=100');
       if (res.data.success) {
         setMaterials(res.data.materials);
+        sessionStorage.setItem('cg_admin_placement_cache', JSON.stringify(res.data.materials));
       }
     } catch (err) {
       console.error('[FETCH ADMIN PLACEMENT PREP ERROR]', err);
