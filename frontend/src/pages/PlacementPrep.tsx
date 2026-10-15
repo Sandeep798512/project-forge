@@ -43,7 +43,7 @@ export const PlacementPrep: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
 
-  // Typewriter Animation State (Types exactly 2 times, then permanently stops with full text visible)
+  // Typewriter Animation State (Types at a comfortable pace exactly 1 time on page load, then permanently stops)
   const fullHeadingText = 'Placement Roadmaps, DSA Sheets & Tech Interview E-Books';
   const [typedHeading, setTypedHeading] = useState<string>(() => {
     if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -51,46 +51,24 @@ export const PlacementPrep: React.FC = () => {
     }
     return '';
   });
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
-  const [cycleCount, setCycleCount] = useState<number>(0);
   const [typingStopped, setTypingStopped] = useState<boolean>(() => {
     return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   });
-  const [typingSpeed, setTypingSpeed] = useState<number>(45);
 
   useEffect(() => {
     if (typingStopped) return;
 
-    const handleType = () => {
-      if (isDeleting) {
-        setTypedHeading(fullHeadingText.substring(0, typedHeading.length - 1));
-        setTypingSpeed(20);
-      } else {
-        setTypedHeading(fullHeadingText.substring(0, typedHeading.length + 1));
-        setTypingSpeed(45);
-      }
+    if (typedHeading.length >= fullHeadingText.length) {
+      setTypingStopped(true);
+      return;
+    }
 
-      // When full text is reached
-      if (!isDeleting && typedHeading === fullHeadingText) {
-        if (cycleCount >= 1) {
-          // Exactly 2 full typing cycles completed (0 is 1st, 1 is 2nd) -> STOP permanently!
-          setTypingStopped(true);
-          return;
-        }
-        // Pause 1.8s so user can read before backspacing for cycle 2
-        setTypingSpeed(1800);
-        setIsDeleting(true);
-      } else if (isDeleting && typedHeading === '') {
-        // Backspacing finished, start cycle 2
-        setIsDeleting(false);
-        setCycleCount((prev) => prev + 1);
-        setTypingSpeed(150);
-      }
-    };
+    const timer = setTimeout(() => {
+      setTypedHeading(fullHeadingText.substring(0, typedHeading.length + 1));
+    }, 75);
 
-    const timer = setTimeout(handleType, typingSpeed);
     return () => clearTimeout(timer);
-  }, [typedHeading, isDeleting, cycleCount, typingStopped, typingSpeed]);
+  }, [typedHeading, typingStopped]);
 
   useEffect(() => {
     fetchMaterials();
