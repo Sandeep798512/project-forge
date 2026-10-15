@@ -15,6 +15,8 @@ import {
   AlertCircle,
   RefreshCw,
   X,
+  Calendar,
+  Clock,
 } from 'lucide-react';
 import { BRAND } from '../../config/brand.config';
 import api from '../../services/api';
@@ -412,6 +414,7 @@ export const AdminPlacementPrep: React.FC = () => {
                       <th className="p-3.5">Pages</th>
                       <th className="p-3.5">Price</th>
                       <th className="p-3.5">Sales</th>
+                      <th className="p-3.5">Date Added</th>
                       <th className="p-3.5">Status</th>
                       <th className="p-3.5 text-right">Actions</th>
                     </tr>
@@ -429,6 +432,10 @@ export const AdminPlacementPrep: React.FC = () => {
                         <td className="p-3.5 max-w-xs">
                           <span className="font-bold text-white block line-clamp-1">{m.title}</span>
                           <span className="text-[10px] font-mono text-amber-400">{m.careerTrack || 'Placement Prep'}</span>
+                          <div className="text-[10px] text-gray-500 font-mono mt-0.5 flex items-center space-x-1">
+                            <Calendar className="w-3 h-3 text-gray-500" />
+                            <span>Added: {m.createdAt ? new Date(m.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}</span>
+                          </div>
                         </td>
                         <td className="p-3.5 text-gray-300">
                           <span className="text-xs">{m.targetRole || 'Software Engineer'}</span>
@@ -444,6 +451,32 @@ export const AdminPlacementPrep: React.FC = () => {
                         </td>
                         <td className="p-3.5 font-mono text-emerald-400">
                           {m.downloadCount || 0}
+                        </td>
+                        <td className="p-3.5 whitespace-nowrap">
+                          <div className="flex items-center space-x-1.5 text-xs text-gray-200 font-medium">
+                            <Calendar className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+                            <span>
+                              {m.createdAt
+                                ? new Date(m.createdAt).toLocaleDateString('en-IN', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric',
+                                  })
+                                : 'N/A'}
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-gray-500 font-mono flex items-center space-x-1 mt-0.5">
+                            <Clock className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                            <span>
+                              {m.createdAt
+                                ? new Date(m.createdAt).toLocaleTimeString('en-IN', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: true,
+                                  })
+                                : ''}
+                            </span>
+                          </div>
                         </td>
                         <td className="p-3.5">
                           <button

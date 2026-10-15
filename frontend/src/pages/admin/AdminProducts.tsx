@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, CheckCircle2, XCircle, Search, Copy, Sparkles, X, Save, Upload, FileText, Download, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle2, XCircle, Search, Copy, Sparkles, X, Save, Upload, FileText, Download, AlertCircle, Image as ImageIcon, Calendar, Clock } from 'lucide-react';
 import { BRAND } from '../../config/brand.config';
 import api from '../../services/api';
 
@@ -417,6 +417,7 @@ export const AdminProducts: React.FC = () => {
                   <th className="p-3.5">Category</th>
                   <th className="p-3.5">Price</th>
                   <th className="p-3.5">Files & Assets</th>
+                  <th className="p-3.5">Date Added</th>
                   <th className="p-3.5">Status</th>
                   <th className="p-3.5 text-right">Actions</th>
                 </tr>
@@ -437,6 +438,10 @@ export const AdminProducts: React.FC = () => {
                             (p.hasDoc ?? p.hasDocumentation) !== false && 'Doc'
                           ].filter(Boolean).join(' + ')}
                         </div>
+                        <div className="text-[10px] text-gray-500 font-mono mt-0.5 flex items-center space-x-1">
+                          <Calendar className="w-3 h-3 text-gray-500" />
+                          <span>Added: {p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}</span>
+                        </div>
                       </div>
                     </td>
                     <td className="p-3.5 text-gray-400">{p.category?.name || 'General'}</td>
@@ -449,6 +454,32 @@ export const AdminProducts: React.FC = () => {
                         <FileText className="w-3 h-3" />
                         <span>Manage Files ({p.assets?.length || 0})</span>
                       </button>
+                    </td>
+                    <td className="p-3.5 whitespace-nowrap">
+                      <div className="flex items-center space-x-1.5 text-xs text-gray-200 font-medium">
+                        <Calendar className="w-3.5 h-3.5 text-primary-400 flex-shrink-0" />
+                        <span>
+                          {p.createdAt
+                            ? new Date(p.createdAt).toLocaleDateString('en-IN', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                              })
+                            : 'N/A'}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-gray-500 font-mono flex items-center space-x-1 mt-0.5">
+                        <Clock className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                        <span>
+                          {p.createdAt
+                            ? new Date(p.createdAt).toLocaleTimeString('en-IN', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true,
+                              })
+                            : ''}
+                        </span>
+                      </div>
                     </td>
                     <td className="p-3.5">
                       {p.isPublished ? (
