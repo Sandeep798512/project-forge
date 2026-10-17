@@ -165,54 +165,95 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     const cleanEmail = email.toLowerCase().trim();
 
     // Extract client IP safely (supports proxies, reverse proxy headers, and local direct)
+    const forwarded = req.headers['x-forwarded-for'];
     const ipAddress =
-      (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() ||
+      (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : '') ||
+      (req.headers['cf-connecting-ip'] as string)?.trim() ||
       req.ip ||
       req.socket.remoteAddress ||
       '127.0.0.1';
 
-    // 1. Rate Limit Check: 15-minute per-email limit (Max 3 attempts)
-    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
-    const emailAttempts15m = await PasswordResetAttempt.countDocuments({
-      email: cleanEmail,
-      createdAt: { $gte: fifteenMinutesAgo },
-    });
+    const deviceId =
+      (req.headers['x-device-id'] as string)?.trim() ||
+      (parseResult.data.deviceId ? parseResult.data.deviceId.trim() : '') ||
+      '';
 
-    if (emailAttempts15m >= 3) {
+    const sevenMinutesAgo = new Date(Date.now() - 7 * 60 * 1000);
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    // 1. Rate Limit Check: Cooldown (1 bar send krne ke baad 7 minutes bad send kr sake)
+    const recentEmailAttempt = await PasswordResetAttempt.findOne({
+      email: cleanEmail,
+      createdAt: { $gte: sevenMinutesAgo },
+    }).sort({ createdAt: -1 });
+
+    if (recentEmailAttempt) {
+      const elapsedMs = Date.now() - new Date(recentEmailAttempt.createdAt).getTime();
+      const cooldownMs = 7 * 60 * 1000;
+      const remainingSeconds = Math.max(1, Math.ceil((cooldownMs - elapsedMs) / 1000));
+      const remainingMinutes = Math.ceil(remainingSeconds / 60);
+
       res.status(429).json({
         success: false,
-        message: 'Too many password reset requests for this email address. Maximum 3 attempts allowed in 15 minutes. Please check your inbox or wait 15 minutes before trying again.',
+        code: 'COOLDOWN_ACTIVE',
+        remainingSeconds,
+        message: `Please wait ${remainingMinutes} minute${remainingMinutes > 1 ? 's' : ''} (${remainingSeconds}s) before requesting another reset link for this email. (Minimum 7-minute wait required between requests).`,
       });
       return;
     }
 
-    // 2. Rate Limit Check: 24-hour per-email limit (Max 5 attempts)
-    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    // 2. Rate Limit Check: 24-hour limit per email (Maximum 2 attempts in 24 hours)
     const emailAttempts24h = await PasswordResetAttempt.countDocuments({
       email: cleanEmail,
       createdAt: { $gte: twentyFourHoursAgo },
     });
 
-    if (emailAttempts24h >= 5) {
+    if (emailAttempts24h >= 2) {
       res.status(429).json({
         success: false,
-        message: 'Daily password reset limit reached for this email address (maximum 5 requests per 24 hours). Please contact support if you need immediate assistance.',
+        code: 'DAILY_EMAIL_LIMIT_REACHED',
+        message: 'Daily password reset limit reached for this email address (maximum 2 requests per 24 hours). Please check your email inbox/spam or try again after 24 hours.',
       });
       return;
     }
 
-    // 3. Rate Limit Check: IP-based shared-network friendly limit
-    // High threshold (25 per 15 min) prevents bot flooding while safely accommodating
-    // genuine students sharing public NAT IP on university/hostel Wi-Fi
-    const ipAttempts15m = await PasswordResetAttempt.countDocuments({
-      ipAddress,
-      createdAt: { $gte: fifteenMinutesAgo },
+    // 3. Rate Limit Check: Per Device / Network Distinct Email Limit (Maximum 3 different email accounts in 24 hours)
+    const deviceConditions: any[] = [];
+    if (deviceId) {
+      deviceConditions.push({ deviceId });
+    }
+    if (ipAddress && ipAddress !== '127.0.0.1') {
+      deviceConditions.push({ ipAddress });
+    }
+    if (deviceConditions.length === 0) {
+      deviceConditions.push({ ipAddress });
+    }
+
+    const distinctEmailsFromDevice = await PasswordResetAttempt.distinct('email', {
+      $or: deviceConditions,
+      createdAt: { $gte: twentyFourHoursAgo },
     });
 
-    if (ipAttempts15m >= 25) {
+    if (distinctEmailsFromDevice.length >= 3 && !distinctEmailsFromDevice.includes(cleanEmail)) {
       res.status(429).json({
         success: false,
-        message: 'High volume of reset requests detected from your network. Please wait 15 minutes before trying again.',
+        code: 'DEVICE_EMAIL_LIMIT_REACHED',
+        message: 'Security limit reached: Maximum 3 different email accounts can request password resets from this device/network within 24 hours. Please wait 24 hours or contact support.',
+      });
+      return;
+    }
+
+    // 4. Rate Limit Check: Maximum total attempts from same device/network in 24 hours (Max 6 total attempts)
+    const totalDeviceAttempts = await PasswordResetAttempt.countDocuments({
+      $or: deviceConditions,
+      createdAt: { $gte: twentyFourHoursAgo },
+    });
+
+    if (totalDeviceAttempts >= 6) {
+      res.status(429).json({
+        success: false,
+        code: 'DEVICE_TOTAL_LIMIT_REACHED',
+        message: 'Security limit: Too many password reset requests from this device/network today. Please wait 24 hours before trying again.',
       });
       return;
     }
@@ -221,6 +262,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     await PasswordResetAttempt.create({
       email: cleanEmail,
       ipAddress,
+      ...(deviceId ? { deviceId } : {}),
     });
 
     const user = await User.findOne({ email: cleanEmail });

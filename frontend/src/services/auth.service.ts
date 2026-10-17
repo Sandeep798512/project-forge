@@ -17,8 +17,8 @@ export const authService = {
     return response.data;
   },
 
-  forgotPassword: async (email: string): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/forgot-password', { email });
+  forgotPassword: async (email: string, deviceId?: string): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>('/auth/forgot-password', { email, deviceId });
     return response.data;
   },
 

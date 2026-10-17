@@ -1,27 +1,92 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Terminal, Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Mail, ArrowRight, CheckCircle2, Clock, RefreshCw } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
 import { authService } from '../services/auth.service';
+import { getDeviceId } from '../services/api';
+
+const COOLDOWN_DURATION = 7 * 60; // 7 minutes in seconds
 
 export const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [cooldown, setCooldown] = useState<number>(0);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Check stored cooldown for the current email
+  useEffect(() => {
+    const cleanEmail = email.toLowerCase().trim();
+    if (!cleanEmail) {
+      setCooldown(0);
+      return;
+    }
+
+    const lastSentTime = localStorage.getItem(`campusget_reset_ts_${cleanEmail}`);
+    if (lastSentTime) {
+      const elapsed = Math.floor((Date.now() - parseInt(lastSentTime, 10)) / 1000);
+      if (elapsed < COOLDOWN_DURATION) {
+        setCooldown(COOLDOWN_DURATION - elapsed);
+      } else {
+        setCooldown(0);
+      }
+    }
+  }, [email]);
+
+  // Cooldown countdown interval
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const interval = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [cooldown]);
+
+  const handleSendReset = async (targetEmail: string) => {
+    const cleanEmail = targetEmail.toLowerCase().trim();
+    if (!cleanEmail) return;
+
     setError(null);
     setLoading(true);
+
     try {
-      await authService.forgotPassword(email);
+      const deviceId = getDeviceId();
+      await authService.forgotPassword(cleanEmail, deviceId);
       setSubmitted(true);
+
+      // Record timestamp for 7-minute cooldown
+      localStorage.setItem(`campusget_reset_ts_${cleanEmail}`, Date.now().toString());
+      setCooldown(COOLDOWN_DURATION);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to process password reset request. Please check your network and try again.');
+      const respData = err.response?.data;
+      if (respData?.remainingSeconds) {
+        setCooldown(respData.remainingSeconds);
+      }
+      setError(
+        respData?.message ||
+        'Failed to process password reset request. Please check your network and try again.'
+      );
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await handleSendReset(email);
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -42,8 +107,9 @@ export const ForgotPassword: React.FC = () => {
         </div>
 
         {error && (
-          <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center space-x-2">
-            <span>⚠️ {error}</span>
+          <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-start space-x-2.5">
+            <span className="flex-shrink-0 mt-0.5">⚠️</span>
+            <span className="leading-relaxed">{error}</span>
           </div>
         )}
 
@@ -62,11 +128,43 @@ export const ForgotPassword: React.FC = () => {
               </div>
             </div>
 
+            {/* Resend Cooldown Section */}
+            <div className="p-3.5 rounded-xl bg-background/80 border border-border/70 text-xs flex flex-col gap-2">
+              <div className="flex items-center justify-between text-gray-300">
+                <span className="flex items-center gap-1.5 text-gray-400">
+                  <Clock className="w-4 h-4 text-primary-400" />
+                  Resend Cooldown:
+                </span>
+                {cooldown > 0 ? (
+                  <span className="font-mono text-primary-400 font-bold bg-primary-500/10 px-2 py-0.5 rounded border border-primary-500/20">
+                    {formatTime(cooldown)}
+                  </span>
+                ) : (
+                  <span className="text-emerald-400 font-semibold text-[11px]">Ready to resend</span>
+                )}
+              </div>
+
+              <button
+                type="button"
+                disabled={cooldown > 0 || loading}
+                onClick={() => handleSendReset(email)}
+                className="w-full py-2 px-3 rounded-lg bg-surface border border-border/80 hover:border-primary-500/50 hover:bg-surface/80 text-white font-medium text-xs disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                {loading
+                  ? 'Resending link...'
+                  : cooldown > 0
+                  ? `Resend link available in ${formatTime(cooldown)}`
+                  : 'Resend Reset Link'}
+              </button>
+            </div>
+
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
               <button
                 type="button"
                 onClick={() => {
                   setSubmitted(false);
+                  setError(null);
                 }}
                 className="text-gray-400 hover:text-white transition-colors"
               >
@@ -95,13 +193,25 @@ export const ForgotPassword: React.FC = () => {
               </div>
             </div>
 
+            <div className="rounded-lg bg-surface/50 border border-border/50 p-2.5 text-[11px] text-gray-400 space-y-1">
+              <div className="flex items-center gap-1.5 text-gray-300 font-semibold">
+                <Clock className="w-3.5 h-3.5 text-primary-400" />
+                <span>Security Notice:</span>
+              </div>
+              <p>• Max 2 reset links per email in 24 hours.</p>
+              <p>• Minimum 7-minute wait required between requests.</p>
+              <p>• Max 3 distinct email requests per device/day.</p>
+            </div>
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || cooldown > 0}
               className="w-full py-3 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-bold text-sm shadow-glow-sm disabled:opacity-50 transition-all flex items-center justify-center space-x-2"
             >
               {loading ? (
                 <span>Sending link...</span>
+              ) : cooldown > 0 ? (
+                <span>Wait {formatTime(cooldown)} to resend</span>
               ) : (
                 <>
                   <span>Send Reset Link</span>

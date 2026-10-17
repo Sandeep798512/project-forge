@@ -16,13 +16,27 @@ const api = axios.create({
   },
 });
 
-// Request Interceptor: Attach Token
+export const getDeviceId = (): string => {
+  try {
+    let id = localStorage.getItem('campusget_device_id');
+    if (!id) {
+      id = 'dev_' + Math.random().toString(36).substring(2, 12) + Date.now().toString(36);
+      localStorage.setItem('campusget_device_id', id);
+    }
+    return id;
+  } catch {
+    return 'client-default';
+  }
+};
+
+// Request Interceptor: Attach Token & Device ID
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('projectforge_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    config.headers['x-device-id'] = getDeviceId();
     return config;
   },
   (error) => Promise.reject(error)
