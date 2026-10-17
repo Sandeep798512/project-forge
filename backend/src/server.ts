@@ -24,6 +24,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy for accurate client IP identification on Render / reverse proxies
+app.set('trust proxy', 1);
+
 // Security & Middleware
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(
@@ -33,6 +36,8 @@ app.use(
       callback(null, true);
     },
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-device-id', 'Accept'],
+    exposedHeaders: ['x-device-id'],
   })
 );
 app.use(morgan('dev'));
