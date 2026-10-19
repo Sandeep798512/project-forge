@@ -4,6 +4,7 @@ import User from '../models/User';
 import Entitlement from '../models/Entitlement';
 import AuditLog from '../models/AuditLog';
 import PasswordResetAttempt from '../models/PasswordResetAttempt';
+import LoginAttempt from '../models/LoginAttempt';
 import { hashPassword, comparePassword } from '../utils/passwords';
 import { generateToken } from '../utils/jwt';
 import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '../validators/auth.validator';
@@ -85,18 +86,94 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     const { email, password } = parseResult.data;
+    const cleanEmail = email.toLowerCase().trim();
 
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+    // Extract client IP safely
+    const forwarded = req.headers['x-forwarded-for'];
+    const ipAddress =
+      (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : '') ||
+      (req.headers['cf-connecting-ip'] as string)?.trim() ||
+      req.ip ||
+      req.socket.remoteAddress ||
+      '127.0.0.1';
+
+    const lockoutWindow = 15 * 60 * 1000; // 15-minute lockout window
+    const windowStart = new Date(Date.now() - lockoutWindow);
+
+    // 1. Check if this email is already locked out (5 or more failed attempts in the last 15 minutes)
+    const failedAttemptsCount = await LoginAttempt.countDocuments({
+      email: cleanEmail,
+      createdAt: { $gte: windowStart },
+    });
+
+    if (failedAttemptsCount >= 5) {
+      const latestAttempt = await LoginAttempt.findOne({
+        email: cleanEmail,
+        createdAt: { $gte: windowStart },
+      }).sort({ createdAt: -1 });
+
+      const elapsed = latestAttempt ? Date.now() - new Date(latestAttempt.createdAt).getTime() : 0;
+      const remainingSeconds = Math.max(1, Math.ceil((lockoutWindow - elapsed) / 1000));
+      const remainingMinutes = Math.ceil(remainingSeconds / 60);
+
+      res.status(429).json({
+        success: false,
+        code: 'ACCOUNT_LOCKED',
+        remainingSeconds,
+        message: `Too many failed login attempts for this email address. For security, login is locked for ${remainingMinutes} minute(s). Please try again later or use 'Forgot Password'.`,
+      });
+      return;
+    }
+
+    const user = await User.findOne({ email: cleanEmail }).select('+password');
+
     if (!user || !user.password) {
-      res.status(401).json({ success: false, message: 'Invalid email or password.' });
+      // Record failed attempt
+      await LoginAttempt.create({ email: cleanEmail, ipAddress });
+      const currentFailed = failedAttemptsCount + 1;
+      const attemptsRemaining = Math.max(0, 5 - currentFailed);
+      const message =
+        attemptsRemaining > 0
+          ? `Invalid email or password. You have ${attemptsRemaining} attempt${attemptsRemaining > 1 ? 's' : ''} remaining before account lockout.`
+          : 'Invalid email or password. Maximum 5 attempts reached. Your account has been temporarily locked for 15 minutes.';
+
+      res.status(401).json({
+        success: false,
+        attemptsRemaining,
+        message,
+      });
+      return;
+    }
+
+    if (user.isSuspended) {
+      res.status(403).json({
+        success: false,
+        message: 'Your account has been suspended. Please contact support.',
+      });
       return;
     }
 
     const isMatch = await comparePassword(password, user.password);
     if (!isMatch) {
-      res.status(401).json({ success: false, message: 'Invalid email or password.' });
+      // Record failed attempt
+      await LoginAttempt.create({ email: cleanEmail, ipAddress });
+      const currentFailed = failedAttemptsCount + 1;
+      const attemptsRemaining = Math.max(0, 5 - currentFailed);
+      const message =
+        attemptsRemaining > 0
+          ? `Invalid email or password. You have ${attemptsRemaining} attempt${attemptsRemaining > 1 ? 's' : ''} remaining before account lockout.`
+          : 'Invalid email or password. Maximum 5 attempts reached. Your account has been temporarily locked for 15 minutes.';
+
+      res.status(401).json({
+        success: false,
+        attemptsRemaining,
+        message,
+      });
       return;
     }
+
+    // Login successful: Clear failed login attempts for this email
+    await LoginAttempt.deleteMany({ email: cleanEmail });
 
     const token = generateToken({
       userId: (user._id as any).toString(),

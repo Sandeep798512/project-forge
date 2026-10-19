@@ -56,9 +56,18 @@ export const Login: React.FC = () => {
         </div>
 
         {error && (
-          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center space-x-2">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            <span>{error}</span>
+          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex flex-col space-y-1.5">
+            <div className="flex items-start space-x-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              <span className="leading-relaxed">{error}</span>
+            </div>
+            {error.toLowerCase().includes('lock') && (
+              <div className="pt-1 pl-6">
+                <Link to="/forgot-password" className="text-primary-400 hover:underline font-semibold text-[11px] inline-flex items-center gap-1">
+                  Forgot password? Reset it here →
+                </Link>
+              </div>
+            )}
           </div>
         )}
 
