@@ -26,9 +26,21 @@ export const Privacy: React.FC = () => {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">2. Payment Security & Third-Party Processing</h2>
+            <h2 className="text-lg font-bold text-white">2. Payment Security & Third-Party Processing (Razorpay)</h2>
             <p>
-              All online financial transactions are processed securely through certified payment gateway partner <strong>Razorpay</strong> using bank-grade SSL encryption.
+              All online financial transactions are processed securely through certified payment processor partner <strong>Razorpay</strong> using bank-grade SSL encryption.
+            </p>
+            <p>
+              Razorpay handles the actual transaction when you purchase a project package, documentation, or digital resource. Razorpay collects and processes your payment details directly under its own privacy policy, which we encourage you to review at{' '}
+              <a
+                href="https://razorpay.com/privacy"
+                target="_blank"
+                rel="noreferrer"
+                className="text-primary-400 hover:underline"
+              >
+                razorpay.com/privacy
+              </a>
+              .
             </p>
             <p className="text-emerald-400 font-medium">
               CampusGet NEVER collects, views, processes, or stores raw credit/debit card numbers, CVVs, net banking credentials, or UPI PINs on our servers.
@@ -36,12 +48,12 @@ export const Privacy: React.FC = () => {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">3. How Data Is Used & Retention Principles</h2>
+            <h2 className="text-lg font-bold text-white">3. How Data Is Used & Tracker Disclosure</h2>
             <p>
               Collected data is used strictly to fulfill digital access entitlements, verify payment signatures, manage referral rewards, respond to support inquiries, and comply with operational and legal recordkeeping requirements.
             </p>
             <p>
-              We do not sell, rent, or trade customer personal information to third-party advertisers. Data is retained for as long as your account remains active or as required by operational, tax, and dispute resolution obligations under applicable law.
+              We do not sell, rent, or trade customer personal information to third parties. We do not integrate any advertising networks or third-party advertising analytics trackers on the platform. Data is retained for as long as your account remains active or as required by operational, tax, and dispute resolution obligations under applicable law.
             </p>
           </section>
 
@@ -122,9 +134,41 @@ export const RefundPolicy: React.FC = () => {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">5. Support-First Resolution</h2>
+            <h2 className="text-lg font-bold text-white">5. Payment Gateway Processing (Razorpay)</h2>
             <p>
-              We encourage customers to reach out to our WhatsApp or Email support prior to initiating payment disputes, as most delivery or setup questions can be resolved immediately by our technical support team.
+              <strong>Razorpay</strong> is our authorized third-party payment processor — it securely handles the actual financial transaction whenever you purchase a project package, study notes, career roadmap, or digital resource on CampusGet.
+            </p>
+            <p>
+              Razorpay collects and processes your payment details directly, under its own privacy policy and bank-grade security standards, which we encourage you to review at{' '}
+              <a
+                href="https://razorpay.com/privacy"
+                target="_blank"
+                rel="noreferrer"
+                className="text-primary-400 hover:underline"
+              >
+                razorpay.com/privacy
+              </a>
+              .
+            </p>
+            <p className="text-emerald-400 font-medium">
+              CampusGet NEVER collects, views, processes, or stores raw credit/debit card numbers, CVVs, net banking credentials, or UPI PINs on our servers.
+            </p>
+            <p>
+              Approved refunds are disbursed directly through the Razorpay gateway back to the original payment method used during checkout (Bank Account, UPI, Card, or Wallet) within 5 to 7 business days as per banking timelines.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">6. No Advertising Networks & Tracker Policy</h2>
+            <p>
+              We do not integrate any third-party advertising networks or advertising analytics trackers in CampusGet. Your account, download, and purchase information is used strictly to fulfill digital services and is never monetized, rented, or shared with commercial marketing agencies.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">7. Support-First Resolution</h2>
+            <p>
+              We encourage customers to reach out to our WhatsApp or Email support (<a href={`mailto:${BRAND.supportEmail}`} className="text-primary-400 hover:underline">{BRAND.supportEmail}</a>) prior to initiating payment disputes or chargebacks, as most delivery or setup questions can be resolved immediately by our technical support team.
             </p>
           </section>
         </div>
