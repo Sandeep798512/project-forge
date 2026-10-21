@@ -13,6 +13,8 @@ import {
   FileCode,
   ChevronLeft,
   ChevronRight,
+  X,
+  Eye,
 } from 'lucide-react';
 import api, { getBaseURL } from '../services/api';
 import { PdfThumbnail } from '../components/common/PdfThumbnail';
@@ -65,6 +67,7 @@ export const StudyMaterials: React.FC = () => {
   };
 
   const [materials, setMaterials] = useState<StudyMaterialItem[]>(getInitialMaterials);
+  const [selectedItem, setSelectedItem] = useState<StudyMaterialItem | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [search, setSearch] = useState<string>('');
   const [university, setUniversity] = useState<string>('ALL');
@@ -90,7 +93,7 @@ export const StudyMaterials: React.FC = () => {
       if (semester !== 'ALL') params.append('semester', semester);
       if (materialType !== 'ALL') params.append('materialType', materialType);
       params.append('page', String(page));
-      params.append('limit', '12');
+      params.append('limit', '16');
 
       const res = await api.get(`/study-materials?${params.toString()}`);
       if (res.data.success) {
@@ -111,6 +114,23 @@ export const StudyMaterials: React.FC = () => {
   useEffect(() => {
     fetchMaterials();
   }, [page, university, branch, year, semester, materialType]);
+
+  // Lock body scroll and handle Escape key when popup preview is open
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedItem(null);
+    };
+    if (selectedItem) {
+      window.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedItem]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -338,24 +358,25 @@ export const StudyMaterials: React.FC = () => {
 
         {/* MATERIALS GRID */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-64 bg-surface/50 rounded-2xl animate-pulse border border-border/40" />
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div key={i} className="h-64 sm:h-72 bg-surface/50 rounded-xl sm:rounded-2xl animate-pulse border border-border/40" />
             ))}
           </div>
         ) : materials.length > 0 ? (
           <ScrollStagger
-            staggerDelay={70}
+            staggerDelay={40}
             animation="fade-up"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5"
           >
             {materials.map((item) => (
               <div
                 key={item._id}
-                className="bg-surface border border-border/70 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-emerald-500/40 transition-all duration-200 shadow-md group"
+                onClick={() => setSelectedItem(item)}
+                className="bg-surface border border-border/70 rounded-xl sm:rounded-2xl overflow-hidden flex flex-col justify-between hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-950/20 transition-all duration-200 group cursor-pointer"
               >
-                {/* 1st Page Thumbnail Preview Banner */}
-                <div className="relative aspect-[16/10] w-full bg-slate-900 border-b border-border/50 overflow-hidden">
+                {/* Compact 1st Page Thumbnail Preview Banner */}
+                <div className="relative aspect-[16/11] sm:aspect-[16/10] w-full bg-slate-900 border-b border-border/50 overflow-hidden">
                   <PdfThumbnail
                     fileUrl={`${getBaseURL()}/study-materials/${item._id}/preview`}
                     thumbnailUrl={item.thumbnailUrl}
@@ -365,71 +386,65 @@ export const StudyMaterials: React.FC = () => {
                     materialType={item.materialType}
                     className="w-full h-full"
                   />
+                  {/* Type badge overlay on thumbnail */}
+                  <div className="absolute top-2 left-2 flex items-center gap-1 z-10 pointer-events-none">
+                    <span
+                      className={`text-[9px] sm:text-[10px] font-mono font-bold px-1.5 sm:px-2 py-0.5 rounded shadow-sm uppercase border backdrop-blur-md ${getBadgeStyle(
+                        item.materialType
+                      )}`}
+                    >
+                      {item.materialType === 'PYQ' ? 'PYQ' : item.materialType}
+                    </span>
+                  </div>
+                  <div className="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/10 transition-colors flex items-center justify-center pointer-events-none">
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900/90 text-emerald-400 text-[10px] sm:text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-500/30 flex items-center gap-1 shadow-lg backdrop-blur-sm">
+                      <Eye className="w-3 h-3" /> Click to View
+                    </span>
+                  </div>
                 </div>
 
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <div className="space-y-4">
-                    {/* Top Badges */}
-                    <div className="flex items-center justify-between gap-2">
-                      <span
-                        className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-md uppercase border ${getBadgeStyle(
-                          item.materialType
-                        )}`}
-                      >
-                        {item.materialType === 'PYQ' ? 'Previous Year Qs' : item.materialType}
+                <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between space-y-2.5">
+                  <div className="space-y-1.5">
+                    {/* Branch & Semester */}
+                    <div className="flex items-center justify-between gap-1 text-[10px] text-gray-400">
+                      <span className="bg-background/80 px-1.5 py-0.5 rounded border border-border/40 font-mono truncate max-w-[110px]">
+                        {item.branch}
                       </span>
-
-                      <span className="text-[11px] font-medium text-gray-400 bg-background/80 px-2.5 py-0.5 rounded border border-border/40">
-                        {(() => {
-                          const y = item.year || (item.semester ? String(Math.ceil(Number(item.semester) / 2)) : '');
-                          const yText = y === '1' ? '1st Year' : y === '2' ? '2nd Year' : y === '3' ? '3rd Year' : y === '4' ? '4th Year' : y ? `Year ${y}` : '';
-                          return yText ? `${yText} • Sem ${item.semester} • ${item.branch}` : `Sem ${item.semester} • ${item.branch}`;
-                        })()}
+                      <span className="font-medium text-gray-400 shrink-0">
+                        {item.semester ? `Sem ${item.semester}` : ''}
                       </span>
                     </div>
 
-                    {/* Title & Subject */}
-                    <div>
-                      <h3 className="font-bold text-base text-white group-hover:text-emerald-300 transition-colors line-clamp-2">
-                        {item.title}
-                      </h3>
-                      <p className="text-xs font-medium text-emerald-400/90 mt-1">
-                        Subject: {item.subject}
-                      </p>
-                    </div>
+                    {/* Title */}
+                    <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition-colors line-clamp-2 leading-snug">
+                      {item.title}
+                    </h3>
 
-                    {/* Description */}
-                    {item.description && (
-                      <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">
-                        {item.description}
-                      </p>
-                    )}
+                    {/* Subject */}
+                    <p className="text-[11px] text-emerald-400/90 font-medium truncate">
+                      {item.subject}
+                    </p>
 
-                    {/* Info Tags */}
-                    <div className="flex flex-wrap items-center gap-2 text-[11px] text-gray-400 pt-1">
-                      <span className="bg-background px-2 py-0.5 rounded border border-border/40 font-mono">
-                        {item.university}
-                      </span>
-                      <span className="text-gray-500">•</span>
-                      <span>{formatFileSize(item.fileSize)}</span>
+                    {/* University & File Size */}
+                    <div className="flex items-center justify-between text-[10px] text-gray-400 pt-1 border-t border-border/30">
+                      <span className="truncate max-w-[90px] text-gray-400">{item.university}</span>
+                      <span className="font-mono text-gray-400 shrink-0">{formatFileSize(item.fileSize)}</span>
                     </div>
                   </div>
 
-                  {/* Bottom Action */}
-                  <div className="pt-4 border-t border-border/50 flex items-center justify-between">
-                    <div className="text-[11px] text-gray-500 truncate max-w-[150px]">
-                      {item.fileName}
-                    </div>
-
-                    <a
-                      href={`${getBaseURL()}/study-materials/${item._id}/download?deviceId=${getOrCreateDeviceId()}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-glow-sm transition-all duration-200"
+                  {/* Quick Action Button */}
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedItem(item);
+                      }}
+                      className="w-full inline-flex items-center justify-center space-x-1.5 bg-emerald-600/15 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 hover:border-emerald-500 text-xs font-semibold py-1.5 px-2 rounded-lg transition-all duration-200"
                     >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Free Download</span>
-                    </a>
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>View & Download</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -478,6 +493,133 @@ export const StudyMaterials: React.FC = () => {
             >
               <ChevronRight className="w-5 h-5" />
             </button>
+          </div>
+        )}
+
+        {/* ENLARGED PREVIEW & DOWNLOAD MODAL */}
+        {selectedItem && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md animate-fade-in"
+            onClick={() => setSelectedItem(null)}
+          >
+            <div
+              className="relative bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-hidden flex flex-col shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-800 bg-slate-950/60">
+                <div className="flex items-center space-x-2">
+                  <span
+                    className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded uppercase border ${getBadgeStyle(
+                      selectedItem.materialType
+                    )}`}
+                  >
+                    {selectedItem.materialType === 'PYQ' ? 'Previous Year Qs' : selectedItem.materialType}
+                  </span>
+                  <span className="text-xs text-slate-400 font-medium">
+                    {selectedItem.subject}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedItem(null)}
+                  className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+                  aria-label="Close modal"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Modal Scrollable Body */}
+              <div className="overflow-y-auto flex-1 p-5 space-y-4">
+                {/* Large Thumbnail / Document Preview */}
+                <div className="relative aspect-[16/10] max-h-[300px] w-full bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-inner">
+                  <PdfThumbnail
+                    fileUrl={`${getBaseURL()}/study-materials/${selectedItem._id}/preview`}
+                    thumbnailUrl={selectedItem.thumbnailUrl}
+                    thumbnailBase64={selectedItem.thumbnailBase64}
+                    title={selectedItem.title}
+                    subject={selectedItem.subject}
+                    materialType={selectedItem.materialType}
+                    className="w-full h-full"
+                  />
+                </div>
+
+                {/* Title & Info */}
+                <div className="space-y-2">
+                  <h2 className="text-lg sm:text-xl font-bold text-white leading-snug">
+                    {selectedItem.title}
+                  </h2>
+                  {selectedItem.description && (
+                    <p className="text-xs sm:text-sm text-gray-300 leading-relaxed bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
+                      {selectedItem.description}
+                    </p>
+                  )}
+                </div>
+
+                {/* Metadata Details Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 text-xs">
+                  <div className="bg-slate-950/50 p-2.5 rounded-xl border border-slate-800">
+                    <span className="text-[10px] text-gray-400 block uppercase">University</span>
+                    <span className="font-semibold text-white truncate block">{selectedItem.university}</span>
+                  </div>
+                  <div className="bg-slate-950/50 p-2.5 rounded-xl border border-slate-800">
+                    <span className="text-[10px] text-gray-400 block uppercase">Branch</span>
+                    <span className="font-semibold text-white truncate block">{selectedItem.branch}</span>
+                  </div>
+                  <div className="bg-slate-950/50 p-2.5 rounded-xl border border-slate-800">
+                    <span className="text-[10px] text-gray-400 block uppercase">Semester / Year</span>
+                    <span className="font-semibold text-white truncate block">
+                      Sem {selectedItem.semester} {selectedItem.year ? `(${selectedItem.year}th Yr)` : ''}
+                    </span>
+                  </div>
+                  <div className="bg-slate-950/50 p-2.5 rounded-xl border border-slate-800">
+                    <span className="text-[10px] text-gray-400 block uppercase">File Size</span>
+                    <span className="font-semibold text-emerald-400 truncate block">
+                      {formatFileSize(selectedItem.fileSize)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-[11px] text-gray-400 flex items-center justify-between px-1">
+                  <span className="truncate max-w-[260px]">File: {selectedItem.fileName}</span>
+                  <span>Added: {new Date(selectedItem.createdAt).toLocaleDateString()}</span>
+                </div>
+              </div>
+
+              {/* Modal Footer with Actions */}
+              <div className="px-5 py-3.5 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between gap-3">
+                <a
+                  href={`${getBaseURL()}/study-materials/${selectedItem._id}/preview`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white bg-slate-800 hover:bg-slate-700 transition-colors"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Open Full PDF</span>
+                </a>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedItem(null)}
+                    className="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-400 hover:text-white bg-transparent hover:bg-slate-800 transition-colors"
+                  >
+                    Close
+                  </button>
+
+                  <a
+                    href={`${getBaseURL()}/study-materials/${selectedItem._id}/download?deviceId=${getOrCreateDeviceId()}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-5 py-2 rounded-xl shadow-glow transition-all duration-200"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download PDF (Free)</span>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
