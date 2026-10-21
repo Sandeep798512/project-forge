@@ -17,6 +17,7 @@ import {
 import api, { getBaseURL } from '../services/api';
 import { PdfThumbnail } from '../components/common/PdfThumbnail';
 import { ScrollReveal, ScrollStagger } from '../components/common/ScrollReveal';
+import { INITIAL_STUDY_MATERIALS } from '../data/initialMarketplaceData';
 
 export interface StudyMaterialItem {
   _id: string;
@@ -51,8 +52,20 @@ const getOrCreateDeviceId = (): string => {
 };
 
 export const StudyMaterials: React.FC = () => {
-  const [materials, setMaterials] = useState<StudyMaterialItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  // Instant pre-loaded study materials for 0ms initial render (no cold-start waiting)
+  const getInitialMaterials = (): StudyMaterialItem[] => {
+    try {
+      const cached = localStorage.getItem('cg_cached_study_materials');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return INITIAL_STUDY_MATERIALS as StudyMaterialItem[];
+  };
+
+  const [materials, setMaterials] = useState<StudyMaterialItem[]>(getInitialMaterials);
+  const [loading, setLoading] = useState<boolean>(false);
   const [search, setSearch] = useState<string>('');
   const [university, setUniversity] = useState<string>('ALL');
   const [branch, setBranch] = useState<string>('ALL');
@@ -61,11 +74,14 @@ export const StudyMaterials: React.FC = () => {
   const [materialType, setMaterialType] = useState<string>('ALL');
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [totalCount, setTotalCount] = useState<number>(0);
+  const [totalCount, setTotalCount] = useState<number>(INITIAL_STUDY_MATERIALS.length);
 
   const fetchMaterials = async () => {
     try {
-      setLoading(true);
+      const isDefault = !search.trim() && university === 'ALL' && branch === 'ALL' && year === 'ALL' && semester === 'ALL' && materialType === 'ALL' && page === 1;
+      if (!isDefault) {
+        setLoading(true);
+      }
       const params = new URLSearchParams();
       if (search.trim()) params.append('search', search.trim());
       if (university !== 'ALL') params.append('university', university);
@@ -81,6 +97,9 @@ export const StudyMaterials: React.FC = () => {
         setMaterials(res.data.materials);
         setTotalPages(res.data.pagination.pages || 1);
         setTotalCount(res.data.pagination.total || 0);
+        if (isDefault) {
+          localStorage.setItem('cg_cached_study_materials', JSON.stringify(res.data.materials));
+        }
       }
     } catch (error) {
       console.error('Failed to load study materials', error);

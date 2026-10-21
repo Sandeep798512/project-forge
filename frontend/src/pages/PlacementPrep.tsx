@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Search, GraduationCap, BookOpen, CheckCircle, ArrowRight, Sparkles, Filter, RefreshCcw } from 'lucide-react';
 import { PlacementCard } from '../components/marketplace/PlacementCard';
 import { ScrollReveal, ScrollStagger } from '../components/common/ScrollReveal';
+import { INITIAL_PLACEMENT_PREP } from '../data/initialMarketplaceData';
 import api from '../services/api';
 
 const CAREER_TRACKS = [
@@ -18,6 +19,7 @@ const CAREER_TRACKS = [
 export const PlacementPrep: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // Instant pre-loaded items for 0ms initial render (no cold-start waiting)
   const getInitialPlacement = () => {
     try {
       const cached = localStorage.getItem('cg_cached_placement_prep');
@@ -26,7 +28,7 @@ export const PlacementPrep: React.FC = () => {
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
     } catch (e) {}
-    return [];
+    return INITIAL_PLACEMENT_PREP;
   };
 
   const [materials, setMaterials] = useState<any[]>(getInitialPlacement);
