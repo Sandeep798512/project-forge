@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   BookOpen,
   Search,
@@ -66,10 +67,13 @@ export const StudyMaterials: React.FC = () => {
     return INITIAL_STUDY_MATERIALS as StudyMaterialItem[];
   };
 
+  const [searchParams] = useSearchParams();
+  const urlSearch = searchParams.get('search') || '';
+
   const [materials, setMaterials] = useState<StudyMaterialItem[]>(getInitialMaterials);
   const [selectedItem, setSelectedItem] = useState<StudyMaterialItem | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [search, setSearch] = useState<string>('');
+  const [search, setSearch] = useState<string>(urlSearch);
   const [university, setUniversity] = useState<string>('ALL');
   const [branch, setBranch] = useState<string>('ALL');
   const [year, setYear] = useState<string>('ALL');
@@ -78,6 +82,13 @@ export const StudyMaterials: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number>(INITIAL_STUDY_MATERIALS.length);
+
+  useEffect(() => {
+    if (urlSearch && urlSearch !== search) {
+      setSearch(urlSearch);
+      setPage(1);
+    }
+  }, [urlSearch]);
 
   const fetchMaterials = async () => {
     try {
