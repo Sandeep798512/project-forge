@@ -9,13 +9,35 @@ import { FAQSection } from '../components/marketplace/FAQSection';
 import { CategoryFilter, CategoryItem } from '../components/marketplace/CategoryFilter';
 import { HeroBackground } from '../components/common/HeroBackground';
 import { ScrollReveal, ScrollStagger } from '../components/common/ScrollReveal';
+import { INITIAL_CATEGORIES, INITIAL_FEATURED_PRODUCTS } from '../data/initialMarketplaceData';
 import api from '../services/api';
 
 export const Home: React.FC = () => {
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
-  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
+  // Instant pre-loaded categories & products for 0ms initial render (no cold-start waiting)
+  const [categories, setCategories] = useState<CategoryItem[]>(() => {
+    try {
+      const cached = localStorage.getItem('cg_cached_categories');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return INITIAL_CATEGORIES;
+  });
+
+  const [featuredProducts, setFeaturedProducts] = useState<any[]>(() => {
+    try {
+      const cached = localStorage.getItem('cg_cached_featured');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return INITIAL_FEATURED_PRODUCTS;
+  });
+
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Typewriter Animation State
   const phrases = [
@@ -57,27 +79,10 @@ export const Home: React.FC = () => {
   }, [typedText, isDeleting, loopNum, typingSpeed]);
 
   useEffect(() => {
-    // Instant cache read for 0ms page load
-    const cachedCategories = localStorage.getItem('cg_cached_categories');
-    const cachedFeatured = localStorage.getItem('cg_cached_featured');
-
-    if (cachedCategories) {
-      try { setCategories(JSON.parse(cachedCategories)); } catch (e) {}
-    }
-    if (cachedFeatured && !selectedCategory) {
-      try {
-        const parsed = JSON.parse(cachedFeatured);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setFeaturedProducts(parsed);
-          setLoading(false);
-        }
-      } catch (e) {}
-    }
-
     const fetchData = async () => {
       try {
-        // Only set loading true if no cached data exists
-        if (!cachedFeatured || selectedCategory) {
+        // Show loading state only when filtering by a specific category
+        if (selectedCategory) {
           setLoading(true);
         }
         const [catRes, prodRes] = await Promise.all([

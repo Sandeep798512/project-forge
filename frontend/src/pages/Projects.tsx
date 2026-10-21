@@ -4,6 +4,7 @@ import { Search, Filter, SlidersHorizontal, RefreshCcw } from 'lucide-react';
 import { ProjectCard } from '../components/marketplace/ProjectCard';
 import { CategoryFilter, CategoryItem } from '../components/marketplace/CategoryFilter';
 import { ScrollReveal, ScrollStagger } from '../components/common/ScrollReveal';
+import { INITIAL_CATEGORIES, INITIAL_FEATURED_PRODUCTS } from '../data/initialMarketplaceData';
 import api from '../services/api';
 
 export const Projects: React.FC = () => {
@@ -27,7 +28,7 @@ export const Projects: React.FC = () => {
         }
       }
     } catch (e) {}
-    return [];
+    return INITIAL_FEATURED_PRODUCTS;
   };
 
   const getInitialCategories = () => {
@@ -38,7 +39,7 @@ export const Projects: React.FC = () => {
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
     } catch (e) {}
-    return [];
+    return INITIAL_CATEGORIES;
   };
 
   const [products, setProducts] = useState<any[]>(getInitialCatalog);
