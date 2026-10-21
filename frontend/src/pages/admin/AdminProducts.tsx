@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, CheckCircle2, XCircle, Search, Copy, Sparkles, X, Save, Upload, FileText, Download, AlertCircle, Image as ImageIcon, Calendar, Clock, Pin } from 'lucide-react';
 import { BRAND } from '../../config/brand.config';
+import { INITIAL_CATEGORIES } from '../../data/initialMarketplaceData';
 import api from '../../services/api';
 
 export const AdminProducts: React.FC = () => {
@@ -20,13 +21,13 @@ export const AdminProducts: React.FC = () => {
 
   const getInitialCategories = () => {
     try {
-      const cached = sessionStorage.getItem('cg_admin_categories_cache');
+      const cached = localStorage.getItem('cg_cached_categories') || sessionStorage.getItem('cg_admin_categories_cache');
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
     } catch (e) {}
-    return [];
+    return INITIAL_CATEGORIES;
   };
 
   const initialProds = getInitialProducts();
@@ -87,6 +88,24 @@ export const AdminProducts: React.FC = () => {
 
   const [formData, setFormData] = useState<any>(initialFormState);
 
+  // Fetch categories independently so modal & filters always have full categories list
+  const fetchCategories = async () => {
+    try {
+      const catRes = await api.get('/categories');
+      if (catRes.data.success && Array.isArray(catRes.data.categories) && catRes.data.categories.length > 0) {
+        setCategories(catRes.data.categories);
+        localStorage.setItem('cg_cached_categories', JSON.stringify(catRes.data.categories));
+        sessionStorage.setItem('cg_admin_categories_cache', JSON.stringify(catRes.data.categories));
+      }
+    } catch (err) {
+      console.warn('Using cached/initial categories', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
   useEffect(() => {
     fetchData();
   }, [search, selectedCategory]);
@@ -96,10 +115,9 @@ export const AdminProducts: React.FC = () => {
       if (products.length === 0 || search || selectedCategory) {
         setLoading(true);
       }
-      const [prodRes, catRes] = await Promise.all([
-        api.get(`/admin/products/enhanced?search=${encodeURIComponent(search)}&category=${encodeURIComponent(selectedCategory)}&productType=project&limit=100`),
-        api.get('/categories'),
-      ]);
+      const prodRes = await api.get(
+        `/admin/products/enhanced?search=${encodeURIComponent(search)}&category=${encodeURIComponent(selectedCategory)}&productType=project&limit=100`
+      );
       if (prodRes.data.success) {
         // Strict frontend filter: software projects ONLY (never placement_prep)
         const projectOnly = (prodRes.data.products || []).filter(
@@ -109,10 +127,6 @@ export const AdminProducts: React.FC = () => {
         if (!search && !selectedCategory) {
           sessionStorage.setItem('cg_admin_products_cache', JSON.stringify(projectOnly));
         }
-      }
-      if (catRes.data.success) {
-        setCategories(catRes.data.categories);
-        sessionStorage.setItem('cg_admin_categories_cache', JSON.stringify(catRes.data.categories));
       }
     } catch (err) {
       console.error(err);
@@ -137,6 +151,8 @@ export const AdminProducts: React.FC = () => {
         const catRes = await api.get('/categories');
         if (catRes.data.success) {
           setCategories(catRes.data.categories);
+          localStorage.setItem('cg_cached_categories', JSON.stringify(catRes.data.categories));
+          sessionStorage.setItem('cg_admin_categories_cache', JSON.stringify(catRes.data.categories));
           const createdCat = catRes.data.categories.find((c: any) => c.slug === slug || c.name === newCatName.trim());
           if (createdCat) {
             setFormData((prev: any) => ({ ...prev, category: createdCat._id }));
@@ -151,6 +167,27 @@ export const AdminProducts: React.FC = () => {
     } finally {
       setCreatingCat(false);
     }
+  };
+
+  const extractCategoryId = (cat: any): string => {
+    if (!cat) return categories[0]?._id || '';
+    if (typeof cat === 'string') {
+      const matched = categories.find(
+        (c: any) => c._id === cat || c.name?.toLowerCase() === cat.toLowerCase() || c.slug === cat
+      );
+      return matched ? matched._id : cat;
+    }
+    if (typeof cat === 'object') {
+      if (cat._id) return String(cat._id);
+      if (cat.id) return String(cat.id);
+      if (cat.name) {
+        const matched = categories.find(
+          (c: any) => c.name?.toLowerCase() === cat.name?.toLowerCase() || c.slug === cat.slug
+        );
+        if (matched) return matched._id;
+      }
+    }
+    return categories[0]?._id || '';
   };
 
   const handleOpenCreateModal = () => {
@@ -170,7 +207,7 @@ export const AdminProducts: React.FC = () => {
     setEditingProductId(p._id);
     setFormData({
       ...p,
-      category: p.category?._id || p.category || categories[0]?._id,
+      category: extractCategoryId(p.category),
       techStack: Array.isArray(p.techStack) ? p.techStack.join(', ') : p.techStack,
       screenshots: Array.isArray(p.screenshots) ? p.screenshots : [],
       hasCode: p.hasCode !== false,
@@ -194,7 +231,7 @@ export const AdminProducts: React.FC = () => {
     setEditingProductId(p._id);
     setFormData({
       ...p,
-      category: p.category?._id || p.category || categories[0]?._id,
+      category: extractCategoryId(p.category),
       techStack: Array.isArray(p.techStack) ? p.techStack.join(', ') : p.techStack,
       screenshots: Array.isArray(p.screenshots) ? p.screenshots : [],
       hasCode: p.hasCode !== false,
@@ -673,15 +710,22 @@ export const AdminProducts: React.FC = () => {
 
                     {!showAddCatInput ? (
                       <select
-                        value={formData.category}
+                        value={extractCategoryId(formData.category)}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100 font-semibold"
+                        className="w-full bg-background border border-border rounded-xl px-3 py-2 text-gray-100 font-semibold focus:outline-none focus:ring-2 focus:ring-accent-500"
                       >
+                        <option value="">-- Select Category --</option>
                         {categories.map((c) => (
                           <option key={c._id} value={c._id}>
                             {c.name}
                           </option>
                         ))}
+                        {/* Fallback option if product's category is custom or not in categories list */}
+                        {formData.category && typeof formData.category === 'object' && formData.category.name && !categories.some((c) => c._id === formData.category._id) && (
+                          <option value={formData.category._id}>
+                            {formData.category.name}
+                          </option>
+                        )}
                       </select>
                     ) : (
                       <div className="flex items-center space-x-2">
