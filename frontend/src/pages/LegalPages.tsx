@@ -384,7 +384,7 @@ export const ShippingPolicy: React.FC = () => {
               <li>WhatsApp Support: <a href={`https://wa.me/${BRAND.whatsappNumber}`} className="text-emerald-400 hover:underline">+{BRAND.whatsappNumber}</a></li>
             </ul>
             <p className="text-xs text-gray-400">
-              Our support team will verify your transaction reference and provision direct access links within 1 to 2 business hours.
+              Our support team will verify your transaction reference and provision direct access links within 1 to 2 business days.
             </p>
           </section>
         </div>
