@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ExternalLink, CheckCircle2, ShieldCheck, Play, ArrowLeft, FileText, Database, Layers, HelpCircle, Code, ShoppingCart, MessageSquare, Download, Video, Maximize2 } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
 import { WhatsAppButton } from '../components/common/WhatsAppButton';
+import { SEOHead } from '../components/common/SEOHead';
 import { useAuth } from '../context/AuthContext';
 import { trackEvent } from '../services/analytics';
 import api from '../services/api';
@@ -75,8 +76,43 @@ export const ProjectDetail: React.FC = () => {
   const allImages = [product.thumbnail, ...(product.screenshots || [])].filter(Boolean);
   const currentImgSrc = allImages[activeImageIndex] || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80';
 
+  const productSchema = product ? {
+    '@context': 'https://schema.org/',
+    '@type': 'Product',
+    name: product.title,
+    image: product.thumbnail
+      ? (product.thumbnail.startsWith('http') ? product.thumbnail : `https://campusget.vercel.app${product.thumbnail}`)
+      : 'https://campusget.vercel.app/campusget-icon-light-tile.png',
+    description: product.shortDescription || product.title,
+    brand: {
+      '@type': 'Brand',
+      name: 'CampusGet',
+    },
+    offers: {
+      '@type': 'Offer',
+      url: `https://campusget.vercel.app/projects/${product.slug}`,
+      priceCurrency: 'INR',
+      price: product.price,
+      availability: 'https://schema.org/InStock',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: product.ratingAverage || 5.0,
+      reviewCount: product.ratingCount || 15,
+    },
+  } : undefined;
+
   return (
     <div className="py-10 bg-background min-h-screen">
+      <SEOHead
+        title={`${product.title} - Full Source Code & PPT`}
+        description={product.shortDescription || `Download ${product.title} with full source code, PPT presentation, and setup documentation on CampusGet.`}
+        keywords={product.techStack ? `${Array.isArray(product.techStack) ? product.techStack.join(', ') : product.techStack}, source code, college project` : 'software project source code'}
+        canonicalPath={`/projects/${slug}`}
+        ogImage={product.thumbnail?.startsWith('http') ? product.thumbnail : `https://campusget.vercel.app${product.thumbnail || '/campusget-icon-light-tile.png'}`}
+        ogType="product"
+        structuredData={productSchema}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Back Link */}

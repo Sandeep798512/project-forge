@@ -4,6 +4,7 @@ import { Search, Filter, SlidersHorizontal, RefreshCcw } from 'lucide-react';
 import { ProjectCard } from '../components/marketplace/ProjectCard';
 import { CategoryFilter, CategoryItem } from '../components/marketplace/CategoryFilter';
 import { ScrollReveal, ScrollStagger } from '../components/common/ScrollReveal';
+import { SEOHead } from '../components/common/SEOHead';
 import { INITIAL_CATEGORIES, INITIAL_FEATURED_PRODUCTS } from '../data/initialMarketplaceData';
 import api from '../services/api';
 
@@ -120,6 +121,12 @@ export const Projects: React.FC = () => {
 
   return (
     <div className="py-10 bg-background min-h-screen">
+      <SEOHead
+        title="Software Projects with Source Code, PPT & Documentation"
+        description="Explore production-ready full-stack software project packages built with MERN stack, Python, React, and Node.js. Instant ZIP download with complete source code, reports & setup guides."
+        keywords="full stack projects, MERN stack project with source code, final year CSE projects, Python AI projects, college projects with synopsis, CampusGet projects"
+        canonicalPath="/projects"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Title */}

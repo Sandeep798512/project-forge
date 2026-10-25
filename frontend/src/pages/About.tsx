@@ -1,10 +1,17 @@
 import React from 'react';
 import { Terminal, Shield, Code, Sparkles, CheckCircle2 } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
+import { SEOHead } from '../components/common/SEOHead';
 
 export const About: React.FC = () => {
   return (
     <div className="py-16 bg-background min-h-screen">
+      <SEOHead
+        title="About CampusGet | Engineering Projects, Source Code & Prep Ecosystem"
+        description="Learn about CampusGet - the premier engineering project marketplace and study hub built to empower students with production-grade full-stack source code, documentation, and viva prep."
+        keywords="about campusget, engineering project ecosystem, computer science projects, student developer marketplace"
+        canonicalPath="/about"
+      />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
         <div className="text-center space-y-4">

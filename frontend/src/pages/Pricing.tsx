@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { CheckCircle2, Wrench, Sparkles, MessageSquare, ArrowRight } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
 import { WhatsAppButton } from '../components/common/WhatsAppButton';
+import { SEOHead } from '../components/common/SEOHead';
 
 export const Pricing: React.FC = () => {
   const customizationTiers = [
@@ -54,6 +55,12 @@ export const Pricing: React.FC = () => {
 
   return (
     <div className="py-16 bg-background min-h-screen">
+      <SEOHead
+        title="Pricing & Customization Plans | CampusGet Engineering Projects"
+        description="Affordable project packages and custom software development services starting at ₹499. Source code, IEEE reports, PPTs, database scripts, and 1-on-1 setup support."
+        keywords="campusget pricing, college project cost, buy btech project, custom software development for students, viva prep packages"
+        canonicalPath="/pricing"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
         <div className="text-center max-w-3xl mx-auto space-y-4">

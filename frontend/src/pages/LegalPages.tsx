@@ -1,9 +1,15 @@
 import React from 'react';
 import { BRAND } from '../config/brand.config';
+import { SEOHead } from '../components/common/SEOHead';
 
 export const Privacy: React.FC = () => {
   return (
     <div className="py-16 bg-background min-h-screen">
+      <SEOHead
+        title="Privacy Policy | CampusGet"
+        description="Learn how CampusGet handles and protects your data, Razorpay payment processing, and download privacy."
+        canonicalPath="/privacy"
+      />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-gray-300 text-sm leading-relaxed">
         <div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Privacy Policy</h1>
@@ -91,6 +97,11 @@ export const Privacy: React.FC = () => {
 export const RefundPolicy: React.FC = () => {
   return (
     <div className="py-16 bg-background min-h-screen">
+      <SEOHead
+        title="Refund & Cancellation Policy | CampusGet"
+        description="Review CampusGet refund, order cancellation, and technical download guarantee policy for digital projects and study materials."
+        canonicalPath="/refund-policy"
+      />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-gray-300 text-sm leading-relaxed">
         <div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Refund & Download Policy</h1>

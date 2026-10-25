@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Search, GraduationCap, BookOpen, CheckCircle, ArrowRight, Sparkles, Filter, RefreshCcw } from 'lucide-react';
 import { PlacementCard } from '../components/marketplace/PlacementCard';
 import { ScrollReveal, ScrollStagger } from '../components/common/ScrollReveal';
+import { SEOHead } from '../components/common/SEOHead';
 import { INITIAL_PLACEMENT_PREP } from '../data/initialMarketplaceData';
 import api from '../services/api';
 
@@ -128,6 +129,12 @@ export const PlacementPrep: React.FC = () => {
 
   return (
     <div className="py-10 bg-background min-h-screen">
+      <SEOHead
+        title="Placement Prep Guides, DSA Sheets & Tech Interview E-Books"
+        description="Crack campus placements and tech interviews. Download high-yield interview preparation e-books, SQL Q&As, DSA coding sheets, Core CS (OS, DBMS, CN) handbooks & career roadmaps."
+        keywords="placement preparation books, SQL interview questions and answers, TCS interview guide, DSA sheets, campus placement cracker, tech interview roadmap"
+        canonicalPath="/placement-prep"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* HERO BANNER */}

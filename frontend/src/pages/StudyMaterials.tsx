@@ -21,6 +21,7 @@ import api, { getBaseURL } from '../services/api';
 import { PdfThumbnail } from '../components/common/PdfThumbnail';
 import { ScrollReveal, ScrollStagger } from '../components/common/ScrollReveal';
 import { INITIAL_STUDY_MATERIALS } from '../data/initialMarketplaceData';
+import { SEOHead } from '../components/common/SEOHead';
 
 export interface StudyMaterialItem {
   _id: string;
@@ -176,6 +177,12 @@ export const StudyMaterials: React.FC = () => {
 
   return (
     <div className="min-h-screen py-10 md:py-16">
+      <SEOHead
+        title="Free B.Tech CSE Notes & University PYQs (AKTU, VTU) | CampusGet"
+        description="Download free engineering lecture notes, AKTU & university previous year question papers (PYQs), lab manuals, and syllabus for CSE/IT students. Instant 1-click PDF download."
+        keywords="engineering notes pdf, free btech cse notes, aktu previous year question papers, aktu pyqs, vtu cse notes, data structures notes, dbms pdf notes, university exam papers free download"
+        canonicalPath="/study-materials"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         
         {/* HERO HEADER */}

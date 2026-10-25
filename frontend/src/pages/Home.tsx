@@ -9,6 +9,7 @@ import { FAQSection } from '../components/marketplace/FAQSection';
 import { CategoryFilter, CategoryItem } from '../components/marketplace/CategoryFilter';
 import { HeroBackground } from '../components/common/HeroBackground';
 import { ScrollReveal, ScrollStagger } from '../components/common/ScrollReveal';
+import { SEOHead } from '../components/common/SEOHead';
 import { INITIAL_CATEGORIES, INITIAL_FEATURED_PRODUCTS } from '../data/initialMarketplaceData';
 import api from '../services/api';
 
@@ -112,6 +113,12 @@ export const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen">
+      <SEOHead
+        title="CampusGet - Software Projects with Source Code, Notes & Placement Prep"
+        description="Production-ready software projects with full source code, PPT, documentation & setup guides. Get 100% free university notes, AKTU/VTU PYQs, and placement interview roadmaps."
+        keywords="software projects with source code, final year college projects, MERN stack projects, Python AI projects, free notes, AKTU notes, PYQs, placement preparation e-books, SQL interview questions, DSA sheets, CampusGet"
+        canonicalPath="/"
+      />
       
       {/* HERO SECTION */}
       <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 border-b border-border/40">

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Mail, Phone, MessageSquare, MapPin, Send, CheckCircle2 } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
 import { WhatsAppButton } from '../components/common/WhatsAppButton';
+import { SEOHead } from '../components/common/SEOHead';
 
 export const Contact: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -14,6 +15,12 @@ export const Contact: React.FC = () => {
 
   return (
     <div className="py-16 bg-background min-h-screen">
+      <SEOHead
+        title="Contact CampusGet Support | WhatsApp & Email Helpdesk"
+        description="Need assistance with source code setup, payments, or have college submission queries? Contact CampusGet developer support via WhatsApp or email."
+        keywords="campusget contact, project download support, whatsapp developer helpdesk, campusget email"
+        canonicalPath="/contact"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
         <div className="text-center max-w-2xl mx-auto space-y-3">

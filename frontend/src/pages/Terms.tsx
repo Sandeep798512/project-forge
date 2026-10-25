@@ -1,9 +1,15 @@
 import React from 'react';
 import { BRAND } from '../config/brand.config';
+import { SEOHead } from '../components/common/SEOHead';
 
 export const Terms: React.FC = () => {
   return (
     <div className="py-16 bg-background min-h-screen">
+      <SEOHead
+        title="Terms of Service & Licensing | CampusGet"
+        description="CampusGet terms of service, acceptable academic use, intellectual property rights, and digital licensing guidelines."
+        canonicalPath="/terms"
+      />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-gray-300 text-sm leading-relaxed">
         <div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Terms of Service</h1>

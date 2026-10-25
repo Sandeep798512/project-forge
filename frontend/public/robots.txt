@@ -1,0 +1,41 @@
+# CampusGet Robots.txt
+# https://campusget.vercel.app/
+
+User-agent: *
+Allow: /
+Allow: /projects
+Allow: /projects/*
+Allow: /placement-prep
+Allow: /placement-prep/*
+Allow: /study-materials
+Allow: /about
+Allow: /pricing
+Allow: /faq
+Allow: /contact
+Allow: /support
+Allow: /terms
+Allow: /privacy
+Allow: /refund-policy
+Allow: /shipping-policy
+Allow: /disclaimer
+Allow: /license
+Allow: /ip-complaint
+
+# Disallow Private & Admin Portals
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /dashboard
+Disallow: /dashboard/*
+Disallow: /checkout
+Disallow: /checkout/*
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /login
+Disallow: /register
+Disallow: /api/
+
+# Host
+Host: https://campusget.vercel.app
+
+# Sitemap
+Sitemap: https://campusget.vercel.app/sitemap.xml

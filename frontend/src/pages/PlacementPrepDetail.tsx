@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
 import { WhatsAppButton } from '../components/common/WhatsAppButton';
+import { SEOHead } from '../components/common/SEOHead';
 import { useAuth } from '../context/AuthContext';
 import { trackEvent } from '../services/analytics';
 import api from '../services/api';
@@ -129,8 +130,39 @@ export const PlacementPrepDetail: React.FC = () => {
       ? material.originalPrice - material.price
       : 0;
 
+  const prepSchema = material ? {
+    '@context': 'https://schema.org/',
+    '@type': 'Book',
+    name: material.title,
+    description: material.shortDescription || material.title,
+    image: material.thumbnail
+      ? (material.thumbnail.startsWith('http') ? material.thumbnail : `https://campusget.vercel.app${material.thumbnail}`)
+      : 'https://campusget.vercel.app/campusget-icon-light-tile.png',
+    author: {
+      '@type': 'Organization',
+      name: 'CampusGet',
+    },
+    numberOfPages: material.pageCount || 50,
+    offers: {
+      '@type': 'Offer',
+      url: `https://campusget.vercel.app/placement-prep/${material.slug}`,
+      priceCurrency: 'INR',
+      price: material.price,
+      availability: 'https://schema.org/InStock',
+    },
+  } : undefined;
+
   return (
     <div className="py-10 bg-background min-h-screen">
+      <SEOHead
+        title={`${material.title} - Placement Prep Guide`}
+        description={material.shortDescription || `Download ${material.title} placement preparation guide, interview Q&As & roadmap on CampusGet.`}
+        keywords={`${material.careerTrack || 'placement prep'}, ${material.targetRole || 'tech interview'}, interview questions, placement handbook, CampusGet`}
+        canonicalPath={`/placement-prep/${slug}`}
+        ogImage={material.thumbnail?.startsWith('http') ? material.thumbnail : `https://campusget.vercel.app${material.thumbnail || '/campusget-icon-light-tile.png'}`}
+        ogType="article"
+        structuredData={prepSchema}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Back Link */}

@@ -3,13 +3,20 @@ import Product from '../models/Product';
 import { BRAND } from '../config/brand.config';
 
 export const getRobotsTxt = (req: Request, res: Response): void => {
+  const baseUrl = (process.env.CLIENT_URL && !process.env.CLIENT_URL.includes('localhost'))
+    ? process.env.CLIENT_URL
+    : 'https://campusget.vercel.app';
+
   const content = `User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /dashboard/
-Disallow: /api/
+Disallow: /login
+Disallow: /register
+Disallow: /verify-otp
+Disallow: /checkout/
 
-Sitemap: ${process.env.CLIENT_URL || 'http://localhost:5173'}/sitemap.xml`;
+Sitemap: ${baseUrl}/sitemap.xml`;
 
   res.setHeader('Content-Type', 'text/plain');
   res.status(200).send(content);
@@ -17,7 +24,9 @@ Sitemap: ${process.env.CLIENT_URL || 'http://localhost:5173'}/sitemap.xml`;
 
 export const getSitemapXml = async (req: Request, res: Response): Promise<void> => {
   try {
-    const baseUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    const baseUrl = (process.env.CLIENT_URL && !process.env.CLIENT_URL.includes('localhost'))
+      ? process.env.CLIENT_URL
+      : 'https://campusget.vercel.app';
     const products = await Product.find({ isPublished: true }).select('slug updatedAt');
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -33,9 +42,19 @@ export const getSitemapXml = async (req: Request, res: Response): Promise<void> 
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>${baseUrl}/placement-prep</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/study-materials</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
     <loc>${baseUrl}/about</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>${baseUrl}/pricing</loc>
@@ -51,13 +70,29 @@ export const getSitemapXml = async (req: Request, res: Response): Promise<void> 
     <loc>${baseUrl}/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/privacy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/terms</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/refund-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
   </url>`;
 
     products.forEach((p) => {
+      const dateStr = p.updatedAt ? new Date(p.updatedAt).toISOString().split('T')[0] : '2026-10-25';
       xml += `
   <url>
     <loc>${baseUrl}/projects/${p.slug}</loc>
-    <lastmod>${new Date(p.updatedAt).toISOString().split('T')[0]}</lastmod>
+    <lastmod>${dateStr}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>`;
