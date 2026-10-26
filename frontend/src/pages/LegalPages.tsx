@@ -56,7 +56,7 @@ export const Privacy: React.FC = () => {
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white">3. How Data Is Used & Tracker Disclosure</h2>
             <p>
-              Collected data is used strictly to fulfill digital access entitlements, verify payment signatures, manage referral rewards, respond to support inquiries, and comply with operational and legal recordkeeping requirements.
+              Collected data is used strictly to fulfill digital access entitlements, verify payment signatures, provision source code access to your dashboard or registered WhatsApp (within 1 to 2 business days in the event of gateway latency), manage referral rewards, respond to support inquiries, and comply with operational and legal recordkeeping requirements.
             </p>
             <p>
               We do not sell, rent, or trade customer personal information to third parties. We do not integrate any advertising networks or third-party advertising analytics trackers on the platform. Data is retained for as long as your account remains active or as required by operational, tax, and dispute resolution obligations under applicable law.
@@ -105,47 +105,63 @@ export const RefundPolicy: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-gray-300 text-sm leading-relaxed">
         <div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Refund & Download Policy</h1>
-          <p className="text-xs text-gray-400 mt-2">Last updated: September 10, 2026 • Effective Date: September 10, 2026</p>
+          <p className="text-xs text-gray-400 mt-2">Last updated: October 26, 2026 • Effective Date: October 26, 2026</p>
         </div>
 
         <div className="bg-surface/60 p-6 sm:p-8 rounded-2xl border border-border/60 space-y-6">
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">1. Nature of Digital Deliverables</h2>
+            <h2 className="text-lg font-bold text-white">1. Nature of Digital Deliverables (Non-Tangible Digital Goods)</h2>
             <p>
-              CampusGet specializes in downloadable digital software project packages containing non-tangible source code, documentation, presentations, and technical resources. Upon successful server-side payment verification, digital access is immediately provisioned to your customer dashboard.
+              CampusGet operates exclusively as an online educational marketplace specializing in downloadable digital software project packages, full-stack source code archives, database schemas, presentation slide decks (.PPTX), comprehensive academic project reports (.PDF), placement preparation eBooks, and technical study materials.
+            </p>
+            <p className="text-emerald-400 font-medium">
+              All deliverables offered on CampusGet are non-tangible, digital intellectual property. No physical goods or shipments are involved.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">2. Order Cancellation</h2>
+            <h2 className="text-lg font-bold text-white">2. Strict No-Refund & No-Return Policy for Digital Goods</h2>
             <p>
-              Orders may be cancelled prior to digital access delivery. Once payment verification is completed and digital download tokens have been generated/accessed, cancellation is subject to our refund evaluation rules below.
+              Due to the intrinsic nature of digital goods (source code, database scripts, eBooks, and documentation), which are immediately viewable, copyable, and usable upon receipt, <strong>ALL SALES ARE STRICTLY FINAL</strong>.
             </p>
+            <div className="bg-background/80 border border-amber-500/30 rounded-xl p-4 text-amber-200 text-xs sm:text-sm leading-relaxed">
+              <strong>Single-Download Finality Rule:</strong> If a customer or student has accessed the digital download link or downloaded any file/archive even a single time, return and refund are strictly impossible under any circumstances, as digital files cannot be revoked, returned, or un-seen once downloaded.
+            </div>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">3. Eligible Reviewable Refund Scenarios</h2>
-            <p>CampusGet evaluates refund requests on a fair, case-by-case basis under the following eligible technical scenarios:</p>
+            <h2 className="text-lg font-bold text-white">3. 100% Guaranteed Access & Delivery Commitment (Within 1 to 2 Business Days)</h2>
+            <p>
+              In rare situations where a student completes their payment via Razorpay, but the source code or project package does not immediately appear in their <strong>"My Purchases"</strong> dashboard due to network interruptions, browser closure, or payment gateway webhook latency:
+            </p>
             <ul className="list-disc list-inside space-y-2 text-gray-300">
-              <li><strong>Duplicate Payment:</strong> Multiple charges incurred for the exact same order due to a payment gateway glitch.</li>
-              <li><strong>Unfulfilled Access:</strong> Payment was successfully charged but our system failed to grant entitlement and technical support cannot provision access within 24 business hours.</li>
-              <li><strong>Corrupted Source Archive:</strong> The downloaded ZIP or file archive is corrupted/unreadable and CampusGet support is unable to provide a working replacement archive.</li>
+              <li><strong>Your purchase is 100% safe:</strong> Payment confirmation is logged securely on our servers.</li>
+              <li><strong>Guaranteed Fulfillment:</strong> Our technical support team will manually verify your payment reference and provision complete access to your <strong>"My Purchases"</strong> dashboard, or send the source code access links directly to your registered <strong>WhatsApp</strong> (<a href={`https://wa.me/${BRAND.whatsappNumber}`} className="text-emerald-400 hover:underline">+{BRAND.whatsappNumber}</a>) or email within <strong>1 to 2 business days</strong>.</li>
+              <li><strong>No Cancellations Once Paid:</strong> Because CampusGet unconditionally guarantees full access and manual fulfillment within 1 to 2 business days, payments cannot be cancelled, reversed, or refunded once processed through Razorpay.</li>
             </ul>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">4. Refund Request Process & Timeline</h2>
-            <p>To request a refund review:</p>
+            <h2 className="text-lg font-bold text-white">4. Order Cancellation & Payment Dispute Policy</h2>
+            <p>
+              Once a payment transaction is initiated or completed on the Razorpay payment gateway, the order cannot be cancelled by the customer. Customers agree that because digital fulfillment is guaranteed within 1 to 2 business days, initiating premature chargebacks, payment disputes, or cancellation claims with Razorpay or bank issuers without allowing the 1-2 business days support fulfillment window is strictly prohibited.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">5. Eligible Reviewable Scenario: Duplicate Payment Only</h2>
+            <p>
+              The only scenario eligible for a monetary refund review is an unintended <strong>Duplicate Payment</strong>, where a customer was accidentally charged multiple times for the exact same order reference due to a payment gateway glitch:
+            </p>
             <ol className="list-decimal list-inside space-y-2 text-gray-300">
-              <li>Email <a href={`mailto:${BRAND.supportEmail}`} className="text-primary-400 hover:underline">{BRAND.supportEmail}</a> or open a ticket from your Customer Dashboard.</li>
-              <li>Provide your <strong>Order ID</strong> (e.g., <code>ORD-17882873...</code>), registered email address, and a clear description of the technical issue.</li>
-              <li>Our support team will review the transaction logs and archive integrity within 24-48 business hours.</li>
-              <li>Approved refunds will be processed back to the original payment source via Razorpay within 5 to 7 business days as per standard banking timelines.</li>
+              <li>Email <a href={`mailto:${BRAND.supportEmail}`} className="text-primary-400 hover:underline">{BRAND.supportEmail}</a> or message our WhatsApp desk (<a href={`https://wa.me/${BRAND.whatsappNumber}`} className="text-emerald-400 hover:underline">+{BRAND.whatsappNumber}</a>).</li>
+              <li>Provide both duplicate <strong>Order IDs / Razorpay Payment IDs</strong> and registered account details.</li>
+              <li>Our team will verify gateway logs within 24-48 business hours. Upon confirmation, the duplicate excess transaction will be refunded back to the original source account via Razorpay within 5 to 7 business days as per banking timelines.</li>
             </ol>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">5. Payment Gateway Processing (Razorpay)</h2>
+            <h2 className="text-lg font-bold text-white">6. Payment Gateway Processing (Razorpay)</h2>
             <p>
               <strong>Razorpay</strong> is our authorized third-party payment processor — it securely handles the actual financial transaction whenever you purchase a project package, study notes, career roadmap, or digital resource on CampusGet.
             </p>
@@ -164,22 +180,19 @@ export const RefundPolicy: React.FC = () => {
             <p className="text-emerald-400 font-medium">
               CampusGet NEVER collects, views, processes, or stores raw credit/debit card numbers, CVVs, net banking credentials, or UPI PINs on our servers.
             </p>
-            <p>
-              Approved refunds are disbursed directly through the Razorpay gateway back to the original payment method used during checkout (Bank Account, UPI, Card, or Wallet) within 5 to 7 business days as per banking timelines.
-            </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">6. No Advertising Networks & Tracker Policy</h2>
+            <h2 className="text-lg font-bold text-white">7. No Advertising Networks & Tracker Policy</h2>
             <p>
               We do not integrate any third-party advertising networks or advertising analytics trackers in CampusGet. Your account, download, and purchase information is used strictly to fulfill digital services and is never monetized, rented, or shared with commercial marketing agencies.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">7. Support-First Resolution</h2>
+            <h2 className="text-lg font-bold text-white">8. Support-First Resolution</h2>
             <p>
-              We encourage customers to reach out to our WhatsApp or Email support (<a href={`mailto:${BRAND.supportEmail}`} className="text-primary-400 hover:underline">{BRAND.supportEmail}</a>) prior to initiating payment disputes or chargebacks, as most delivery or setup questions can be resolved immediately by our technical support team.
+              We encourage customers to reach out to our WhatsApp helpdesk (<a href={`https://wa.me/${BRAND.whatsappNumber}`} className="text-emerald-400 hover:underline">+{BRAND.whatsappNumber}</a>) or Email desk (<a href={`mailto:${BRAND.supportEmail}`} className="text-primary-400 hover:underline">{BRAND.supportEmail}</a>) for any access or configuration inquiries. Our technical team is committed to ensuring you receive and successfully run your purchased software.
             </p>
           </section>
         </div>
@@ -235,6 +248,16 @@ export const License: React.FC = () => {
             </p>
             <p>
               <strong>Third-Party & Open-Source Libraries:</strong> Packages may utilize third-party open-source libraries, frameworks (e.g., React, Node.js, Express, Tailwind CSS), fonts, or icons. Such components remain governed by their respective open-source licenses (e.g., MIT, Apache 2.0). CampusGet does not claim original ownership over third-party open-source dependencies.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">5. Digital Goods Finality & Non-Refundability of License Fees</h2>
+            <p>
+              This Single-Developer Educational License grants immediate digital access to electronic software source code, database architectures, and academic eBooks. Because these digital assets can be instantly saved and used upon access, all license fees processed through Razorpay are strictly final and non-refundable once downloaded or accessed even a single time.
+            </p>
+            <p className="text-gray-400 text-xs leading-relaxed">
+              In the event of temporary payment gateway delivery latency, CampusGet technical support guarantees manual provisioning of your licensed files to your customer dashboard or registered WhatsApp within 1 to 2 business days.
             </p>
           </section>
         </div>
@@ -323,6 +346,13 @@ export const Disclaimer: React.FC = () => {
               For questions regarding a specific project's included features, licensing, or supported environment, users should contact CampusGet support before purchase or deployment.
             </p>
           </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">Digital Goods Nature & Sales Finality</h2>
+            <p>
+              All software packages, source codes, and technical eBooks offered on CampusGet are non-tangible digital goods. Once payment is processed via Razorpay and files are downloaded or accessed even a single time, returns and cancellations are strictly unavailable. If delivery is delayed due to network or technical glitches, our support team guarantees direct manual access delivery to your customer dashboard or registered WhatsApp within 1 to 2 business days.
+            </p>
+          </section>
         </div>
       </div>
     </div>
@@ -384,7 +414,14 @@ export const ShippingPolicy: React.FC = () => {
               <li>WhatsApp Support: <a href={`https://wa.me/${BRAND.whatsappNumber}`} className="text-emerald-400 hover:underline">+{BRAND.whatsappNumber}</a></li>
             </ul>
             <p className="text-xs text-gray-400">
-              Our support team will verify your transaction reference and provision direct access links within 1 to 2 business days.
+              Our support team will verify your transaction reference and provision direct access links to your dashboard or registered WhatsApp within 1 to 2 business days.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white">5. Delivery Guarantee & Non-Cancellable Orders</h2>
+            <p>
+              Because CampusGet guarantees 100% fulfillment and delivery within 1 to 2 business days even if automated unlocking experiences gateway delays, orders cannot be cancelled and payments cannot be refunded once completed through Razorpay. Once digital files are downloaded or accessed even a single time, all sales are strictly final.
             </p>
           </section>
         </div>

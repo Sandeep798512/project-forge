@@ -208,6 +208,9 @@ ${ownershipStatement}
             <div className="p-2.5 rounded-xl bg-background border border-primary-500/30 text-primary-400">3. ACTION_TAKEN</div>
             <div className="p-2.5 rounded-xl bg-background border border-emerald-500/30 text-emerald-400">4. CLOSED</div>
           </div>
+          <p className="text-gray-400 text-[11px] pt-2 border-t border-border/60">
+            Note: All digital project assets and educational materials are delivered electronically. Valid intellectual property claims are evaluated promptly, and appropriate remediations or package modifications are handled within 24–48 business hours.
+          </p>
         </div>
 
       </div>

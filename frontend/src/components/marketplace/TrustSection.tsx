@@ -59,7 +59,7 @@ export const TrustSection: React.FC = () => {
             What You Receive With Every Project Package
           </h2>
           <p className="text-gray-400 text-sm mt-2">
-            No partial code or missing files. Everything is structured so you can run, understand, customize, and present with confidence.
+            No partial code or missing source code. Everything is structured so you can run, understand, customize, and present with confidence.
           </p>
         </ScrollReveal>
 

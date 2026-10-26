@@ -32,6 +32,14 @@ export const defaultFAQs: FAQItem[] = [
     question: 'Do you offer custom feature development or UI modifications?',
     answer: 'Yes, we offer paid customization services starting from ₹499+. You can request UI branding changes, new feature integrations, or deployment assistance through our Customization request options.',
   },
+  {
+    question: 'Can I cancel, return, or request a refund for a purchased project or eBook?',
+    answer: 'All software packages, source codes, and eBooks on CampusGet are non-tangible digital goods. Once downloaded or accessed even a single time, returns and cancellations are strictly not permitted, and all payments via Razorpay are final. If you encounter any difficulty running the project, our developer support team is available on WhatsApp to assist you.',
+  },
+  {
+    question: 'What happens if my payment succeeds but source code files do not appear immediately?',
+    answer: 'Your purchase is 100% safe. In rare cases of network drops or gateway latency, our support team verifies your Razorpay transaction ID and provisions complete access to your "My Purchases" dashboard or sends the source code files directly to your registered WhatsApp (+91 9369980644) or Email within 1 to 2 business days. Because full delivery is guaranteed within 1-2 business days, payments cannot be cancelled once paid.',
+  },
 ];
 
 export const FAQSection: React.FC<{ items?: FAQItem[] }> = ({ items = defaultFAQs }) => {

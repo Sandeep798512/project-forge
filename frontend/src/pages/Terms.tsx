@@ -52,12 +52,15 @@ export const Terms: React.FC = () => {
         </section>
 
         <section className="space-y-4 bg-surface/60 p-6 sm:p-8 rounded-2xl border border-border/60">
-          <h2 className="text-xl font-bold text-white">4. Digital Delivery & Access Authorization</h2>
+          <h2 className="text-xl font-bold text-white">4. Digital Delivery, Access Guarantee & Strict No-Refund Policy</h2>
           <p>
-            Digital project packages are delivered electronically upon successful server-side payment verification. Verified purchasers receive access via their authenticated account dashboard.
+            Digital project packages, source code archives, database scripts, and eBooks are non-tangible electronic goods delivered upon successful payment verification via Razorpay. Verified purchasers receive access via their authenticated account dashboard (<a href="/dashboard/purchases" className="text-primary-400 hover:underline">/dashboard/purchases</a>).
+          </p>
+          <p className="text-amber-300/90 font-medium">
+            Due to the intrinsic nature of digital software and educational materials, which can be immediately viewed, copied, and saved once accessed, all sales are strictly final. If a user has accessed or downloaded the files even a single time, returns and refunds are strictly not permitted.
           </p>
           <p>
-            To protect digital intellectual property and prevent link leaking, download access is governed by authenticated, time-limited security tokens. Customers should download and store their purchased archives promptly. If access fails or is interrupted due to a technical glitch, customers can contact developer support at <a href={`mailto:${BRAND.supportEmail}`} className="text-primary-400 hover:underline">{BRAND.supportEmail}</a> for prompt assistance.
+            If a customer completes payment via Razorpay but digital access is not immediately unlocked due to network latency or technical issues, CampusGet technical support guarantees direct provisioning of the source code and files to the customer's dashboard or registered WhatsApp (<a href={`https://wa.me/${BRAND.whatsappNumber}`} className="text-emerald-400 hover:underline">+{BRAND.whatsappNumber}</a>) within <strong>1 to 2 business days</strong>. Because 100% delivery is guaranteed within 1 to 2 business days, orders cannot be cancelled or refunded once paid.
           </p>
         </section>
 
@@ -87,7 +90,8 @@ export const Terms: React.FC = () => {
             <li>Reselling, sublicensing, or publicly redistributing raw, un-customized project ZIP packages on public marketplaces, forums, or code repositories.</li>
             <li>Attempting to bypass authentication, download token expiration, or access control mechanisms.</li>
             <li>Submitting malware, stolen confidential code, API secrets, or unauthorized third-party credentials.</li>
-            <li>Engaging in fraudulent chargebacks or unauthorized account sharing.</li>
+            <li>Engaging in fraudulent chargebacks, bank disputes, or cancellation attempts on delivered or guaranteed digital goods without allowing the 1-2 business days fulfillment window.</li>
+            <li>Unauthorized account sharing or automated scraping of platform resources.</li>
           </ul>
         </section>
 
