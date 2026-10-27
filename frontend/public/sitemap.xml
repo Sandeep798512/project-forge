@@ -26,6 +26,42 @@
     <priority>0.95</priority>
   </url>
   <url>
+    <loc>https://campusget.vercel.app/guides</loc>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://campusget.vercel.app/guides/btech-final-year-project-selection-guide</loc>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://campusget.vercel.app/guides/top-mern-stack-projects-with-source-code</loc>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://campusget.vercel.app/guides/how-to-crack-engineering-project-viva</loc>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://campusget.vercel.app/guides/aktu-vtu-engineering-exam-notes-pyq-strategy</loc>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://campusget.vercel.app/guides/full-stack-project-local-setup-deployment-guide</loc>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
     <loc>https://campusget.vercel.app/pricing</loc>
     <lastmod>2026-10-25</lastmod>
     <changefreq>weekly</changefreq>

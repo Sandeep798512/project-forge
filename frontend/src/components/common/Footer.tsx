@@ -53,6 +53,7 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2.5 font-normal">
               <li><Link to="/placement-prep" className="hover:text-white transition-colors">Placement & Roadmaps</Link></li>
               <li><Link to="/study-materials" className="hover:text-emerald-300 text-emerald-400 font-semibold transition-colors">Free Study Materials & PYQs</Link></li>
+              <li><Link to="/guides" className="hover:text-white transition-colors">Engineering Guides & Tutorials</Link></li>
               <li><Link to="/about" className="hover:text-white transition-colors">About {BRAND.name}</Link></li>
               <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
               <li><Link to="/faq" className="hover:text-white transition-colors">Frequently Asked Questions</Link></li>

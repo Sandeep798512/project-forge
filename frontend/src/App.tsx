@@ -32,6 +32,8 @@ import { Checkout } from './pages/Checkout';
 import { StudyMaterials } from './pages/StudyMaterials';
 import { PlacementPrep } from './pages/PlacementPrep';
 import { PlacementPrepDetail } from './pages/PlacementPrepDetail';
+import { ProjectGuides } from './pages/ProjectGuides';
+import { ProjectGuideDetail } from './pages/ProjectGuideDetail';
 
 // Auth Pages
 import { Login } from './pages/Login';
@@ -118,6 +120,8 @@ export const App: React.FC = () => {
           <Route path="/study-materials" element={<PublicLayout><StudyMaterials /></PublicLayout>} />
           <Route path="/placement-prep" element={<PublicLayout><PlacementPrep /></PublicLayout>} />
           <Route path="/placement-prep/:slug" element={<PublicLayout><PlacementPrepDetail /></PublicLayout>} />
+          <Route path="/guides" element={<PublicLayout><ProjectGuides /></PublicLayout>} />
+          <Route path="/guides/:slug" element={<PublicLayout><ProjectGuideDetail /></PublicLayout>} />
           <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
           <Route path="/pricing" element={<PublicLayout><Pricing /></PublicLayout>} />
           <Route path="/faq" element={<PublicLayout><FAQPage /></PublicLayout>} />

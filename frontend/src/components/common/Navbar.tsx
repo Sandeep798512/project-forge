@@ -601,6 +601,7 @@ export const Navbar: React.FC = () => {
             <Link to="/projects" className="hover:text-white transition-colors">Projects</Link>
             <Link to="/placement-prep" className="hover:text-white transition-colors">Placement & Roadmaps</Link>
             <Link to="/study-materials" className="hover:text-white transition-colors">Free Notes & PYQs</Link>
+            <Link to="/guides" className="hover:text-white transition-colors">Guides</Link>
             <Link to="/about" className="hover:text-white transition-colors">About</Link>
             <Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link>
             <Link to="/faq" className="hover:text-white transition-colors">FAQ</Link>
@@ -693,6 +694,7 @@ export const Navbar: React.FC = () => {
             <Link to="/projects" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-white">Explore Projects</Link>
             <Link to="/placement-prep" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-white">Placement & Roadmaps</Link>
             <Link to="/study-materials" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-white">Free Notes & PYQs</Link>
+            <Link to="/guides" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-white">Engineering Guides & Tutorials</Link>
             <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-white">About Platform</Link>
             <Link to="/pricing" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-white">Pricing & Customization</Link>
             <Link to="/faq" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-white">FAQ</Link>

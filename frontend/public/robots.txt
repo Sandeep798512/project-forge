@@ -8,6 +8,8 @@ Allow: /projects/*
 Allow: /placement-prep
 Allow: /placement-prep/*
 Allow: /study-materials
+Allow: /guides
+Allow: /guides/*
 Allow: /about
 Allow: /pricing
 Allow: /faq

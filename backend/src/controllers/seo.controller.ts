@@ -52,6 +52,36 @@ export const getSitemapXml = async (req: Request, res: Response): Promise<void> 
     <priority>0.85</priority>
   </url>
   <url>
+    <loc>${baseUrl}/guides</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/guides/btech-final-year-project-selection-guide</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/guides/top-mern-stack-projects-with-source-code</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/guides/how-to-crack-engineering-project-viva</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/guides/aktu-vtu-engineering-exam-notes-pyq-strategy</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/guides/full-stack-project-local-setup-deployment-guide</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
     <loc>${baseUrl}/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
