@@ -216,6 +216,130 @@ export const StudyMaterials: React.FC = () => {
           </div>
         </ScrollReveal>
 
+        {/* ── 2 BIG PRIMARY ACTION BUTTONS (ALL NOTES vs PYQs) ── */}
+        <ScrollReveal animation="fade-up" delay={60} className="max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 p-1.5 rounded-2xl bg-surface/80 border border-border/80 backdrop-blur-md shadow-xl">
+            
+            {/* BUTTON 1: ALL NOTES */}
+            <button
+              type="button"
+              onClick={() => {
+                setMaterialType(materialType === 'NOTES' ? 'ALL' : 'NOTES');
+                setPage(1);
+              }}
+              className={`group relative overflow-hidden rounded-xl p-4 sm:p-5 text-left transition-all duration-300 cursor-pointer border ${
+                materialType === 'NOTES'
+                  ? 'bg-gradient-to-br from-emerald-600/35 via-emerald-600/20 to-teal-900/30 border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.35)] ring-2 ring-emerald-500/50 scale-[1.01]'
+                  : 'bg-background/90 hover:bg-surface border-border/70 hover:border-emerald-500/50 hover:shadow-lg'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3.5">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
+                    materialType === 'NOTES'
+                      ? 'bg-emerald-500 text-white shadow-glow-sm'
+                      : 'bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white'
+                  }`}>
+                    <BookOpen className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-base sm:text-lg text-white flex items-center gap-2">
+                      <span>All Notes</span>
+                      {materialType === 'NOTES' ? (
+                        <span className="text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-full">
+                          Active
+                        </span>
+                      ) : (
+                        <span className="text-[10px] bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold px-2 py-0.5 rounded-full">
+                          Free PDFs
+                        </span>
+                      )}
+                    </h3>
+                    <p className="text-xs text-gray-400 group-hover:text-gray-300 mt-0.5">
+                      Handwritten & Unit-wise Lecture Notes
+                    </p>
+                  </div>
+                </div>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  materialType === 'NOTES'
+                    ? 'bg-emerald-500 text-white'
+                    : 'bg-white/5 text-gray-400 group-hover:bg-emerald-500/20 group-hover:text-emerald-300'
+                }`}>
+                  →
+                </div>
+              </div>
+            </button>
+
+            {/* BUTTON 2: PYQs */}
+            <button
+              type="button"
+              onClick={() => {
+                setMaterialType(materialType === 'PYQ' ? 'ALL' : 'PYQ');
+                setPage(1);
+              }}
+              className={`group relative overflow-hidden rounded-xl p-4 sm:p-5 text-left transition-all duration-300 cursor-pointer border ${
+                materialType === 'PYQ'
+                  ? 'bg-gradient-to-br from-purple-600/35 via-indigo-600/20 to-purple-950/30 border-purple-500 shadow-[0_0_25px_rgba(147,51,234,0.35)] ring-2 ring-purple-500/50 scale-[1.01]'
+                  : 'bg-background/90 hover:bg-surface border-border/70 hover:border-purple-500/50 hover:shadow-lg'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3.5">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
+                    materialType === 'PYQ'
+                      ? 'bg-purple-600 text-white shadow-glow-sm'
+                      : 'bg-purple-500/10 text-purple-400 group-hover:bg-purple-600 group-hover:text-white'
+                  }`}>
+                    <GraduationCap className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-base sm:text-lg text-white flex items-center gap-2">
+                      <span>PYQs</span>
+                      {materialType === 'PYQ' ? (
+                        <span className="text-[10px] bg-purple-600 text-white font-bold px-2 py-0.5 rounded-full">
+                          Active
+                        </span>
+                      ) : (
+                        <span className="text-[10px] bg-purple-500/15 text-purple-300 border border-purple-500/30 font-semibold px-2 py-0.5 rounded-full">
+                          University Papers
+                        </span>
+                      )}
+                    </h3>
+                    <p className="text-xs text-gray-400 group-hover:text-gray-300 mt-0.5">
+                      Previous Year Exam Papers & Solved Sets
+                    </p>
+                  </div>
+                </div>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  materialType === 'PYQ'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white/5 text-gray-400 group-hover:bg-purple-500/20 group-hover:text-purple-300'
+                }`}>
+                  →
+                </div>
+              </div>
+            </button>
+
+          </div>
+
+          {/* Active Filter Clear Helper */}
+          {materialType !== 'ALL' && (
+            <div className="flex items-center justify-center mt-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setMaterialType('ALL');
+                  setPage(1);
+                }}
+                className="text-xs text-gray-400 hover:text-white inline-flex items-center gap-1.5 bg-surface/90 px-3.5 py-1.5 rounded-full border border-border/80 hover:border-gray-500 transition-colors cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5 text-gray-400" />
+                <span>Viewing <strong>{materialType === 'NOTES' ? 'Lecture Notes' : 'PYQs'}</strong> only — <span className="text-emerald-400 font-semibold hover:underline">Click to Show All Resources</span></span>
+              </button>
+            </div>
+          )}
+        </ScrollReveal>
+
         {/* SEARCH & FILTERS BAR */}
         <ScrollReveal animation="fade-up" delay={80} className="bg-surface border border-border/80 rounded-2xl p-5 shadow-xl space-y-4">
           

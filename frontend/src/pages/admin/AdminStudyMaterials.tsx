@@ -131,6 +131,26 @@ export const AdminStudyMaterials: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const openCreateModalWithType = (type: 'NOTES' | 'PYQ') => {
+    setEditingId(null);
+    setFormData({
+      title: '',
+      description: '',
+      university: 'AKTU',
+      branch: 'CSE',
+      year: '1',
+      semester: '1',
+      subject: '',
+      materialType: type,
+      fileName: '',
+      fileBase64: '',
+      mimeType: '',
+      isPublished: true,
+    });
+    setFormError('');
+    setIsModalOpen(true);
+  };
+
   const openEditModal = (item: AdminMaterialItem) => {
     setEditingId(item._id);
     setFormData({
@@ -238,13 +258,88 @@ export const AdminStudyMaterials: React.FC = () => {
           </p>
         </div>
 
-        <button
-          onClick={openCreateModal}
-          className="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-glow-sm transition-all"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Upload Study Material</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => openCreateModalWithType('NOTES')}
+            className="inline-flex items-center space-x-1.5 bg-emerald-600/20 border border-emerald-500/40 hover:bg-emerald-600 text-emerald-300 hover:text-white text-xs font-semibold px-3 py-2 rounded-xl transition-all cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>+ Add Notes</span>
+          </button>
+          <button
+            onClick={() => openCreateModalWithType('PYQ')}
+            className="inline-flex items-center space-x-1.5 bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600 text-purple-300 hover:text-white text-xs font-semibold px-3 py-2 rounded-xl transition-all cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>+ Add PYQ</span>
+          </button>
+          <button
+            onClick={openCreateModal}
+            className="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-glow-sm transition-all cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Upload Material</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ── HIGH VISIBILITY QUICK SWITCH BAR FOR ADMIN (ALL NOTES vs PYQs) ── */}
+      <div className="bg-surface/90 border border-border/80 rounded-2xl p-3 sm:p-4 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center space-x-2 text-xs font-bold text-gray-300 pl-1">
+          <Filter className="w-4 h-4 text-emerald-400" />
+          <span>Quick Switch View:</span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* All Resources */}
+          <button
+            type="button"
+            onClick={() => setMaterialTypeFilter('ALL')}
+            className={`inline-flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              materialTypeFilter === 'ALL'
+                ? 'bg-gradient-to-r from-primary-600 to-indigo-600 text-white shadow-glow-sm ring-1 ring-primary-400/50'
+                : 'bg-background hover:bg-surface border border-border/60 text-gray-300 hover:text-white'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-primary-400" />
+            <span>All Materials</span>
+            <span className="text-[10px] bg-white/10 px-1.5 py-0.5 rounded font-mono">{materials.length}</span>
+          </button>
+
+          {/* All Notes Button */}
+          <button
+            type="button"
+            onClick={() => setMaterialTypeFilter('NOTES')}
+            className={`inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              materialTypeFilter === 'NOTES'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-[0_0_20px_rgba(16,185,129,0.35)] ring-1 ring-emerald-400/50 scale-[1.02]'
+                : 'bg-background hover:bg-surface border border-border/60 text-gray-300 hover:text-white hover:border-emerald-500/40'
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+            <span>📚 All Notes</span>
+            <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-mono font-bold">
+              {materials.filter((m) => m.materialType === 'NOTES').length}
+            </span>
+          </button>
+
+          {/* PYQs Button */}
+          <button
+            type="button"
+            onClick={() => setMaterialTypeFilter('PYQ')}
+            className={`inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              materialTypeFilter === 'PYQ'
+                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[0_0_20px_rgba(147,51,234,0.35)] ring-1 ring-purple-400/50 scale-[1.02]'
+                : 'bg-background hover:bg-surface border border-border/60 text-gray-300 hover:text-white hover:border-purple-500/40'
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5 text-purple-400" />
+            <span>🎯 PYQs</span>
+            <span className="text-[10px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded font-mono font-bold">
+              {materials.filter((m) => m.materialType === 'PYQ').length}
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* Search & Filter Bar */}
