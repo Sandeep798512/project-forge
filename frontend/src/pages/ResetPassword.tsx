@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Lock, CheckCircle2, AlertCircle, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
 import { authService } from '../services/auth.service';
+import { CosmicBackground } from '../components/common/CosmicBackground';
 
 export const ResetPassword: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -53,25 +54,39 @@ export const ResetPassword: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-6 bg-surface/90 border border-border/80 p-8 rounded-2xl shadow-2xl">
+    <div className="min-h-screen bg-[#07071a] flex items-center justify-center py-10 px-4 sm:px-6 relative overflow-hidden select-none">
+      {/* DevMate AI Particle & Glow Cosmic Canvas */}
+      <CosmicBackground />
+
+      {/* Main Glassmorphic Reset Password Card */}
+      <div className="max-w-md w-full devmate-glass-card p-7 sm:p-8 rounded-[22px] relative z-10 my-auto transition-all duration-300">
         
-        <div className="text-center space-y-2">
-          <Link to="/" className="inline-flex items-center space-x-2">
+        {/* Brand Header with DevMate Pulsing Badge */}
+        <div className="text-center space-y-1 mb-5">
+          <div className="w-13 h-13 mx-auto mb-2 rounded-2xl bg-gradient-to-br from-[#5b21b6] to-[#4f46e5] flex items-center justify-center shadow-[0_0_24px_rgba(99,102,241,0.55)] border border-purple-400/35 transition-transform hover:scale-105 p-2">
             <img
               src="/campusget-icon-light-tile.png"
               alt={BRAND.name}
-              className="w-10 h-10 rounded-xl object-contain shadow-glow-sm"
+              className="w-7 h-7 rounded-lg object-contain drop-shadow"
             />
-            <span className="font-extrabold text-2xl text-white">{BRAND.name}</span>
-          </Link>
-          <h2 className="text-xl font-bold text-white pt-2">Set New Password</h2>
-          <p className="text-xs text-gray-400">Choose a secure password for your CampusGet account</p>
+          </div>
+
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            <span className="text-white">Set New Password</span>
+          </h1>
+          <p className="text-xs text-gray-400">Choose a secure password for your {BRAND.name} account</p>
+
+          {/* DevMate Signature Glow Dot Divider */}
+          <div className="flex items-center justify-center pt-2 pb-1">
+            <div className="h-[1px] w-20 bg-gradient-to-r from-transparent to-primary-500/50" />
+            <div className="w-1.5 h-1.5 rounded-full bg-primary-400 shadow-[0_0_8px_#8b5cf6] mx-2" />
+            <div className="h-[1px] w-20 bg-gradient-to-l from-transparent to-primary-500/50" />
+          </div>
         </div>
 
         {/* Missing Token Warning */}
         {!token && (
-          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs space-y-2">
+          <div className="p-4 mb-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs space-y-2">
             <p className="font-bold flex items-center space-x-1.5">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>Missing Reset Token</span>
@@ -81,7 +96,7 @@ export const ResetPassword: React.FC = () => {
             </p>
             <Link
               to="/forgot-password"
-              className="inline-block pt-1 text-emerald-400 font-bold underline hover:text-emerald-300"
+              className="inline-block pt-1 text-primary-400 font-bold underline hover:text-primary-300"
             >
               Go to Forgot Password Page →
             </Link>
@@ -89,8 +104,8 @@ export const ResetPassword: React.FC = () => {
         )}
 
         {error && (
-          <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center space-x-2">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <div className="p-3 mb-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-300 text-xs flex items-center space-x-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
             <span>{error}</span>
           </div>
         )}
@@ -108,7 +123,7 @@ export const ResetPassword: React.FC = () => {
             </div>
             <Link
               to="/login"
-              className="inline-flex items-center space-x-2 py-3 px-8 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs shadow-glow-sm transition-all"
+              className="inline-flex items-center space-x-2 py-3 px-8 rounded-xl bg-gradient-to-r from-[#5b21b6] via-[#6366f1] to-[#7c3aed] hover:from-[#6d28d9] hover:via-[#4f46e5] hover:to-[#8b5cf6] text-white font-semibold text-xs shadow-[0_4px_20px_rgba(99,102,241,0.45)] transition-all hover:-translate-y-0.5"
             >
               <span>Sign In Now</span>
               <ArrowRight className="w-4 h-4" />
@@ -118,9 +133,9 @@ export const ResetPassword: React.FC = () => {
           token && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">New Password</label>
+                <label className="block text-xs font-medium text-gray-200 mb-1.5">New Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300/60" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
@@ -129,12 +144,12 @@ export const ResetPassword: React.FC = () => {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Min 6 characters"
-                    className="w-full bg-background border border-border/80 rounded-xl pl-10 pr-10 py-2.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full bg-white/[0.05] border border-indigo-500/20 rounded-xl pl-10 pr-10 py-2.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-purple-400/80 focus:bg-indigo-500/10 focus:ring-2 focus:ring-purple-500/20 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors p-1"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-300 transition-colors p-1"
                     tabIndex={-1}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -143,9 +158,9 @@ export const ResetPassword: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">Confirm New Password</label>
+                <label className="block text-xs font-medium text-gray-200 mb-1.5">Confirm New Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300/60" />
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     required
@@ -154,12 +169,12 @@ export const ResetPassword: React.FC = () => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Re-enter new password"
-                    className="w-full bg-background border border-border/80 rounded-xl pl-10 pr-10 py-2.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full bg-white/[0.05] border border-indigo-500/20 rounded-xl pl-10 pr-10 py-2.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-purple-400/80 focus:bg-indigo-500/10 focus:ring-2 focus:ring-purple-500/20 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors p-1"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-300 transition-colors p-1"
                     tabIndex={-1}
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -167,16 +182,17 @@ export const ResetPassword: React.FC = () => {
                 </div>
               </div>
 
+              {/* DevMate AI Glowing Gradient Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-bold text-sm shadow-glow-sm disabled:opacity-50 transition-all flex items-center justify-center space-x-2"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-[#5b21b6] via-[#6366f1] to-[#7c3aed] hover:from-[#6d28d9] hover:via-[#4f46e5] hover:to-[#8b5cf6] text-white font-semibold text-sm shadow-[0_4px_20px_rgba(99,102,241,0.45)] flex items-center justify-center space-x-2 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none cursor-pointer"
               >
                 {loading ? <span>Updating Password...</span> : <span>Confirm & Update Password</span>}
               </button>
 
-              <div className="text-center pt-2">
-                <Link to="/login" className="text-xs text-gray-400 hover:text-primary-400 transition-colors">
+              <div className="text-center pt-2 border-t border-indigo-500/20">
+                <Link to="/login" className="text-xs text-gray-400 hover:text-primary-300 transition-colors">
                   Back to <span className="text-primary-400 font-semibold underline">Sign In</span>
                 </Link>
               </div>

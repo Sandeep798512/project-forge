@@ -5,6 +5,7 @@ import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { WhatsAppButton } from './components/common/WhatsAppButton';
 import { ScrollProgressBar } from './components/common/ScrollProgressBar';
+import { CosmicBackground } from './components/common/CosmicBackground';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Scroll To Top Component on Route Change
@@ -91,10 +92,11 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 // Layout Wrapper
 const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-background">
+    <div className="min-h-screen flex flex-col justify-between bg-background relative overflow-x-hidden">
+      <CosmicBackground />
       <ScrollProgressBar />
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 relative z-10">{children}</main>
       <Footer />
       <WhatsAppButton variant="floating" />
     </div>

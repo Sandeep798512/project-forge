@@ -4,27 +4,96 @@
 
 @layer base {
   body {
-    @apply bg-background text-gray-100 font-sans antialiased;
+    @apply text-gray-100 font-sans antialiased;
+    background: radial-gradient(ellipse 120% 80% at 50% 0%, #1a0a3e 0%, transparent 60%),
+                radial-gradient(ellipse 80% 60% at 0% 80%, #0d0a2e 0%, transparent 50%),
+                radial-gradient(ellipse 70% 50% at 100% 50%, #0f0428 0%, transparent 50%),
+                #07071a;
+    min-height: 100vh;
   }
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - DevMate Violet Theme */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B0F19;
+  background: #07071a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1F2937;
+  background: #4c1d95;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #374151;
+  background: #6d28d9;
+}
+
+/* DevMate Cosmic Ambient Animations */
+@keyframes devmateBgGlow {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.22; }
+  50% { transform: translate(-50%, -50%) scale(1.12); opacity: 0.35; }
+}
+
+@keyframes devmateOrbFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-30px) scale(1.06); }
+}
+
+@keyframes devmateFloating {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.devmate-bg-grid {
+  background-image: radial-gradient(circle, rgba(139, 92, 246, 0.18) 1px, transparent 1px);
+  background-size: 38px 38px;
+}
+
+.devmate-glass-card {
+  background: rgba(16, 10, 40, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(139, 92, 246, 0.28);
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.08),
+              0 8px 32px rgba(0, 0, 0, 0.6),
+              0 0 80px rgba(88, 40, 200, 0.18),
+              inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.devmate-glass-card:hover {
+  border-color: rgba(168, 85, 247, 0.45);
+  box-shadow: 0 0 45px rgba(124, 58, 237, 0.28),
+              0 20px 60px rgba(0, 0, 0, 0.7),
+              inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.devmate-btn-primary {
+  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.45);
+  transition: all 0.25s ease;
+}
+
+.devmate-btn-primary:hover {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  box-shadow: 0 6px 28px rgba(124, 58, 237, 0.65);
+  transform: translateY(-1px);
+}
+
+.devmate-input {
+  background: rgba(18, 11, 46, 0.85);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  color: #f3f4f6;
+  transition: all 0.2s ease;
+}
+
+.devmate-input:focus {
+  outline: none;
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2), 0 0 20px rgba(124, 58, 237, 0.25);
 }
 
 /* Hero Ambient Animations */

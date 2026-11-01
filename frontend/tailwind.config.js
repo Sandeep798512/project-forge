@@ -8,17 +8,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0B0F19',
-        surface: '#111827',
-        'surface-hover': '#1F2937',
-        border: 'rgba(255, 255, 255, 0.1)',
+        background: '#07071A',
+        surface: 'rgba(16, 10, 40, 0.75)',
+        'surface-hover': 'rgba(28, 18, 65, 0.85)',
+        border: 'rgba(120, 80, 255, 0.22)',
         primary: {
-          50: '#EEF2FF',
-          100: '#E0E7FF',
-          400: '#818CF8',
-          500: '#6366F1',
-          600: '#4F46E5',
-          700: '#4338CA',
+          50: '#FAF5FF',
+          100: '#F3E8FF',
+          400: '#A78BFA',
+          500: '#8B5CF6',
+          600: '#7C3AED',
+          700: '#6D28D9',
         },
         accent: {
           400: '#C084FC',
@@ -26,8 +26,8 @@ export default {
           600: '#9333EA',
         },
         cyan: {
-          400: '#22D3EE',
-          500: '#06B6D4',
+          400: '#38BDF8',
+          500: '#0EA5E9',
         }
       },
       fontFamily: {
@@ -35,9 +35,10 @@ export default {
         mono: ['JetBrains Mono', 'monospace'],
       },
       boxShadow: {
-        'glow-sm': '0 0 15px -3px rgba(99, 102, 241, 0.3)',
-        'glow-md': '0 0 25px -5px rgba(99, 102, 241, 0.4)',
-        'glow-lg': '0 0 35px -5px rgba(168, 85, 247, 0.4)',
+        'glow-sm': '0 0 20px -3px rgba(124, 58, 237, 0.35)',
+        'glow-md': '0 0 35px -5px rgba(124, 58, 237, 0.5)',
+        'glow-lg': '0 0 60px -5px rgba(139, 92, 246, 0.45)',
+        'devmate-card': '0 8px 32px rgba(0, 0, 0, 0.6), 0 0 80px rgba(88, 40, 200, 0.2)',
       }
     },
   },
