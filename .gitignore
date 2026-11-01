@@ -19,3 +19,9 @@ logs/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Storage / Protected Assets
+storage/
+backend/storage/
+*.zip
+*.rar
