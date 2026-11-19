@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, CheckCircle2, XCircle, Search, Copy, Sparkles, X, Save, Upload, FileText, Download, AlertCircle, Image as ImageIcon, Calendar, Clock, Pin } from 'lucide-react';
 import { BRAND } from '../../config/brand.config';
-import { INITIAL_CATEGORIES } from '../../data/initialMarketplaceData';
+import { INITIAL_CATEGORIES, INITIAL_FEATURED_PRODUCTS } from '../../data/initialMarketplaceData';
 import api from '../../services/api';
 
 export const AdminProducts: React.FC = () => {
   // Read instant cache for 0ms initial render
   const getInitialProducts = () => {
     try {
-      const cached = sessionStorage.getItem('cg_admin_products_cache');
+      const cached = localStorage.getItem('cg_admin_products_cache') || sessionStorage.getItem('cg_admin_products_cache');
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
           return parsed.filter((p: any) => p.productType !== 'placement_prep');
         }
+      }
+      // Instant fallback to preloaded featured products for 0ms first-time render
+      if (Array.isArray(INITIAL_FEATURED_PRODUCTS) && INITIAL_FEATURED_PRODUCTS.length > 0) {
+        return INITIAL_FEATURED_PRODUCTS.filter((p: any) => p.productType !== 'placement_prep');
       }
     } catch (e) {}
     return [];
@@ -112,7 +116,7 @@ export const AdminProducts: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      if (products.length === 0 || search || selectedCategory) {
+      if (products.length === 0) {
         setLoading(true);
       }
       const prodRes = await api.get(
@@ -126,6 +130,7 @@ export const AdminProducts: React.FC = () => {
         setProducts(projectOnly);
         if (!search && !selectedCategory) {
           sessionStorage.setItem('cg_admin_products_cache', JSON.stringify(projectOnly));
+          localStorage.setItem('cg_admin_products_cache', JSON.stringify(projectOnly));
         }
       }
     } catch (err) {
@@ -468,11 +473,14 @@ export const AdminProducts: React.FC = () => {
       </div>
 
       {/* Product List Table */}
-      <div className="bg-surface/90 border border-border/80 rounded-2xl overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center text-gray-400 text-xs">Loading product packages...</div>
+      <div className="bg-surface/90 border border-border/80 rounded-2xl overflow-hidden relative">
+        {loading && products.length === 0 ? (
+          <div className="p-8 text-center text-gray-400 text-xs flex items-center justify-center space-x-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-500 border-t-transparent" />
+            <span>Loading product packages...</span>
+          </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className={`overflow-x-auto transition-opacity duration-200 ${loading ? 'opacity-70' : 'opacity-100'}`}>
             <table className="w-full text-left text-xs">
               <thead className="bg-background border-b border-border/60 text-gray-400 font-mono">
                 <tr>

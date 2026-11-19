@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import {
   ShieldCheck,
@@ -27,11 +27,74 @@ import {
 } from 'lucide-react';
 import { BRAND } from '../config/brand.config';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
 export const AdminLayout: React.FC = () => {
   const { user, isAdmin, loading } = useAuth();
   const location = useLocation();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  // Background prefetching of admin routes for instant, zero-delay tab switching
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const prefetchEndpoints = [
+      { url: '/admin/analytics/overview', key: 'cg_admin_dashboard_cache' },
+      {
+        url: '/admin/products/enhanced?productType=project&limit=100',
+        key: 'cg_admin_products_cache',
+        extract: (d: any) => d.products?.filter((p: any) => p.productType !== 'placement_prep'),
+      },
+      { url: '/categories', key: 'cg_cached_categories', extract: (d: any) => d.categories },
+      { url: '/admin/orders', key: 'cg_admin_orders_cache', extract: (d: any) => d.orders },
+      { url: '/admin/customers/list', key: 'cg_admin_customers_cache', extract: (d: any) => d.customers },
+      { url: '/admin/study-materials?limit=50', key: 'cg_admin_study_materials_cache', extract: (d: any) => d.materials },
+    ];
+
+    prefetchEndpoints.forEach((ep, i) => {
+      setTimeout(async () => {
+        try {
+          const res = await api.get(ep.url);
+          if (res.data?.success) {
+            const data = ep.extract ? ep.extract(res.data) : res.data;
+            if (data) {
+              const str = JSON.stringify(data);
+              sessionStorage.setItem(ep.key, str);
+              localStorage.setItem(ep.key, str);
+            }
+          }
+        } catch (e) {}
+      }, i * 120);
+    });
+  }, [isAdmin]);
+
+  const handlePrefetch = (path: string) => {
+    try {
+      if (path === '/admin/products' && !sessionStorage.getItem('cg_admin_products_cache')) {
+        api.get('/admin/products/enhanced?productType=project&limit=100').then((res) => {
+          if (res.data?.success) {
+            const list = res.data.products?.filter((p: any) => p.productType !== 'placement_prep');
+            sessionStorage.setItem('cg_admin_products_cache', JSON.stringify(list));
+            localStorage.setItem('cg_admin_products_cache', JSON.stringify(list));
+          }
+        }).catch(() => {});
+      } else if (path === '/admin/orders' && !sessionStorage.getItem('cg_admin_orders_cache')) {
+        api.get('/admin/orders').then((res) => {
+          if (res.data?.success) {
+            sessionStorage.setItem('cg_admin_orders_cache', JSON.stringify(res.data.orders));
+            localStorage.setItem('cg_admin_orders_cache', JSON.stringify(res.data.orders));
+          }
+        }).catch(() => {});
+      } else if (path === '/admin/categories' && !sessionStorage.getItem('cg_admin_categories_cache')) {
+        api.get('/admin/categories/crud').then((res) => {
+          if (res.data?.success) {
+            sessionStorage.setItem('cg_admin_categories_cache', JSON.stringify(res.data.categories));
+            localStorage.setItem('cg_cached_categories', JSON.stringify(res.data.categories));
+          }
+        }).catch(() => {});
+      }
+    } catch (e) {}
+  };
 
   if (loading) {
     return (
@@ -97,6 +160,7 @@ export const AdminLayout: React.FC = () => {
                 <Link
                   key={item.path}
                   to={item.path}
+                  onMouseEnter={() => handlePrefetch(item.path)}
                   className={`flex items-center space-x-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
                     isActive
                       ? 'bg-accent-600/20 text-accent-300 border border-accent-500/40 shadow-sm'

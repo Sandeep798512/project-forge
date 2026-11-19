@@ -1,10 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Layers, Plus, Edit, Trash2 } from 'lucide-react';
+import { INITIAL_CATEGORIES } from '../../data/initialMarketplaceData';
 import api from '../../services/api';
 
 export const AdminCategories: React.FC = () => {
-  const [categories, setCategories] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const getInitialCategories = () => {
+    try {
+      const cached = localStorage.getItem('cg_cached_categories') || sessionStorage.getItem('cg_admin_categories_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return INITIAL_CATEGORIES;
+  };
+
+  const initialCats = getInitialCategories();
+  const [categories, setCategories] = useState<any[]>(initialCats);
+  const [loading, setLoading] = useState(initialCats.length === 0);
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -16,9 +29,13 @@ export const AdminCategories: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      setLoading(true);
+      if (categories.length === 0) setLoading(true);
       const res = await api.get('/admin/categories/crud');
-      if (res.data.success) setCategories(res.data.categories);
+      if (res.data.success && Array.isArray(res.data.categories)) {
+        setCategories(res.data.categories);
+        localStorage.setItem('cg_cached_categories', JSON.stringify(res.data.categories));
+        sessionStorage.setItem('cg_admin_categories_cache', JSON.stringify(res.data.categories));
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -113,10 +130,14 @@ export const AdminCategories: React.FC = () => {
         </form>
       </div>
 
-      <div className="bg-surface/90 border border-border/80 rounded-2xl overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center text-gray-400 text-xs">Loading categories...</div>
+      <div className="bg-surface/90 border border-border/80 rounded-2xl overflow-hidden relative">
+        {loading && categories.length === 0 ? (
+          <div className="p-8 text-center text-gray-400 text-xs flex items-center justify-center space-x-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-500 border-t-transparent" />
+            <span>Loading categories...</span>
+          </div>
         ) : (
+          <div className={`transition-opacity duration-200 ${loading ? 'opacity-70' : 'opacity-100'}`}>
           <table className="w-full text-left text-xs">
             <thead className="bg-background border-b border-border/60 text-gray-400 font-mono">
               <tr>
@@ -144,6 +165,7 @@ export const AdminCategories: React.FC = () => {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

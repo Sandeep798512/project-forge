@@ -4,8 +4,20 @@ import { BRAND } from '../../config/brand.config';
 import api from '../../services/api';
 
 export const AdminPayments: React.FC = () => {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const getInitialPayments = () => {
+    try {
+      const cached = localStorage.getItem('cg_admin_orders_cache') || sessionStorage.getItem('cg_admin_orders_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  };
+
+  const initialPayments = getInitialPayments();
+  const [orders, setOrders] = useState<any[]>(initialPayments);
+  const [loading, setLoading] = useState(initialPayments.length === 0);
 
   useEffect(() => {
     fetchPayments();
@@ -13,10 +25,12 @@ export const AdminPayments: React.FC = () => {
 
   const fetchPayments = async () => {
     try {
-      setLoading(true);
+      if (orders.length === 0) setLoading(true);
       const res = await api.get('/admin/orders/list');
-      if (res.data.success) {
+      if (res.data.success && Array.isArray(res.data.orders)) {
         setOrders(res.data.orders);
+        sessionStorage.setItem('cg_admin_orders_cache', JSON.stringify(res.data.orders));
+        localStorage.setItem('cg_admin_orders_cache', JSON.stringify(res.data.orders));
       }
     } catch (err) {
       console.error(err);
@@ -32,11 +46,14 @@ export const AdminPayments: React.FC = () => {
         <p className="text-gray-400 text-xs mt-1">Immutable payment provider transactions, webhook logs, and verification statuses.</p>
       </div>
 
-      <div className="bg-surface/90 border border-border/80 rounded-2xl overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center text-gray-400 text-xs">Loading payment transactions...</div>
+      <div className="bg-surface/90 border border-border/80 rounded-2xl overflow-hidden relative">
+        {loading && orders.length === 0 ? (
+          <div className="p-8 text-center text-gray-400 text-xs flex items-center justify-center space-x-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-500 border-t-transparent" />
+            <span>Loading payment transactions...</span>
+          </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className={`overflow-x-auto transition-opacity duration-200 ${loading ? 'opacity-70' : 'opacity-100'}`}>
             <table className="w-full text-left text-xs">
               <thead className="bg-background border-b border-border/60 text-gray-400 font-mono">
                 <tr>

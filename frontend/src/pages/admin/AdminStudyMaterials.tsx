@@ -16,6 +16,7 @@ import {
   AlertCircle,
   Filter,
 } from 'lucide-react';
+import { INITIAL_STUDY_MATERIALS } from '../../data/initialMarketplaceData';
 import api from '../../services/api';
 
 export interface AdminMaterialItem {
@@ -37,8 +38,23 @@ export interface AdminMaterialItem {
 }
 
 export const AdminStudyMaterials: React.FC = () => {
-  const [materials, setMaterials] = useState<AdminMaterialItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const getInitialMaterials = (): any[] => {
+    try {
+      const cached = localStorage.getItem('cg_cached_study_materials') || sessionStorage.getItem('cg_admin_study_materials_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      if (Array.isArray(INITIAL_STUDY_MATERIALS) && INITIAL_STUDY_MATERIALS.length > 0) {
+        return INITIAL_STUDY_MATERIALS;
+      }
+    } catch (e) {}
+    return [];
+  };
+
+  const initialItems = getInitialMaterials();
+  const [materials, setMaterials] = useState<AdminMaterialItem[]>(initialItems);
+  const [loading, setLoading] = useState<boolean>(initialItems.length === 0);
   const [search, setSearch] = useState<string>('');
   const [universityFilter, setUniversityFilter] = useState<string>('ALL');
   const [branchFilter, setBranchFilter] = useState<string>('ALL');
@@ -68,7 +84,7 @@ export const AdminStudyMaterials: React.FC = () => {
 
   const fetchMaterials = async () => {
     try {
-      setLoading(true);
+      if (materials.length === 0) setLoading(true);
       const params = new URLSearchParams();
       if (search.trim()) params.append('search', search.trim());
       if (universityFilter !== 'ALL') params.append('university', universityFilter);
@@ -79,8 +95,12 @@ export const AdminStudyMaterials: React.FC = () => {
       params.append('limit', '50');
 
       const res = await api.get(`/admin/study-materials?${params.toString()}`);
-      if (res.data.success) {
+      if (res.data.success && Array.isArray(res.data.materials)) {
         setMaterials(res.data.materials);
+        if (!search.trim() && universityFilter === 'ALL' && branchFilter === 'ALL' && yearFilter === 'ALL' && materialTypeFilter === 'ALL' && statusFilter === 'ALL') {
+          sessionStorage.setItem('cg_admin_study_materials_cache', JSON.stringify(res.data.materials));
+          localStorage.setItem('cg_cached_study_materials', JSON.stringify(res.data.materials));
+        }
       }
     } catch (error) {
       console.error('Failed to fetch admin study materials', error);
@@ -419,11 +439,14 @@ export const AdminStudyMaterials: React.FC = () => {
       </div>
 
       {/* Materials Data Table */}
-      <div className="bg-surface border border-border/80 rounded-2xl overflow-hidden shadow-lg">
-        {loading ? (
-          <div className="p-8 text-center text-xs text-gray-400 font-mono">Loading study materials...</div>
+      <div className="bg-surface border border-border/80 rounded-2xl overflow-hidden shadow-lg relative">
+        {loading && materials.length === 0 ? (
+          <div className="p-8 text-center text-xs text-gray-400 font-mono flex items-center justify-center space-x-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-emerald-500 border-t-transparent" />
+            <span>Loading study materials...</span>
+          </div>
         ) : materials.length > 0 ? (
-          <div className="overflow-x-auto">
+          <div className={`overflow-x-auto transition-opacity duration-200 ${loading ? 'opacity-70' : 'opacity-100'}`}>
             <table className="w-full text-left text-xs text-gray-300">
               <thead className="bg-background/80 uppercase font-mono text-[10px] text-gray-400 border-b border-border/60">
                 <tr>

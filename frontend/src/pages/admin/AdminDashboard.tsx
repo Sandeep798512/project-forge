@@ -19,12 +19,21 @@ import { BRAND } from '../../config/brand.config';
 import api from '../../services/api';
 
 export const AdminDashboard: React.FC = () => {
-  const [summary, setSummary] = useState<any | null>(null);
-  const [recentOrders, setRecentOrders] = useState<any[]>([]);
-  const [topProducts, setTopProducts] = useState<any[]>([]);
-  const [recentCustomers, setRecentCustomers] = useState<any[]>([]);
-  const [revenueChart, setRevenueChart] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const getInitialDashboard = () => {
+    try {
+      const cached = localStorage.getItem('cg_admin_dashboard_cache') || sessionStorage.getItem('cg_admin_dashboard_cache');
+      if (cached) return JSON.parse(cached);
+    } catch (e) {}
+    return null;
+  };
+
+  const initialDash = getInitialDashboard();
+  const [summary, setSummary] = useState<any | null>(initialDash?.summary || null);
+  const [recentOrders, setRecentOrders] = useState<any[]>(initialDash?.recentOrders || []);
+  const [topProducts, setTopProducts] = useState<any[]>(initialDash?.topProducts || []);
+  const [recentCustomers, setRecentCustomers] = useState<any[]>(initialDash?.recentCustomers || []);
+  const [revenueChart, setRevenueChart] = useState<any[]>(initialDash?.revenueChart || []);
+  const [loading, setLoading] = useState(!initialDash);
 
   // Search filter state for Recent Customer Orders (Order ID, Customer Name, Coupon Code)
   const [orderSearch, setOrderSearch] = useState('');
@@ -35,7 +44,9 @@ export const AdminDashboard: React.FC = () => {
 
   const fetchDashboardData = async () => {
     try {
-      setLoading(true);
+      if (!summary) {
+        setLoading(true);
+      }
       const res = await api.get('/admin/analytics/overview');
       if (res.data.success) {
         setSummary(res.data.summary);
@@ -43,6 +54,15 @@ export const AdminDashboard: React.FC = () => {
         setTopProducts(res.data.topProducts || []);
         setRecentCustomers(res.data.recentCustomers || []);
         setRevenueChart(res.data.revenueChart || []);
+        const payload = {
+          summary: res.data.summary,
+          recentOrders: res.data.recentOrders || [],
+          topProducts: res.data.topProducts || [],
+          recentCustomers: res.data.recentCustomers || [],
+          revenueChart: res.data.revenueChart || [],
+        };
+        sessionStorage.setItem('cg_admin_dashboard_cache', JSON.stringify(payload));
+        localStorage.setItem('cg_admin_dashboard_cache', JSON.stringify(payload));
       }
     } catch (err) {
       console.error('Failed to load real dashboard analytics', err);
@@ -65,7 +85,7 @@ export const AdminDashboard: React.FC = () => {
     return matchId || matchName || matchEmail || matchCoupon || matchProject;
   });
 
-  if (loading) {
+  if (loading && !summary) {
     return (
       <div className="py-16 text-center text-gray-400 text-xs font-mono">
         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-accent-500 mx-auto mb-3" />
