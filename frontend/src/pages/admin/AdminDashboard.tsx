@@ -19,6 +19,20 @@ import { BRAND } from '../../config/brand.config';
 import api from '../../services/api';
 
 export const AdminDashboard: React.FC = () => {
+  const defaultSummary = {
+    todayRevenue: 0,
+    monthlyRevenue: 0,
+    totalRevenue: 0,
+    totalOrders: 0,
+    successfulOrders: 0,
+    failedPayments: 0,
+    pendingPayments: 0,
+    totalCustomers: 0,
+    totalProducts: 5,
+    totalDownloads: 0,
+    refunds: 0,
+  };
+
   const getInitialDashboard = () => {
     try {
       const cached = localStorage.getItem('cg_admin_dashboard_cache') || sessionStorage.getItem('cg_admin_dashboard_cache');
@@ -28,12 +42,12 @@ export const AdminDashboard: React.FC = () => {
   };
 
   const initialDash = getInitialDashboard();
-  const [summary, setSummary] = useState<any | null>(initialDash?.summary || null);
+  const [summary, setSummary] = useState<any>(initialDash?.summary || defaultSummary);
   const [recentOrders, setRecentOrders] = useState<any[]>(initialDash?.recentOrders || []);
   const [topProducts, setTopProducts] = useState<any[]>(initialDash?.topProducts || []);
   const [recentCustomers, setRecentCustomers] = useState<any[]>(initialDash?.recentCustomers || []);
   const [revenueChart, setRevenueChart] = useState<any[]>(initialDash?.revenueChart || []);
-  const [loading, setLoading] = useState(!initialDash);
+  const [loading, setLoading] = useState(true);
 
   // Search filter state for Recent Customer Orders (Order ID, Customer Name, Coupon Code)
   const [orderSearch, setOrderSearch] = useState('');
@@ -44,9 +58,7 @@ export const AdminDashboard: React.FC = () => {
 
   const fetchDashboardData = async () => {
     try {
-      if (!summary) {
-        setLoading(true);
-      }
+      setLoading(true);
       const res = await api.get('/admin/analytics/overview');
       if (res.data.success) {
         setSummary(res.data.summary);
@@ -85,15 +97,6 @@ export const AdminDashboard: React.FC = () => {
     return matchId || matchName || matchEmail || matchCoupon || matchProject;
   });
 
-  if (loading && !summary) {
-    return (
-      <div className="py-16 text-center text-gray-400 text-xs font-mono">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-accent-500 mx-auto mb-3" />
-        Fetching real-time business statistics from MongoDB...
-      </div>
-    );
-  }
-
   const maxRevenue = Math.max(...(revenueChart.map((d) => d.revenue) || [1]), 1000);
   const trendTotalRevenue = revenueChart.reduce((sum, item) => sum + (item.revenue || 0), 0);
   const trendTotalOrders = revenueChart.reduce((sum, item) => sum + (item.orders || 0), 0);
@@ -119,9 +122,19 @@ export const AdminDashboard: React.FC = () => {
     <div className="space-y-8 max-w-7xl mx-auto">
       
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-extrabold text-white tracking-tight">Business Overview & Sales Analytics</h1>
-        <p className="text-gray-400 text-xs mt-1">Real-time revenue, order conversions, customer acquisition, and marketplace product rankings.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-3">
+            <span>Business Overview & Sales Analytics</span>
+            {loading && (
+              <span className="text-[11px] font-mono text-accent-400 bg-accent-500/10 border border-accent-500/20 px-2.5 py-0.5 rounded-full flex items-center gap-1.5 animate-pulse">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent-400 animate-ping" />
+                <span>Syncing Live...</span>
+              </span>
+            )}
+          </h1>
+          <p className="text-gray-400 text-xs mt-1">Real-time revenue, order conversions, customer acquisition, and marketplace product rankings.</p>
+        </div>
       </div>
 
       {/* 11 Primary Metrics Grid */}

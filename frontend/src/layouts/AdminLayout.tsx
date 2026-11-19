@@ -70,7 +70,21 @@ export const AdminLayout: React.FC = () => {
 
   const handlePrefetch = (path: string) => {
     try {
-      if (path === '/admin/products' && !sessionStorage.getItem('cg_admin_products_cache')) {
+      if (path === '/admin' && !sessionStorage.getItem('cg_admin_dashboard_cache')) {
+        api.get('/admin/analytics/overview').then((res) => {
+          if (res.data?.success) {
+            const payload = {
+              summary: res.data.summary,
+              recentOrders: res.data.recentOrders || [],
+              topProducts: res.data.topProducts || [],
+              recentCustomers: res.data.recentCustomers || [],
+              revenueChart: res.data.revenueChart || [],
+            };
+            sessionStorage.setItem('cg_admin_dashboard_cache', JSON.stringify(payload));
+            localStorage.setItem('cg_admin_dashboard_cache', JSON.stringify(payload));
+          }
+        }).catch(() => {});
+      } else if (path === '/admin/products' && !sessionStorage.getItem('cg_admin_products_cache')) {
         api.get('/admin/products/enhanced?productType=project&limit=100').then((res) => {
           if (res.data?.success) {
             const list = res.data.products?.filter((p: any) => p.productType !== 'placement_prep');
